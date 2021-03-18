@@ -4,8 +4,8 @@
 
 
 # Configuration directories and files
-SourceDirectory: C:/Users/Seb/Desktop/cmakeQuickStart
-BuildDirectory: C:/Users/Seb/Desktop/cmakeQuickStart/build
+SourceDirectory: C:/Users/Seb/Documents/GitHub/YakChessCpp
+BuildDirectory: C:/Users/Seb/Documents/GitHub/YakChessCpp/build
 
 # Where to place the cost data store
 CostDataFile: 
@@ -26,7 +26,7 @@ SubmitURL: http://
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "C:/Program Files/CMake/bin/cmake.exe" "C:/Users/Seb/Desktop/cmakeQuickStart"
+ConfigureCommand: "C:/Program Files/CMake/bin/cmake.exe" "C:/Users/Seb/Documents/GitHub/YakChessCpp"
 MakeCommand: C:/Program\ Files/CMake/bin/cmake.exe --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 
@@ -57,12 +57,12 @@ P4UpdateOptions:
 P4UpdateCustom: 
 
 # Generic update command
-UpdateCommand: 
+UpdateCommand: C:/Program Files/Git/cmd/git.exe
 UpdateOptions: 
-UpdateType: 
+UpdateType: git
 
 # Compiler info
-Compiler: C:/MinGW/bin/mingw32-g++.exe
+Compiler: C:/MinGW/bin/g++.exe
 CompilerVersion: 6.3.0
 
 # Dynamic analysis (MemCheck)

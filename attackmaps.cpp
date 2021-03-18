@@ -2,8 +2,8 @@
 
 namespace attacks {
 
-uint64_t PositiveRay::get(int serialised_piece, uint64_t occupied_squares) {
-    bitboard::print_board(occupied_squares);
+uint64_t Ray::get(int serialised_piece, uint64_t occupied_squares) {
+
     uint64_t ray = 0;
     int blocker = 0;
 
@@ -15,7 +15,13 @@ uint64_t PositiveRay::get(int serialised_piece, uint64_t occupied_squares) {
     }
     
     return ray;
+}
 
+int Ray::get_blocker(int serialised_piece, uint64_t occupied_squares) {
+
+    int blocker = -1;
+
+    return blocker;
 }
 
 int PositiveRay::get_blocker(int serialised_piece, uint64_t occupied_squares) {
@@ -34,23 +40,6 @@ int PositiveRay::get_blocker(int serialised_piece, uint64_t occupied_squares) {
     }
 
     return blocker;
-    
-}
-
-
-uint64_t NegativeRay::get(int serialised_piece, uint64_t occupied_squares) {
-    uint64_t ray = 0;
-    int blocker = 0;
-
-    blocker = get_blocker(serialised_piece, occupied_squares);
-    if (blocker > 0){
-        ray = ray_maps[serialised_piece] ^ ray_maps[blocker];
-    } else {
-        ray = ray_maps[serialised_piece] ^ bitboard::EMPTY;
-    }
-    
-    return ray;
-
 }
 
 int NegativeRay::get_blocker(int serialised_piece, uint64_t occupied_squares) {
@@ -69,18 +58,14 @@ int NegativeRay::get_blocker(int serialised_piece, uint64_t occupied_squares) {
     }
 
     return blocker;
-    
 }
-
 
 NorthRay::NorthRay() {
 
     for (size_t i = 0; i < 64; i++) {
         ray_maps[i] = (bitboard::FILE_A & bitboard::NOT_RANK_1) << i;
     }
-
 }
-
 
 EastRay::EastRay() {
 
@@ -121,18 +106,14 @@ EastRay::EastRay() {
     for (size_t i = 0; i < 56; i++) {
         ray_maps[i + 8] = bitboard::north_one(ray_maps[i]);
     }
-
 }
-
 
 SouthRay::SouthRay() {
 
     for (size_t i = 0; i < 64; i++) {
         ray_maps[63 - i] = (bitboard::FILE_H & bitboard::NOT_RANK_8) >> i;
     }
-
 }
-
 
 WestRay::WestRay() {
 
@@ -149,7 +130,6 @@ WestRay::WestRay() {
     for (size_t i = 0; i < 56; i++) {
         ray_maps[55 - i] = ray_maps[63 - i] >> 8;
     }
-
 }
 
 } // namespace attacks

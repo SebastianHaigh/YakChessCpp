@@ -9,46 +9,38 @@ namespace attacks {
 // Ray is a pure virtual class that serves as the base class for attack ray 
 // generation. Attack rays are used to generate attack maps for the sliding 
 // pieces (Bishop, Rook, and Queen).
+//
+// Rays are generated 
 class Ray {
+    protected:
+        // Ray map array, contains a bitboard map of this ray for all 64 squares 
+        // of the chessboard.
+        uint64_t ray_maps[64] = {0};
+
+    private:
+        // Returns the square index of the first blocker in the ray extending
+        // from the square index: serialised_piece.
+        virtual int get_blocker(int serialised_piece, uint64_t occupied_squares);
+
     public:
-        virtual uint64_t get(int serialised_piece, uint64_t occupied_squares) = 0;
+        // Returns a bitboard of every square attacked by the serialied_piece.
+        virtual uint64_t get(int serialised_piece, uint64_t occupied_squares);
 };
 
-// PositiveRays are those that extend in the North, and West directions.
+// PositiveRays are those that extend in the North, and East directions.
 class PositiveRay: virtual public Ray {
-    protected:
-
-        // Ray map array, contains a bitboard map of this ray for all 64 squares 
-        // of the chessboard.
-        uint64_t ray_maps[64] = {0};
-
     private:
-
         // Returns the square index of the first blocker in the ray extending
         // from the square index: serialised_piece.
-        int get_blocker(int serialised_piece, uint64_t occupied_squares);
-    public:
-
-        // Returns a bitboard of every square attacked by the serialied_piece.
-        uint64_t get(int serialised_piece, uint64_t occupied_squares) override;
+        int get_blocker(int serialised_piece, uint64_t occupied_squares) override;
 };
 
-// NegativeRay are those that extend in the South, and East directions.
+// NegativeRay are those that extend in the South, and West directions.
 class NegativeRay: virtual public Ray {
-    protected:
-
-        // Ray map array, contains a bitboard map of this ray for all 64 squares 
-        // of the chessboard.
-        uint64_t ray_maps[64] = {0};
     private:
-
         // Returns the square index of the first blocker in the ray extending
         // from the square index: serialised_piece.
-        int get_blocker(int serialised_piece, uint64_t occupied_squares);
-    public:
-
-        // Returns a bitboard of every square attacked by the serialied_piece.
-        uint64_t get(int serialised_piece, uint64_t occupied_squares) override;
+        int get_blocker(int serialised_piece, uint64_t occupied_squares) override;
 };
 
 
