@@ -7,6 +7,7 @@
 
 namespace bitboard {
 
+// Bitmasks of all ranks
 const uint64_t RANK_1 = 0x00000000000000ff;
 const uint64_t RANK_2 = 0x000000000000ff00;
 const uint64_t RANK_3 = 0x0000000000ff0000;
@@ -25,6 +26,7 @@ const uint64_t NOT_RANK_6 = 0xffff00ffffffffff;
 const uint64_t NOT_RANK_7 = 0xff00ffffffffffff;
 const uint64_t NOT_RANK_8 = 0x00ffffffffffffff;
 
+// Bitmasks of all files
 const uint64_t FILE_A = 0x0101010101010101;
 const uint64_t FILE_B = 0x0202020202020202;
 const uint64_t FILE_C = 0x0404040404040404;
@@ -42,6 +44,10 @@ const uint64_t NOT_FILE_E = 0xefefefefefefefef;
 const uint64_t NOT_FILE_F = 0xdfdfdfdfdfdfdfdf;
 const uint64_t NOT_FILE_G = 0xbfbfbfbfbfbfbfbf;
 const uint64_t NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
+
+// digonals
+const uint64_t DIAG_A1_H8 = 0x8040201008040201;
+const uint64_t DIAG_A8_H1 = 0x0102040810204080;
 
 const uint64_t UNIVERSAL = 0xffffffffffffffff;
 const uint64_t EMPTY = 0x0000000000000000;

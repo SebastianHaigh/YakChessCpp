@@ -74,7 +74,8 @@ class BlackPawns: virtual public Pawns, protected BlackPieces {
         std::shared_ptr <uint64_t> board;
         std::shared_ptr <uint64_t> empty_squares;
     public:
-        BlackPawns(std::shared_ptr <uint64_t> board_ptr, std::shared_ptr <uint64_t> empty_squares_ptr);
+        BlackPawns(std::shared_ptr <uint64_t> board_ptr, 
+                   std::shared_ptr <uint64_t> empty_squares_ptr);
         Move single_push() override;
         Move double_push() override;
         uint64_t east_attack() override;
@@ -89,7 +90,8 @@ class WhitePawns: virtual public Pawns {
         std::shared_ptr <uint64_t> board;
         std::shared_ptr <uint64_t> empty_squares;
     public:
-        WhitePawns(std::shared_ptr <uint64_t> board_ptr, std::shared_ptr <uint64_t> empty_squares_ptr);
+        WhitePawns(std::shared_ptr <uint64_t> board_ptr, 
+                   std::shared_ptr <uint64_t> empty_squares_ptr);
         Move single_push() override;
         Move double_push() override;
         uint64_t east_attack() override;
@@ -105,14 +107,28 @@ class SlidingPieces {
         std::shared_ptr <uint64_t> empty_squares;
         std::vector <std::unique_ptr <attacks::Ray>> rays;
     public:
-        SlidingPieces(std::shared_ptr <uint64_t> board_ptr, std::shared_ptr <uint64_t> empty_squares_ptr);
+        SlidingPieces(std::shared_ptr <uint64_t> board_ptr, 
+                      std::shared_ptr <uint64_t> empty_squares_ptr);
         std::stack <SerialMove> quite_moves();
         std::stack <SerialMove> targets();
 };
 
 class Rooks: public SlidingPieces {
     public:
-        Rooks(std::shared_ptr <uint64_t> board_ptr, std::shared_ptr <uint64_t> empty_squares_ptr);
+        Rooks(std::shared_ptr <uint64_t> board_ptr, 
+              std::shared_ptr <uint64_t> empty_squares_ptr);
+};
+
+class Bishops: public SlidingPieces {
+    public:
+        Bishops(std::shared_ptr <uint64_t> board_ptr, 
+                std::shared_ptr <uint64_t> empty_squares_ptr);
+};
+
+class Queens: public SlidingPieces {
+    public:
+        Queens(std::shared_ptr <uint64_t> board_ptr, 
+               std::shared_ptr <uint64_t> empty_squares_ptr);
 };
 
 } // namespace name

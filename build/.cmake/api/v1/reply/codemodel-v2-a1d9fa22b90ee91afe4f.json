@@ -300,8 +300,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/Seb/Desktop/cmakeQuickStart/build",
-		"source" : "C:/Users/Seb/Desktop/cmakeQuickStart"
+		"build" : "C:/Users/Seb/Documents/GitHub/YakChessCpp/build",
+		"source" : "C:/Users/Seb/Documents/GitHub/YakChessCpp"
 	},
 	"version" : 
 	{
