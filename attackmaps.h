@@ -130,6 +130,26 @@ class WestRay: public NegativeRay {
         WestRay();
 };
 
+class NorthEastRay: public PositiveRay {
+    public:
+        NorthEastRay();
+};
+
+class SouthEastRay: public NegativeRay {
+    public:
+        SouthEastRay();
+};
+
+class NorthWestRay: public PositiveRay {
+    public:
+        NorthWestRay();
+};
+
+class SouthWestRay: public NegativeRay {
+    public:
+        SouthWestRay();
+};
+
 } // namespace attacks
 
 

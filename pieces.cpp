@@ -219,6 +219,23 @@ Rooks::Rooks(std::shared_ptr <uint64_t> board_ptr, std::shared_ptr <uint64_t> em
     rays.push_back(std::make_unique <attacks::WestRay>());
 }
 
+Bishops::Bishops(std::shared_ptr <uint64_t> board_ptr, std::shared_ptr <uint64_t> empty_squares_ptr) : SlidingPieces(board_ptr, empty_squares_ptr) {
+    rays.push_back(std::make_unique <attacks::NorthWestRay>());
+    rays.push_back(std::make_unique <attacks::NorthEastRay>());
+    rays.push_back(std::make_unique <attacks::SouthWestRay>());
+    rays.push_back(std::make_unique <attacks::SouthEastRay>());
+}
+
+Queens::Queens(std::shared_ptr <uint64_t> board_ptr, std::shared_ptr <uint64_t> empty_squares_ptr) : SlidingPieces(board_ptr, empty_squares_ptr) {
+    rays.push_back(std::make_unique <attacks::NorthRay>());
+    rays.push_back(std::make_unique <attacks::EastRay>());
+    rays.push_back(std::make_unique <attacks::SouthRay>());
+    rays.push_back(std::make_unique <attacks::WestRay>());
+    rays.push_back(std::make_unique <attacks::NorthWestRay>());
+    rays.push_back(std::make_unique <attacks::NorthEastRay>());
+    rays.push_back(std::make_unique <attacks::SouthWestRay>());
+    rays.push_back(std::make_unique <attacks::SouthEastRay>());
+}
 
 Move::Move(uint64_t source_squares, uint64_t target_squares) {
     sources = source_squares;

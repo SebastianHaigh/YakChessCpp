@@ -73,11 +73,11 @@ std::stack <int> scan_forward(uint64_t board) {
 }
 
 int file_index(int square_index) {
-
+    return (square_index | EMPTY) & 7;
 }
 
 int rank_index(int square_index) {
-
+    return (square_index | EMPTY) >> 3;
 }
 
 int square_index(int file_index, int rank_index) {
