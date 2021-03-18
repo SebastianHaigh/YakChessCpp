@@ -2,14 +2,14 @@
 
 namespace attacks {
 
-uint64_t Ray::get(int serialised_piece, uint64_t occupied_squares) {
+Bitboard Ray::get(Square serialised_piece, Bitboard occupied_squares) {
 
-    uint64_t ray = 0;
-    int blocker = 0;
+    Bitboard ray = 0;
+    std::stack<Square> blockers;
 
-    blocker = get_blocker(serialised_piece, occupied_squares);
-    if (blocker > 0){
-        ray = ray_maps[serialised_piece] ^ ray_maps[blocker];
+    blockers = get_blockers(serialised_piece, occupied_squares);
+    if (!blockers.empty()){
+        ray = ray_maps[serialised_piece] ^ ray_maps[blockers.top()];
     } else {
         ray = ray_maps[serialised_piece] ^ bitboard::EMPTY;
     }
@@ -17,47 +17,35 @@ uint64_t Ray::get(int serialised_piece, uint64_t occupied_squares) {
     return ray;
 }
 
-int Ray::get_blocker(int serialised_piece, uint64_t occupied_squares) {
+std::stack<Square> Ray::get_blockers(Square serialised_piece, 
+                                     Bitboard occupied_squares) {
 
-    int blocker = -1;
+    std::stack<Square> blockers;
 
-    return blocker;
+    return blockers;
 }
 
-int PositiveRay::get_blocker(int serialised_piece, uint64_t occupied_squares) {
+std::stack<Square> PositiveRay::get_blockers(Square serialised_piece,
+                                             Bitboard occupied_squares) {
 
-    uint64_t pieces_in_ray;
-    std::stack <int> serialised_pieces_in_ray;
-    int blocker = 0;
+    Bitboard pieces_in_ray;
+    std::stack<Square> blockers;
 
     pieces_in_ray = ray_maps[serialised_piece] & occupied_squares;
-    serialised_pieces_in_ray = bitboard::scan_forward(pieces_in_ray);
+    blockers = bitboard::scan_forward(pieces_in_ray);
 
-    if (!serialised_pieces_in_ray.empty()) {
-        blocker = serialised_pieces_in_ray.top();
-    } else {
-        blocker = -1;
-    }
-
-    return blocker;
+    return blockers;
 }
 
-int NegativeRay::get_blocker(int serialised_piece, uint64_t occupied_squares) {
+std::stack<Square> NegativeRay::get_blockers(Square serialised_piece, Bitboard occupied_squares) {
 
-    uint64_t pieces_in_ray;
-    std::stack <int> serialised_pieces_in_ray;
-    int blocker = 0;
+    Bitboard pieces_in_ray;
+    std::stack<Square> blockers;
 
     pieces_in_ray = ray_maps[serialised_piece] & occupied_squares;
-    serialised_pieces_in_ray = bitboard::scan_backward(pieces_in_ray);
+    blockers = bitboard::scan_backward(pieces_in_ray);
 
-    if (!serialised_pieces_in_ray.empty()) {
-        blocker = serialised_pieces_in_ray.top();
-    } else {
-        blocker = -1;
-    }
-
-    return blocker;
+    return blockers;
 }
 
 NorthRay::NorthRay() {
