@@ -62,6 +62,28 @@ int NegativeRay::get_blocker(int serialised_piece, uint64_t occupied_squares) {
 
 NorthRay::NorthRay() {
 
+    // NorthRay generation is straight forward. The attack map generation starts 
+    // at a1. The north ray from a1 is all of the squares in the a file that are 
+    // not a1. This can be generated as the union of the set of squares in the a 
+    // file and the set of squares that are not on the 1st rank. This union is 
+    // implemented as the bit-wise AND of the bitmasks FILE_A and NOT_RANK_1.
+    //
+    // After this has been generated is right shifted so that its source is at 
+    // the requires source square.
+    //
+    //          ray_maps[0]                                  ray_maps[10]
+    //  (FILE_A & NOT_RANK_1) << 0                   (FILE_A & NOT_RANK_1) << 10              
+    //     8   1 0 0 0 0 0 0 0                           8   0 0 1 0 0 0 0 0
+    //     7   1 0 0 0 0 0 0 0                           7   0 0 1 0 0 0 0 0
+    //     6   1 0 0 0 0 0 0 0      RIGHT SHIFT (<<)     6   0 0 1 0 0 0 0 0
+    //     5   1 0 0 0 0 0 0 0          BY 10            5   0 0 1 0 0 0 0 0
+    //     4   1 0 0 0 0 0 0 0       ----------->        4   0 0 1 0 0 0 0 0
+    //     3   1 0 0 0 0 0 0 0                           3   0 0 1 0 0 0 0 0
+    //     2   1 0 0 0 0 0 0 0                           2   0 0 x 0 0 0 0 0
+    //     1   x 0 0 0 0 0 0 0                           1   0 0 0 0 0 0 0 0
+    //
+    //         a b c d e f g h                               a b c d e f g h
+
     for (size_t i = 0; i < 64; i++) {
         ray_maps[i] = (bitboard::FILE_A & bitboard::NOT_RANK_1) << i;
     }
@@ -96,6 +118,49 @@ EastRay::EastRay() {
     // the set of all squares that are not on the 2nd rank.
     //
     // This process is repeated for every square on the 1st rank.
+    //
+    //
+    //          ray_maps[0]                                  ray_maps[4]
+    //  (RANK_1 & NOT_FILE_A) << 0                   (FILE_A & NOT_RANK_1) << 4              
+    //     8   0 0 0 0 0 0 0 0                           8   0 0 0 0 0 0 0 0
+    //     7   0 0 0 0 0 0 0 0                           7   0 0 0 0 0 0 0 0
+    //     6   0 0 0 0 0 0 0 0      RIGHT SHIFT (<<)     6   0 0 0 0 0 0 0 0
+    //     5   0 0 0 0 0 0 0 0          BY 4             5   0 0 0 0 0 0 0 0
+    //     4   0 0 0 0 0 0 0 0       ----------->        4   0 0 0 0 0 0 0 0
+    //     3   0 0 0 0 0 0 0 0                           3   0 0 0 0 0 0 0 0
+    //     2   0 0 0 0 0 0 0 0                           2   1 1 1 1 0 0 0 0
+    //     1   x 1 1 1 1 1 1 1                           1   0 0 0 0 x 1 1 1
+    //
+    //         a b c d e f g h                               a b c d e f g h
+    // 
+    //
+    //          ray_maps[0]                                  ray_maps[4]
+    //  ((RANK_1 & NOT_FILE_A) << 0)                ((FILE_A & NOT_RANK_1) << 4)
+    //          & NOT_RANK_2                                  & NOT_RANK_2
+    //     8   0 0 0 0 0 0 0 0                           8   0 0 0 0 0 0 0 0
+    //     7   0 0 0 0 0 0 0 0                           7   0 0 0 0 0 0 0 0
+    //     6   0 0 0 0 0 0 0 0      RIGHT SHIFT (<<)     6   0 0 0 0 0 0 0 0
+    //     5   0 0 0 0 0 0 0 0          BY 4             5   0 0 0 0 0 0 0 0
+    //     4   0 0 0 0 0 0 0 0       ----------->        4   0 0 0 0 0 0 0 0
+    //     3   0 0 0 0 0 0 0 0                           3   0 0 0 0 0 0 0 0
+    //     2   0 0 0 0 0 0 0 0                           2   0 0 0 0 0 0 0 0
+    //     1   x 1 1 1 1 1 1 1                           1   0 0 0 0 x 1 1 1
+    //
+    //         a b c d e f g h                               a b c d e f g h
+    //
+    // 
+    //          ray_maps[4]                                  ray_maps[4 + 8]
+    //     8   0 0 0 0 0 0 0 0                           8   0 0 0 0 0 0 0 0
+    //     7   0 0 0 0 0 0 0 0                           7   0 0 0 0 0 0 0 0
+    //     6   0 0 0 0 0 0 0 0      north_one()          6   0 0 0 0 0 0 0 0
+    //     5   0 0 0 0 0 0 0 0                           5   0 0 0 0 0 0 0 0
+    //     4   0 0 0 0 0 0 0 0       ----------->        4   0 0 0 0 0 0 0 0
+    //     3   0 0 0 0 0 0 0 0                           3   0 0 0 0 0 0 0 0
+    //     2   0 0 0 0 0 0 0 0                           2   0 0 0 0 x 1 1 1
+    //     1   0 0 0 0 x 1 1 1                           1   0 0 0 0 0 0 0 0
+    //
+    //         a b c d e f g h                               a b c d e f g h
+
     for (size_t i = 0; i < 8; i++) {
         ray_maps[i] = ((bitboard::RANK_1 & bitboard::NOT_FILE_A) << i) & bitboard::NOT_RANK_2;
     }
