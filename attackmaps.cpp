@@ -37,7 +37,8 @@ std::stack<Square> PositiveRay::get_blockers(Square serialised_piece,
     return blockers;
 }
 
-std::stack<Square> NegativeRay::get_blockers(Square serialised_piece, Bitboard occupied_squares) {
+std::stack<Square> NegativeRay::get_blockers(Square serialised_piece, 
+                                             Bitboard occupied_squares) {
 
     Bitboard pieces_in_ray;
     std::stack<Square> blockers;

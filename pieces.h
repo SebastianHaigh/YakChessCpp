@@ -10,6 +10,10 @@
 
 namespace pieces {
 
+enum Colour {
+    WHITE, BLACK
+};
+
 class Move {
     private:
         Bitboard sources;
@@ -34,71 +38,62 @@ class SerialMove: public Move {
 
 class Pieces {
     protected:
-        virtual Bitboard pawn_targets_from_sources(Bitboard sources) = 0;
-        virtual Bitboard pawn_sources_from_targets(Bitboard targets) = 0;
-        virtual Bitboard pawn_east_attacks(Bitboard sources) = 0;
-        virtual Bitboard pawn_west_attacks(Bitboard sources) = 0;
-};
-
-class BlackPieces: virtual protected Pieces {
-    protected:
-        Bitboard double_push_targets = bitboard::RANK_5;
-        Bitboard pawn_targets_from_sources(Bitboard sources) override;
-        Bitboard pawn_sources_from_targets(Bitboard targets) override;
-        Bitboard pawn_east_attacks(Bitboard sources) override;
-        Bitboard pawn_west_attacks(Bitboard sources) override;
-};
-
-class WhitePieces: virtual protected Pieces {
-    protected:
-        Bitboard double_push_targets = bitboard::RANK_4;
-        Bitboard pawn_targets_from_sources(Bitboard sources) override;
-        Bitboard pawn_sources_from_targets(Bitboard targets) override;
-        Bitboard pawn_east_attacks(Bitboard sources) override;
-        Bitboard pawn_west_attacks(Bitboard sources) override;
-};
-
-class Pawns {
+        std::shared_ptr<Bitboard> board;
+        std::shared_ptr<Bitboard> empty_squares;
+        Colour colour;
     public:
-        virtual Move single_push() = 0;
-        virtual Move double_push() = 0;
-        virtual Bitboard east_attack() = 0;
-        virtual Bitboard west_attack() = 0;
-        virtual Bitboard all_attack() = 0;
-        virtual Move east_captures(Bitboard opponent_piece) = 0;
-        virtual Move west_captures(Bitboard opponent_piece) = 0;
+        Pieces(std::shared_ptr<Bitboard> board_ptr, 
+              std::shared_ptr<Bitboard> empty_squares_ptr);
+        virtual std::stack<Move> get_all_moves();
+        virtual std::stack<Move> get_quiet_moves();
+        virtual std::stack<Move> get_captures();
+        virtual Bitboard get_all_attacks();
 };
 
-class BlackPawns: virtual public Pawns, protected BlackPieces {
-    private:
-        std::shared_ptr <Bitboard> board;
-        std::shared_ptr <Bitboard> empty_squares;
+class Pawns: protected Pieces{
+
+    protected:
+        Move single_push();
+        Move double_push();
+        Bitboard all_attack();
+        Move east_captures(Bitboard opponent_piece);
+        Move west_captures(Bitboard opponent_piece);
+        virtual Bitboard targets_from_sources(Bitboard sources);
+        virtual Bitboard sources_from_targets(Bitboard sources);
+        virtual Bitboard east_attack();
+        virtual Bitboard west_attack();
+        virtual Bitboard double_push_target();
     public:
-        BlackPawns(std::shared_ptr <Bitboard> board_ptr, 
-                   std::shared_ptr <Bitboard> empty_squares_ptr);
-        Move single_push() override;
-        Move double_push() override;
+        Pawns(std::shared_ptr<Bitboard> board_ptr,
+              std::shared_ptr<Bitboard> empty_squares_ptr);
+        std::stack<Move> get_all_moves() override;
+        std::stack<Move> get_quiet_moves() override;
+        std::stack<Move> get_captures() override;
+        Bitboard get_all_attacks() override;
+};
+
+class WhitePawns: public Pawns {
+    protected:
+        Bitboard targets_from_sources(Bitboard sources) override;
+        Bitboard sources_from_targets(Bitboard sources) override;
         Bitboard east_attack() override;
         Bitboard west_attack() override;
-        Bitboard all_attack() override;
-        Move east_captures(Bitboard opponent_piece) override;
-        Move west_captures(Bitboard opponent_piece) override;
+        Bitboard double_push_target() override;
+    public:
+        WhitePawns(std::shared_ptr<Bitboard> board_ptr,
+                   std::shared_ptr<Bitboard> empty_squares_ptr);
 };
 
-class WhitePawns: virtual public Pawns {
-    private:
-        std::shared_ptr <Bitboard> board;
-        std::shared_ptr <Bitboard> empty_squares;
-    public:
-        WhitePawns(std::shared_ptr <Bitboard> board_ptr, 
-                   std::shared_ptr <Bitboard> empty_squares_ptr);
-        Move single_push() override;
-        Move double_push() override;
+class BlackPawns: public Pawns {
+    protected:
+        Bitboard targets_from_sources(Bitboard sources) override;
+        Bitboard sources_from_targets(Bitboard sources) override;
         Bitboard east_attack() override;
         Bitboard west_attack() override;
-        Bitboard all_attack() override;
-        Move east_captures(Bitboard opponent_piece) override;
-        Move west_captures(Bitboard opponent_piece) override;
+        Bitboard double_push_target() override;
+    public:
+        BlackPawns(std::shared_ptr<Bitboard> board_ptr,
+                   std::shared_ptr<Bitboard> empty_squares_ptr);
 };
 
 class SlidingPieces {

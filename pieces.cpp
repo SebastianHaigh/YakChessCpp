@@ -1,27 +1,123 @@
 #include "pieces.h"
+#include <iostream>
 
 namespace pieces {
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// Implementation of Black Pieces
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-Bitboard BlackPieces::pawn_targets_from_sources(Bitboard sources) {
-    return bitboard::south_one(sources);
+Pieces::Pieces(std::shared_ptr<Bitboard> board_ptr,
+               std::shared_ptr<Bitboard> empty_squares_ptr) {
+    board = board_ptr;
+    empty_squares = empty_squares_ptr;
 }
 
-Bitboard BlackPieces::pawn_sources_from_targets(Bitboard targets) {
-    return bitboard::north_one(targets);
+std::stack<Move> Pieces::get_all_moves() {
+    std::stack<Move> moves;
+    return moves;
 }
 
-Bitboard BlackPieces::pawn_east_attacks(Bitboard sources) {
-    return bitboard::south_east_one(sources);
+std::stack<Move> Pieces::get_quiet_moves() {
+    std::stack<Move> moves;
+    return moves;
 }
 
-Bitboard BlackPieces::pawn_west_attacks(Bitboard sources) {
-    return bitboard::south_west_one(sources);
+std::stack<Move> Pieces::get_captures() {
+    std::stack<Move> moves;
+    return moves;
+}
+
+Bitboard Pieces::get_all_attacks() {
+    Bitboard targets;
+    return targets;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Implementation of Pawns
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+Pawns::Pawns(std::shared_ptr<Bitboard> board_ptr,
+             std::shared_ptr<Bitboard> empty_squares_ptr) 
+             : Pieces (board_ptr, empty_squares_ptr)  {
+
+}
+
+std::stack<Move> Pawns::get_all_moves(){
+    std::stack<Move> moves;
+    moves.push(single_push());
+    moves.push(double_push());
+    return moves;
+}
+
+std::stack<Move> Pawns::get_quiet_moves() {
+    std::stack<Move> moves;
+    moves.push(single_push());
+    moves.push(double_push());
+    return moves;
+}
+
+std::stack<Move> Pawns::get_captures() {
+    std::stack<Move> moves;
+    return moves;
+};
+        
+Bitboard Pawns::get_all_attacks() {
+    return west_attack() | east_attack();
+};
+
+Move Pawns::single_push() {
+    Bitboard sources, targets;
+    sources = sources_from_targets(*empty_squares) & *board;
+    targets = targets_from_sources(sources);
+    Move move = Move(sources, targets);
+    return move;
+}
+
+Move Pawns::double_push() {
+    Bitboard sources, targets, empty_targets, clear_to_target;
+    empty_targets = double_push_target() & *empty_squares;
+    clear_to_target = sources_from_targets(empty_targets) & *empty_squares;
+    sources = sources_from_targets(clear_to_target) & *board;
+    targets = targets_from_sources(sources);
+    targets = targets_from_sources(targets);
+    return Move(sources, targets);
+}
+
+Bitboard Pawns::all_attack() {
+    return west_attack() | east_attack();
+}
+        
+Move Pawns::east_captures(uint64_t opponent_piece) {
+    Bitboard sources, targets;
+    sources = bitboard::north_west_one(opponent_piece) & *board;
+    targets = bitboard::south_east_one(sources);
+    return Move(sources, targets);
+}
+        
+Move Pawns::west_captures(uint64_t opponent_piece) {
+    Bitboard sources, targets;
+    sources = bitboard::north_east_one(opponent_piece) & *board;
+    targets = bitboard::south_west_one(sources);
+    return Move(sources, targets);
+}
+
+Bitboard Pawns::targets_from_sources(Bitboard sources) {
+    return bitboard::EMPTY;
+}
+
+Bitboard Pawns::sources_from_targets(Bitboard targets) {
+    return bitboard::EMPTY;
+}
+
+Bitboard Pawns::east_attack() {
+    return bitboard::EMPTY;
+}
+        
+Bitboard Pawns::west_attack() {
+    return bitboard::EMPTY;
+}
+
+Bitboard Pawns::double_push_target() {
+    return bitboard::EMPTY;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,104 +126,18 @@ Bitboard BlackPieces::pawn_west_attacks(Bitboard sources) {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-Bitboard WhitePieces::pawn_targets_from_sources(Bitboard sources) {
+WhitePawns::WhitePawns(std::shared_ptr<Bitboard> board_ptr,
+                       std::shared_ptr<Bitboard> empty_squares_ptr) 
+                       : Pawns (board_ptr, empty_squares_ptr)  {
+
+}
+
+Bitboard WhitePawns::targets_from_sources(Bitboard sources) {
     return bitboard::north_one(sources);
 }
 
-Bitboard WhitePieces::pawn_sources_from_targets(Bitboard targets) {
+Bitboard WhitePawns::sources_from_targets(Bitboard targets) {
     return bitboard::south_one(targets);
-}
-
-Bitboard WhitePieces::pawn_east_attacks(Bitboard sources) {
-    return bitboard::north_east_one(sources);
-}
-
-Bitboard WhitePieces::pawn_west_attacks(Bitboard sources) {
-    return bitboard::north_west_one(sources);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// Implementation of Black Pawns
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-BlackPawns::BlackPawns(std::shared_ptr <Bitboard> board_ptr, std::shared_ptr <Bitboard> empty_squares_ptr) {
-    board = board_ptr;
-    empty_squares = empty_squares_ptr;
-}
-
-Move BlackPawns::single_push() {
-    Bitboard sources, targets;
-    sources = pawn_sources_from_targets(*empty_squares) & *board;
-    targets = pawn_targets_from_sources(sources);
-    Move move = Move(sources, targets);
-    return move;
-}
-
-Move BlackPawns::double_push() {
-    Bitboard sources, targets, empty_targets, clear_to_target;
-    empty_targets = double_push_targets & *empty_squares;
-    clear_to_target = pawn_sources_from_targets(empty_targets) & *empty_squares;
-    sources = pawn_sources_from_targets(clear_to_target) & *board;
-    targets = pawn_targets_from_sources(sources);
-    targets = pawn_targets_from_sources(targets);
-    return Move(sources, targets);
-}
-
-Bitboard BlackPawns::east_attack() {
-    return bitboard::south_east_one(*board);
-}
-        
-Bitboard BlackPawns::west_attack() {
-    return bitboard::south_west_one(*board);
-}
-        
-Bitboard BlackPawns::all_attack() {
-    return west_attack() | east_attack();
-}
-        
-Move BlackPawns::east_captures(uint64_t opponent_piece) {
-    Bitboard sources, targets;
-    sources = bitboard::north_west_one(opponent_piece) & *board;
-    targets = bitboard::south_east_one(sources);
-    return Move(sources, targets);
-}
-        
-Move BlackPawns::west_captures(uint64_t opponent_piece) {
-    Bitboard sources, targets;
-    sources = bitboard::north_east_one(opponent_piece) & *board;
-    targets = bitboard::south_west_one(sources);
-    return Move(sources, targets);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// Implementation of White Pawns
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-WhitePawns::WhitePawns(std::shared_ptr <Bitboard> board_ptr, std::shared_ptr <Bitboard> empty_squares_ptr) {
-    board = board_ptr;
-    empty_squares = empty_squares_ptr;
-}
-
-Move WhitePawns::single_push() {
-    Bitboard sources, targets;
-    sources = bitboard::north_one(*empty_squares) & *board;
-    targets = bitboard::south_one(sources);
-    return Move(sources, targets);
-}
-
-Move WhitePawns::double_push() {
-    Bitboard sources, targets, empty_squares_on_rank_4, clear_to_rank_4;
-    empty_squares_on_rank_4 = bitboard::RANK_4 & *empty_squares;
-    clear_to_rank_4 = bitboard::south_one(empty_squares_on_rank_4) & *empty_squares;
-    sources = bitboard::south_one(clear_to_rank_4) & *board;
-    targets = bitboard::north_one(sources);
-    targets = bitboard::north_one(targets);
-    return Move(sources, targets);
 }
 
 Bitboard WhitePawns::east_attack() {
@@ -137,25 +147,43 @@ Bitboard WhitePawns::east_attack() {
 Bitboard WhitePawns::west_attack() {
     return bitboard::north_west_one(*board);
 }
-        
-Bitboard WhitePawns::all_attack() {
-    return west_attack() | east_attack();
-}
-        
-Move WhitePawns::east_captures(Bitboard opponent_piece) {
-    Bitboard sources, targets;
-    sources = bitboard::south_west_one(opponent_piece) & *board;
-    targets = bitboard::north_east_one(sources);
-    return Move(sources, targets);
-}
-        
-Move WhitePawns::west_captures(Bitboard opponent_piece) {
-    Bitboard sources, targets;
-    sources = bitboard::south_east_one(opponent_piece) & *board;
-    targets = bitboard::north_west_one(sources);
-    return Move(sources, targets);
+
+Bitboard WhitePawns::double_push_target() {
+    return bitboard::RANK_4;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Implementation of Black Pawns
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+BlackPawns::BlackPawns(std::shared_ptr<Bitboard> board_ptr,
+                       std::shared_ptr<Bitboard> empty_squares_ptr) 
+                       : Pawns (board_ptr, empty_squares_ptr)  {
+
+}
+
+Bitboard BlackPawns::targets_from_sources(Bitboard sources) {
+    return bitboard::south_one(sources);
+}
+
+Bitboard BlackPawns::sources_from_targets(Bitboard targets) {
+    return bitboard::north_one(targets);
+}
+
+Bitboard BlackPawns::east_attack() {
+    return bitboard::south_east_one(*board);
+}
+        
+Bitboard BlackPawns::west_attack() {
+    return bitboard::south_west_one(*board);
+}
+
+Bitboard BlackPawns::double_push_target() {
+    return bitboard::RANK_4;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
