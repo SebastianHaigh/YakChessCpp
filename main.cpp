@@ -20,7 +20,7 @@ int main(int, char**) {
     pieces::Rooks Rooks = pieces::Rooks(black_rook_ptr, empty_squares_ptr);
     pieces::Bishops Bishops = pieces::Bishops(black_rook_ptr, empty_squares_ptr);
     pieces::Queens Queens = pieces::Queens(black_rook_ptr, empty_squares_ptr);
-    pieces::BlackPawns WhitePawns = pieces::BlackPawns(white_pawns, empty_squares_ptr);
+    pieces::WhitePawns WhitePawns = pieces::WhitePawns(white_pawns, empty_squares_ptr);
 
     std::stack<pieces::SerialMove> rook_moves = Rooks.quite_moves();
     while (!rook_moves.empty()) {

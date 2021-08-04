@@ -14,6 +14,10 @@ enum Colour {
     WHITE, BLACK
 };
 
+enum Type {
+    PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
+};
+
 class Move {
     private:
         Bitboard sources;
@@ -50,7 +54,7 @@ class Pieces {
         virtual Bitboard get_all_attacks();
 };
 
-class Pawns: protected Pieces{
+class Pawns: protected Pieces {
 
     protected:
         Move single_push();
