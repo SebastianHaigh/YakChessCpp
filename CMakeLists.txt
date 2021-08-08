@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(QSProject VERSION 0.1.0)
+project(YakChess VERSION 0.1.0)
 
 
 # GoogleTest requires at least C++11
@@ -15,7 +15,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 
-add_executable(QSProject main.cpp bitboard.cpp pieces.cpp attackmaps.cpp)
+add_executable(YakChess main.cpp bitboard.cpp pieces.cpp attackmaps.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
