@@ -23,7 +23,7 @@ include(CPack)
 
 enable_testing()
 
-add_executable(bitboard_test ./test/bitboard_test.cpp)
+add_executable(bitboard_test ./test/bitboard_test.cpp bitboard.cpp)
 
 target_link_libraries(bitboard_test gtest_main)
 
