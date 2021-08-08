@@ -1,4 +1,5 @@
 #include "pieces.h"
+#include <memory>
 
 namespace pieces {
 
