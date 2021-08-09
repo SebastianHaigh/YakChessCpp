@@ -182,7 +182,7 @@ Bitboard BlackPawns::west_attack() {
 }
 
 Bitboard BlackPawns::double_push_target() {
-    return bitboard::RANK_4;
+    return bitboard::RANK_5;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
