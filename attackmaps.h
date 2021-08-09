@@ -24,14 +24,12 @@ class Ray {
 
     public:
         // Returns a bitboard of every square attacked by the serialied_piece.
-        virtual Bitboard get(Square serialised_piece, Bitboard occupied_squares);
+        Bitboard get(Square serialised_piece, Bitboard occupied_squares);
 };
 
 // PositiveRays are those that extend in the North, and East directions.
 class PositiveRay: virtual public Ray {
     private:
-        // Returns the square index of the first blocker in the ray extending
-        // from the square index: serialised_piece.
         std::stack<Square> get_blockers(Square serialised_piece, Bitboard occupied_squares) override;
 };
 
