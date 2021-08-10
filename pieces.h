@@ -40,9 +40,9 @@ class Colour {
         virtual Bitboard pawn_push_targets(Bitboard sources) = 0;
         virtual Bitboard pawn_push_sources(Bitboard targets) = 0;
         virtual Bitboard pawn_east_attack_targets(Bitboard sources) = 0;
-        virtual Bitboard pawn_east_attack_sources(Bitboard targets) = 0;
+        virtual Bitboard pawn_east_attack_sources() = 0;
         virtual Bitboard pawn_west_attack_targets(Bitboard sources) = 0;
-        virtual Bitboard pawn_west_attack_sources(Bitboard targets) = 0;
+        virtual Bitboard pawn_west_attack_sources() = 0;
         virtual Bitboard pawn_double_push_target() = 0;
 };
 
@@ -57,9 +57,9 @@ class Black : public Colour {
         Bitboard pawn_push_targets(Bitboard sources) override;
         Bitboard pawn_push_sources(Bitboard targets) override;
         Bitboard pawn_east_attack_targets(Bitboard sources) override;
-        Bitboard pawn_east_attack_sources(Bitboard targets) override;
+        Bitboard pawn_east_attack_sources() override;
         Bitboard pawn_west_attack_targets(Bitboard sources) override;
-        Bitboard pawn_west_attack_sources(Bitboard targets) override;
+        Bitboard pawn_west_attack_sources() override;
         Bitboard pawn_double_push_target() override;
 };
 
@@ -74,9 +74,9 @@ class White : public Colour {
         Bitboard pawn_push_targets(Bitboard sources) override;
         Bitboard pawn_push_sources(Bitboard targets) override;
         Bitboard pawn_east_attack_targets(Bitboard sources) override;
-        Bitboard pawn_east_attack_sources(Bitboard targets) override;
+        Bitboard pawn_east_attack_sources() override;
         Bitboard pawn_west_attack_targets(Bitboard sources) override;
-        Bitboard pawn_west_attack_sources(Bitboard targets) override;
+        Bitboard pawn_west_attack_sources() override;
         Bitboard pawn_double_push_target() override;
 };
 
@@ -102,7 +102,10 @@ class Pawns {
               std::shared_ptr<Bitboard> empty_squares,
               std::shared_ptr<Colour> colour) 
               : board(board), empty_squares(empty_squares) , colour(colour) {};
-        std::stack<PawnTargets> all_quiet_moves();
+        PawnTargets single_pushes();
+        PawnTargets double_pushes();
+        PawnTargets west_captures();
+        PawnTargets east_captures();
         Bitboard all_attacked_squares();
 };
 

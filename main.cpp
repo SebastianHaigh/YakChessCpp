@@ -18,10 +18,7 @@ int main(int, char**) {
     auto WhitePawns = pieces::Pawns(white_pawns, empty_squares_ptr, WhitePieces);
 
     Bitboard pawn_targets = 0;
-    auto pawn_moves = WhitePawns.all_quiet_moves();
-    while (!pawn_moves.empty()) {
-        auto move = pawn_moves.top();
-        pawn_moves.pop();
-    }
-    print_board(pawn_targets);
+    auto pawn_moves = WhitePawns.single_pushes();
+
+    print_board(pawn_moves.get_target());
 }

@@ -28,8 +28,6 @@ namespace pieces {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-
-
 Bitboard Pawns::all_attacked_squares() {
     return colour->pawn_west_attack_targets(*board) | colour->pawn_east_attack_targets(*board);
 };
@@ -45,32 +43,31 @@ Bitboard Pawns::double_push() {
     return colour->pawn_push_sources(clear_to_target) & *board;
 }
 
-std::stack<PawnTargets> Pawns::all_quiet_moves() {
-    std::stack<PawnTargets> quiet_moves;
-    auto single_push_sources = single_push();
-    auto single_push_targets = colour->pawn_push_targets(single_push_sources);
-    auto double_push_sources = double_push();
-    auto double_push_targets = colour->pawn_double_push_target();
+PawnTargets Pawns::single_pushes() {
+    auto sources = single_push();
+    auto targets = colour->pawn_push_targets(sources);
 
-    quiet_moves.push(PawnTargets(single_push_sources, single_push_targets));
-    quiet_moves.push(PawnTargets(double_push_sources, double_push_targets));
+    return PawnTargets(sources, targets);
+}
 
-    return quiet_moves;
+PawnTargets Pawns::double_pushes() {
+    auto sources = double_push();
+    auto targets = colour->pawn_double_push_target();
+
+    return PawnTargets(sources, targets);
 }
         
-// Bitboard Pawns::east_captures(Bitboard opponent_piece) {
-//     Bitboard sources, targets;
-//     sources = bitboard::north_west_one(opponent_piece) & *board;
-//     //targets = bitboard::south_east_one(sources);
-//     return sources;
-// }
+PawnTargets Pawns::west_captures() {
+    auto sources = colour->pawn_east_attack_sources() & *board;
+    auto targets = colour->pawn_east_attack_targets(sources);
+    return PawnTargets(sources, targets);
+}
         
-// Bitboard Pawns::west_captures(Bitboard opponent_piece) {
-//     Bitboard sources, targets;
-//     sources = bitboard::north_east_one(opponent_piece) & *board;
-//     //targets = bitboard::south_west_one(sources);
-//     return sources;
-// }
+PawnTargets Pawns::east_captures() {
+    auto sources = colour->pawn_west_attack_sources() & *board;
+    auto targets = colour->pawn_west_attack_targets(sources);
+    return PawnTargets(sources, targets);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -168,16 +165,16 @@ Bitboard White::pawn_east_attack_targets(Bitboard sources) {
     return bitboard::north_east_one(sources);
 }
 
-Bitboard White::pawn_east_attack_sources(Bitboard targets) {
-    return bitboard::south_west_one(targets);
+Bitboard White::pawn_east_attack_sources() {
+    return bitboard::south_west_one(*opponent_pieces);
 }
 
 Bitboard White::pawn_west_attack_targets(Bitboard sources) {
     return bitboard::north_west_one(sources);
 }
 
-Bitboard White::pawn_west_attack_sources(Bitboard targets) {
-    return bitboard::south_east_one(targets);
+Bitboard White::pawn_west_attack_sources() {
+    return bitboard::south_east_one(*opponent_pieces);
 }
 
 Bitboard White::pawn_double_push_target() {
@@ -197,16 +194,16 @@ Bitboard Black::pawn_east_attack_targets(Bitboard sources) {
     return bitboard::south_east_one(sources);
 }
 
-Bitboard Black::pawn_east_attack_sources(Bitboard targets) {
-    return bitboard::north_west_one(targets);
+Bitboard Black::pawn_east_attack_sources() {
+    return bitboard::north_west_one(*opponent_pieces);
 }
 
 Bitboard Black::pawn_west_attack_targets(Bitboard sources) {
     return bitboard::south_west_one(sources);
 }
 
-Bitboard Black::pawn_west_attack_sources(Bitboard targets) {
-    return bitboard::north_east_one(targets);
+Bitboard Black::pawn_west_attack_sources() {
+    return bitboard::north_east_one(*opponent_pieces);
 }
 
 Bitboard Black::pawn_double_push_target() {
