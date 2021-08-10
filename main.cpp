@@ -7,17 +7,15 @@
 using namespace bitboard;
 
 int main(int, char**) {
-    Bitboard this_board = RANK_7;
-    Bitboard empty_squares = NOT_RANK_7;
-    Bitboard black_rook_bb = RANK_3 & FILE_D;
-    this_board |= black_rook_bb;
-    empty_squares = ~this_board;
-
+    std::shared_ptr<Bitboard> black_pawns = std::make_shared<Bitboard> (RANK_7);
     std::shared_ptr<Bitboard> white_pawns = std::make_shared<Bitboard> (RANK_2);
-    std::shared_ptr<Bitboard> black_rook_ptr = std::make_shared<Bitboard> (black_rook_bb);
-    std::shared_ptr<Bitboard> empty_squares_ptr = std::make_shared<Bitboard> (empty_squares);
+    std::shared_ptr<Bitboard> black_pieces = std::make_shared<Bitboard> (*black_pawns);
+    std::shared_ptr<Bitboard> white_pieces = std::make_shared<Bitboard> (*white_pawns);
+    auto occupied_squares = *black_pawns ^ *white_pawns;
+    std::shared_ptr<Bitboard> empty_squares_ptr = std::make_shared<Bitboard> (~occupied_squares);
 
-    pieces::WhitePawns WhitePawns = pieces::WhitePawns(white_pawns, empty_squares_ptr);
+    auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
+    auto WhitePawns = pieces::Pawns(white_pawns, empty_squares_ptr, WhitePieces);
 
     Bitboard pawn_targets = 0;
     std::stack<pieces::SourceTargetPair> pawn_moves = WhitePawns.get_all_moves();
