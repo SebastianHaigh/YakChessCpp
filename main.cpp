@@ -17,34 +17,12 @@ int main(int, char**) {
     std::shared_ptr<Bitboard> black_rook_ptr = std::make_shared<Bitboard> (black_rook_bb);
     std::shared_ptr<Bitboard> empty_squares_ptr = std::make_shared<Bitboard> (empty_squares);
 
-    pieces::Rooks Rooks = pieces::Rooks(black_rook_ptr, empty_squares_ptr);
-    pieces::Bishops Bishops = pieces::Bishops(black_rook_ptr, empty_squares_ptr);
-    pieces::Queens Queens = pieces::Queens(black_rook_ptr, empty_squares_ptr);
     pieces::WhitePawns WhitePawns = pieces::WhitePawns(white_pawns, empty_squares_ptr);
 
-    std::stack<pieces::SerialMove> rook_moves = Rooks.quite_moves();
-    while (!rook_moves.empty()) {
-        pieces::SerialMove move = rook_moves.top();
-        print_board(move.get_target());
-        rook_moves.pop();
-    }
-    std::stack <pieces::SerialMove> bishop_moves = Bishops.quite_moves();
-    while (!bishop_moves.empty()) {
-        pieces::SerialMove move = bishop_moves.top();
-        print_board(move.get_target());
-        bishop_moves.pop();
-    }
-    std::stack <pieces::SerialMove> queen_moves = Queens.quite_moves();
-    while (!queen_moves.empty()) {
-        pieces::SerialMove move = queen_moves.top();
-        print_board(move.get_target());
-        queen_moves.pop();
-    }
     Bitboard pawn_targets = 0;
-    std::stack<pieces::Move> pawn_moves = WhitePawns.get_all_moves();
+    std::stack<pieces::SourceTargetPair> pawn_moves = WhitePawns.get_all_moves();
     while (!pawn_moves.empty()) {
-        pieces::Move move = pawn_moves.top();
-        pawn_targets |= move.get_target();
+        auto move = pawn_moves.top();
         pawn_moves.pop();
     }
     print_board(pawn_targets);
