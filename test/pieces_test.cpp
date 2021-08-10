@@ -20,10 +20,8 @@ TEST(WhitePawnsTest, CanGenerateSinglePushesFromUnobstructedStartingPosition) {
     auto single_push_moves = pawns.single_pushes();
 
     // Assert
-
     EXPECT_EQ(single_push_moves.get_source(), bitboard::RANK_2);
     EXPECT_EQ(single_push_moves.get_target(), bitboard::RANK_3);
-
 }
 
 TEST(WhitePawnsTest, DoublePushOnlyAllowedFromRank2) {
@@ -53,6 +51,47 @@ TEST(WhitePawnsTest, DoublePushOnlyAllowedFromRank2) {
     EXPECT_EQ(moves[4].get_source(), 0);
     EXPECT_EQ(moves[5].get_source(), 0);
     EXPECT_EQ(moves[6].get_source(), 0); 
+}
+
+TEST(WhitePawnsTest, ObstructionBlocksPawnPushes) {
+    // Assemble
+    std::shared_ptr<Bitboard> pawns_ptr = std::make_shared<Bitboard>(bitboard::RANK_2);
+    std::shared_ptr<Bitboard> black_pieces = std::make_shared<Bitboard> (bitboard::RANK_3 & bitboard::FILE_C);
+    std::shared_ptr<Bitboard> white_pieces = std::make_shared<Bitboard> (*pawns_ptr);
+    auto occupied_squares = *black_pieces ^ *white_pieces;
+    std::shared_ptr<Bitboard> empty_squares_ptr = std::make_shared<Bitboard>(~occupied_squares);
+
+    auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
+    auto pawns = pieces::Pawns(pawns_ptr, empty_squares_ptr, WhitePieces);
+
+    // Act
+    auto moves = pawns.single_pushes();
+
+    // Assert
+    EXPECT_EQ(moves.get_source(), bitboard::RANK_2 & bitboard::NOT_FILE_C);
+    EXPECT_EQ(moves.get_target(), bitboard::RANK_3 & bitboard::NOT_FILE_C);
+}
+
+TEST(WhitePawnsTest, OpponentPieceCanBeCaptured) {
+    // Assemble
+    std::shared_ptr<Bitboard> pawns_ptr = std::make_shared<Bitboard>(bitboard::RANK_2);
+    std::shared_ptr<Bitboard> black_pieces = std::make_shared<Bitboard> (bitboard::RANK_3 & bitboard::FILE_C);
+    std::shared_ptr<Bitboard> white_pieces = std::make_shared<Bitboard> (*pawns_ptr);
+    auto occupied_squares = *black_pieces ^ *white_pieces;
+    std::shared_ptr<Bitboard> empty_squares_ptr = std::make_shared<Bitboard>(~occupied_squares);
+
+    auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
+    auto pawns = pieces::Pawns(pawns_ptr, empty_squares_ptr, WhitePieces);
+
+    // Act
+    auto west_moves = pawns.west_captures();
+    auto east_moves = pawns.east_captures();
+
+    // Assert
+    EXPECT_EQ(west_moves.get_source(), bitboard::RANK_2 & bitboard::FILE_D);
+    EXPECT_EQ(east_moves.get_source(), bitboard::RANK_2 & bitboard::FILE_B);
+    EXPECT_EQ(west_moves.get_target(), bitboard::RANK_3 & bitboard::FILE_C);
+    EXPECT_EQ(east_moves.get_target(), bitboard::RANK_3 & bitboard::FILE_C);
 }
 
 TEST(WhitePawnsTest, ReturnsVaildCaptures) {
