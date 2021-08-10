@@ -9,7 +9,7 @@
 TEST(WhitePawnsTest, CanGenerateValidMovesFromUnobstructedStartingPosition) {
     // Assemble
     std::shared_ptr<Bitboard> pawns_ptr = std::make_shared<Bitboard>(bitboard::RANK_2);
-    std::shared_ptr<Bitboard> empty_squares_ptr = std::make_shared<Bitboard>(~*pawns_ptr);//std::make_shared<Bitboard>(bitboard::NOT_RANK_2);
+    std::shared_ptr<Bitboard> empty_squares_ptr = std::make_shared<Bitboard>(~*pawns_ptr);
     auto pawns = pieces::WhitePawns(pawns_ptr, empty_squares_ptr);
     Bitboard expected_sources = bitboard::RANK_2;
     Bitboard expected_targets_single_push = bitboard::RANK_3;
@@ -51,6 +51,19 @@ TEST(WhitePawnsTest, DoublePushOnlyAllowedFromRank2) {
     EXPECT_EQ(moves[3].top().get_target(), 0);
     EXPECT_EQ(moves[4].top().get_target(), 0);
     EXPECT_EQ(moves[5].top().get_target(), 0);
+}
+
+TEST(WhitePawnsTest, ReturnsVaildCaptures) {
+    // Assemble
+    std::shared_ptr<Bitboard> pawns_ptr = std::make_shared<Bitboard>(bitboard::RANK_2);
+    std::shared_ptr<Bitboard> empty_squares_ptr = std::make_shared<Bitboard>(bitboard::NOT_RANK_2);
+    auto pawns = pieces::WhitePawns(pawns_ptr, empty_squares_ptr);
+
+    // Act
+    auto captures = pawns.get_captures(0);
+
+    // Assert
+    EXPECT_EQ(captures.top().get_target(), 0);
 }
 
 TEST(BlackPawnsTest, CanGenerateValidMovesFromUnobstructedStartingPosition) {
