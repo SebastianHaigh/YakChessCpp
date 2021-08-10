@@ -15,14 +15,20 @@ TEST(WhitePawnsTest, CanGenerateValidMovesFromUnobstructedStartingPosition) {
 
     auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
     auto pawns = pieces::Pawns(pawns_ptr, empty_squares_ptr, WhitePieces);
-    Bitboard expected_sources = bitboard::RANK_2;
-    Bitboard expected_targets_single_push = bitboard::RANK_3;
-    Bitboard expected_targets_double_push = bitboard::RANK_4;
     
     // Act
     auto moves = pawns.all_quiet_moves();
 
-    // Assert
+    // Assert    
+    auto double_push_moves = moves.top();
+    moves.pop();
+    auto single_push_moves = moves.top();
+
+    EXPECT_EQ(single_push_moves.get_source(), bitboard::RANK_2);
+    EXPECT_EQ(single_push_moves.get_target(), bitboard::RANK_3);
+    EXPECT_EQ(double_push_moves.get_source(), bitboard::RANK_2);
+    EXPECT_EQ(double_push_moves.get_target(), bitboard::RANK_4);
+
 }
 
 TEST(WhitePawnsTest, DoublePushOnlyAllowedFromRank2) {
@@ -45,13 +51,13 @@ TEST(WhitePawnsTest, DoublePushOnlyAllowedFromRank2) {
     }
 
     // Assert
-    EXPECT_EQ(moves[0].size(), 16); // Double and single push from rank 2
-    EXPECT_EQ(moves[1].size(), 8); // Single push from rank 3
-    EXPECT_EQ(moves[2].size(), 8); // Single push from rank 4
-    EXPECT_EQ(moves[3].size(), 8); // Single push from rank 5
-    EXPECT_EQ(moves[4].size(), 8); // Single push from rank 6
-    EXPECT_EQ(moves[5].size(), 8); // Single push from rank 7
-    EXPECT_EQ(moves[6].size(), 0); // Nowhere to go from rank 8
+    EXPECT_EQ(moves[0].top().get_source(), bitboard::RANK_2);
+    EXPECT_EQ(moves[1].top().get_source(), 0);
+    EXPECT_EQ(moves[2].top().get_source(), 0);
+    EXPECT_EQ(moves[3].top().get_source(), 0);
+    EXPECT_EQ(moves[4].top().get_source(), 0);
+    EXPECT_EQ(moves[5].top().get_source(), 0);
+    EXPECT_EQ(moves[6].top().get_source(), 0); 
 }
 
 TEST(WhitePawnsTest, ReturnsVaildCaptures) {
@@ -75,8 +81,15 @@ TEST(BlackPawnsTest, CanGenerateValidMovesFromUnobstructedStartingPosition) {
     // Act
     auto moves = pawns.all_quiet_moves();
 
-    // Assert
-    EXPECT_EQ(moves.size(), 16);
+    // Assert    
+    auto double_push_moves = moves.top();
+    moves.pop();
+    auto single_push_moves = moves.top();
+
+    EXPECT_EQ(single_push_moves.get_source(), bitboard::RANK_7);
+    EXPECT_EQ(single_push_moves.get_target(), bitboard::RANK_6);
+    EXPECT_EQ(double_push_moves.get_source(), bitboard::RANK_7);
+    EXPECT_EQ(double_push_moves.get_target(), bitboard::RANK_5);
 }
 
 TEST(BlackPawnsTest, DoublePushOnlyAllowedFromRank7) {
@@ -99,11 +112,11 @@ TEST(BlackPawnsTest, DoublePushOnlyAllowedFromRank7) {
     }
 
     // Assert
-    EXPECT_EQ(moves[0].size(), 16); // Double and single push from rank 7
-    EXPECT_EQ(moves[1].size(), 8); // Single push from rank 6
-    EXPECT_EQ(moves[2].size(), 8); // Single push from rank 5
-    EXPECT_EQ(moves[3].size(), 8); // Single push from rank 4
-    EXPECT_EQ(moves[4].size(), 8); // Single push from rank 3
-    EXPECT_EQ(moves[5].size(), 8); // Single push from rank 2
-    EXPECT_EQ(moves[6].size(), 0); // Nowhere to go from rank 1
+    EXPECT_EQ(moves[0].top().get_source(), bitboard::RANK_7);
+    EXPECT_EQ(moves[1].top().get_source(), 0);
+    EXPECT_EQ(moves[2].top().get_source(), 0);
+    EXPECT_EQ(moves[3].top().get_source(), 0);
+    EXPECT_EQ(moves[4].top().get_source(), 0);
+    EXPECT_EQ(moves[5].top().get_source(), 0);
+    EXPECT_EQ(moves[6].top().get_source(), 0);
 }

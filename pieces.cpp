@@ -50,7 +50,8 @@ std::stack<PawnTargets> Pawns::all_quiet_moves() {
     auto single_push_sources = single_push();
     auto single_push_targets = colour->pawn_push_targets(single_push_sources);
     auto double_push_sources = double_push();
-    auto double_push_targets = colour->pawn_push_targets(double_push_sources);
+    auto double_push_targets = colour->pawn_double_push_target();
+
     quiet_moves.push(PawnTargets(single_push_sources, single_push_targets));
     quiet_moves.push(PawnTargets(double_push_sources, double_push_targets));
 
