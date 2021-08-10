@@ -58,14 +58,14 @@ PawnTargets Pawns::double_pushes() {
 }
         
 PawnTargets Pawns::west_captures() {
-    auto sources = colour->pawn_east_attack_sources() & *board;
-    auto targets = colour->pawn_east_attack_targets(sources);
+    auto sources = colour->pawn_west_attack_sources() & *board;
+    auto targets = colour->pawn_west_attack_targets(sources);
     return PawnTargets(sources, targets);
 }
         
 PawnTargets Pawns::east_captures() {
-    auto sources = colour->pawn_west_attack_sources() & *board;
-    auto targets = colour->pawn_west_attack_targets(sources);
+    auto sources = colour->pawn_east_attack_sources() & *board;
+    auto targets = colour->pawn_east_attack_targets(sources);
     return PawnTargets(sources, targets);
 }
 
