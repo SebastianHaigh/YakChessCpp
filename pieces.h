@@ -26,7 +26,7 @@ class Move {
         Bitboard targets;
 
     public:
-        Move(Bitboard source_squares, Bitboard target_squares);
+        Move(Bitboard source_squares, Bitboard target_squares): sources(source_squares), targets(target_squares) {};
         Bitboard get_source();
         Bitboard get_target();
 };
@@ -50,7 +50,7 @@ class Pieces {
               std::shared_ptr<Bitboard> empty_squares_ptr);
         virtual std::stack<Move> get_all_moves();
         virtual std::stack<Move> get_quiet_moves();
-        virtual std::stack<Move> get_captures();
+        virtual std::stack<Move> get_captures(Bitboard opponent_piece);
         virtual Bitboard get_all_attacks();
 };
 
@@ -72,7 +72,7 @@ class Pawns: protected Pieces {
               std::shared_ptr<Bitboard> empty_squares_ptr);
         std::stack<Move> get_all_moves() override;
         std::stack<Move> get_quiet_moves() override;
-        std::stack<Move> get_captures() override;
+        std::stack<Move> get_captures(Bitboard opponent_piece) override;
         Bitboard get_all_attacks() override;
 };
 

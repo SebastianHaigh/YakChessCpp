@@ -19,7 +19,7 @@ std::stack<Move> Pieces::get_quiet_moves() {
     return moves;
 }
 
-std::stack<Move> Pieces::get_captures() {
+std::stack<Move> Pieces::get_captures(Bitboard opponent_piece) {
     std::stack<Move> moves;
     return moves;
 }
@@ -41,7 +41,7 @@ Pawns::Pawns(std::shared_ptr<Bitboard> board_ptr,
 
 }
 
-std::stack<Move> Pawns::get_all_moves(){
+std::stack<Move>Pawns::get_all_moves(){
     std::stack<Move> moves;
     moves.push(single_push());
     moves.push(double_push());
@@ -55,8 +55,10 @@ std::stack<Move> Pawns::get_quiet_moves() {
     return moves;
 }
 
-std::stack<Move> Pawns::get_captures() {
+std::stack<Move> Pawns::get_captures(Bitboard opponent_piece) {
     std::stack<Move> moves;
+    moves.push(east_captures(opponent_piece));
+    moves.push(west_captures(opponent_piece));
     return moves;
 };
         
@@ -86,39 +88,29 @@ Bitboard Pawns::all_attack() {
     return west_attack() | east_attack();
 }
         
-Move Pawns::east_captures(uint64_t opponent_piece) {
+Move Pawns::east_captures(Bitboard opponent_piece) {
     Bitboard sources, targets;
     sources = bitboard::north_west_one(opponent_piece) & *board;
     targets = bitboard::south_east_one(sources);
     return Move(sources, targets);
 }
         
-Move Pawns::west_captures(uint64_t opponent_piece) {
+Move Pawns::west_captures(Bitboard opponent_piece) {
     Bitboard sources, targets;
     sources = bitboard::north_east_one(opponent_piece) & *board;
     targets = bitboard::south_west_one(sources);
     return Move(sources, targets);
 }
 
-Bitboard Pawns::targets_from_sources(Bitboard sources) {
-    return bitboard::EMPTY;
-}
+Bitboard Pawns::targets_from_sources(Bitboard sources) { return bitboard::EMPTY; }
 
-Bitboard Pawns::sources_from_targets(Bitboard targets) {
-    return bitboard::EMPTY;
-}
+Bitboard Pawns::sources_from_targets(Bitboard targets) { return bitboard::EMPTY; }
 
-Bitboard Pawns::east_attack() {
-    return bitboard::EMPTY;
-}
+Bitboard Pawns::east_attack() { return bitboard::EMPTY; }
         
-Bitboard Pawns::west_attack() {
-    return bitboard::EMPTY;
-}
+Bitboard Pawns::west_attack() { return bitboard::EMPTY; }
 
-Bitboard Pawns::double_push_target() {
-    return bitboard::EMPTY;
-}
+Bitboard Pawns::double_push_target() { return bitboard::EMPTY; }
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,7 +143,6 @@ Bitboard WhitePawns::west_attack() {
 Bitboard WhitePawns::double_push_target() {
     return bitboard::RANK_4;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -263,11 +254,6 @@ Queens::Queens(std::shared_ptr <Bitboard> board_ptr, std::shared_ptr <Bitboard> 
     rays.push_back(std::make_unique <attacks::NorthEastRay>());
     rays.push_back(std::make_unique <attacks::SouthWestRay>());
     rays.push_back(std::make_unique <attacks::SouthEastRay>());
-}
-
-Move::Move(Bitboard source_squares, Bitboard target_squares) {
-    sources = source_squares;
-    targets = target_squares;
 }
 
 Bitboard Move::get_source() {
