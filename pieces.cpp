@@ -28,49 +28,33 @@ namespace pieces {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-std::stack<SourceTargetPair> Pawns::get_all_moves(){
-    std::stack<SourceTargetPair> moves;
-    std::stack<Square> serial_sources, serial_targets;
-    Bitboard sources, targets;
 
-    sources = single_push();
-    targets = targets_from_sources(sources);
-    serial_sources = bitboard::scan_forward(sources);
-    serial_targets = bitboard::scan_forward(targets);
-    while (!serial_sources.empty()) {
-        moves.push(SourceTargetPair(serial_sources.top(), serial_targets.top()));
-        serial_sources.pop();
-        serial_targets.pop();
-    }
 
-    sources = double_push();
-    targets = targets_from_sources(sources);
-    serial_sources = bitboard::scan_forward(sources);
-    serial_targets = bitboard::scan_forward(targets);
-    while (!serial_sources.empty()) {
-        moves.push(SourceTargetPair(serial_sources.top(), serial_targets.top()));
-        serial_sources.pop();
-        serial_targets.pop();
-    }
-    return moves;
-}
-        
-Bitboard Pawns::get_all_attacks() {
-    return west_attack() | east_attack();
+Bitboard Pawns::all_attacked_squares() {
+    return colour->pawn_west_attack_targets(*board) | colour->pawn_east_attack_targets(*board);
 };
 
 Bitboard Pawns::single_push() {
-    Bitboard sources;
-    sources = colour->pawn_push_sources(*empty_squares) & *board;
-    return sources;
+    return colour->pawn_push_sources(*empty_squares) & *board;;
 }
 
 Bitboard Pawns::double_push() {
-    Bitboard sources, empty_targets, clear_to_target;
+    Bitboard empty_targets, clear_to_target;
     empty_targets = colour->pawn_double_push_target() & *empty_squares;
     clear_to_target = colour->pawn_push_sources(empty_targets) & *empty_squares;
-    sources = colour->pawn_push_sources(clear_to_target) & *board;
-    return sources;
+    return colour->pawn_push_sources(clear_to_target) & *board;
+}
+
+std::stack<PawnTargets> Pawns::all_quiet_moves() {
+    std::stack<PawnTargets> quiet_moves;
+    auto single_push_sources = single_push();
+    auto single_push_targets = colour->pawn_push_targets(single_push_sources);
+    auto double_push_sources = double_push();
+    auto double_push_targets = colour->pawn_push_targets(double_push_sources);
+    quiet_moves.push(PawnTargets(single_push_sources, single_push_targets));
+    quiet_moves.push(PawnTargets(double_push_sources, double_push_targets));
+
+    return quiet_moves;
 }
         
 // Bitboard Pawns::east_captures(Bitboard opponent_piece) {
@@ -167,9 +151,9 @@ Bitboard Pawns::double_push() {
 //     rays.push_back(std::make_unique <attacks::SouthEastRay>());
 // }
 
-void Move::execute() {
-    piece_to_move.make_move(source, target);
-}
+// void Move::execute() {
+//     piece_to_move.make_move(source, target);
+// }
 
 Bitboard White::pawn_push_targets(Bitboard sources) {
     return bitboard::north_one(sources);
@@ -179,7 +163,7 @@ Bitboard White::pawn_push_sources(Bitboard targets) {
     return bitboard::south_one(targets);
 }
 
-Bitboard White::pawn_east_attack_target(Bitboard sources) {
+Bitboard White::pawn_east_attack_targets(Bitboard sources) {
     return bitboard::north_east_one(sources);
 }
 
@@ -191,7 +175,7 @@ Bitboard White::pawn_west_attack_targets(Bitboard sources) {
     return bitboard::north_west_one(sources);
 }
 
-Bitboard White::pawn_west_attack_source(Bitboard targets) {
+Bitboard White::pawn_west_attack_sources(Bitboard targets) {
     return bitboard::south_east_one(targets);
 }
 
@@ -208,7 +192,7 @@ Bitboard Black::pawn_push_sources(Bitboard targets) {
     return bitboard::north_one(targets);
 }
 
-Bitboard Black::pawn_east_attack_target(Bitboard sources) {
+Bitboard Black::pawn_east_attack_targets(Bitboard sources) {
     return bitboard::south_east_one(sources);
 }
 
@@ -220,7 +204,7 @@ Bitboard Black::pawn_west_attack_targets(Bitboard sources) {
     return bitboard::south_west_one(sources);
 }
 
-Bitboard Black::pawn_west_attack_source(Bitboard targets) {
+Bitboard Black::pawn_west_attack_sources(Bitboard targets) {
     return bitboard::north_east_one(targets);
 }
 

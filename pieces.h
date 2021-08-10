@@ -22,6 +22,19 @@ class SourceTargetPair {
         const Square get_source() { return source; };
 };
 
+class PawnTargets {
+    // PawnTargets store pawn move target bitboards and their source bitboards.
+    private:
+        Bitboard source;
+        Bitboard target;
+
+    public:
+        PawnTargets(Bitboard sources, Bitboard targets) 
+            : source(sources), target(targets) {};
+        const Bitboard get_target() { return target; };
+        const Bitboard get_source() { return source; };
+};
+
 class Colour {
     public:
         virtual Bitboard pawn_push_targets(Bitboard sources) = 0;
@@ -41,7 +54,6 @@ class Black : public Colour {
         Black(std::shared_ptr<Bitboard> this_colour_pieces, 
             std::shared_ptr<Bitboard> opponent_pieces)
             : this_colour_pieces(this_colour_pieces), opponent_pieces(opponent_pieces) {};
-        ~Black();
         Bitboard pawn_push_targets(Bitboard sources) override;
         Bitboard pawn_push_sources(Bitboard targets) override;
         Bitboard pawn_east_attack_targets(Bitboard sources) override;
@@ -59,7 +71,6 @@ class White : public Colour {
         White(std::shared_ptr<Bitboard> this_colour_pieces, 
             std::shared_ptr<Bitboard> opponent_pieces)
             : this_colour_pieces(this_colour_pieces), opponent_pieces(opponent_pieces) {};
-        ~White();
         Bitboard pawn_push_targets(Bitboard sources) override;
         Bitboard pawn_push_sources(Bitboard targets) override;
         Bitboard pawn_east_attack_targets(Bitboard sources) override;
@@ -91,7 +102,7 @@ class Pawns {
               std::shared_ptr<Bitboard> empty_squares,
               std::shared_ptr<Colour> colour) 
               : board(board), empty_squares(empty_squares) , colour(colour) {};
-        std::vector<Bitboard[2]> all_quiet_moves();
+        std::stack<PawnTargets> all_quiet_moves();
         Bitboard all_attacked_squares();
 };
 
@@ -125,17 +136,17 @@ class Pawns {
 //                std::shared_ptr <Bitboard> empty_squares_ptr);
 // };
 
-class Move {
-    private:
-        Square source;
-        Square target;
-        Pieces* piece_to_move;
+// class Move {
+//     private:
+//         Square source;
+//         Square target;
+//         Pieces* piece_to_move;
 
-    public:
-        Move(Pieces* piece, Square source_square, Square target_square) 
-        : source(source_square), target(target_square), piece_to_move(piece) {};
-        void execute();
-};
+//     public:
+//         Move(Pieces* piece, Square source_square, Square target_square) 
+//         : source(source_square), target(target_square), piece_to_move(piece) {};
+//         void execute();
+// };
 
 } // namespace name
 
