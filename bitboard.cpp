@@ -73,11 +73,19 @@ std::stack <Square> scan_forward(Bitboard board) {
 }
 
 File file_index(Square square_index) {
-    return square_index & 7;
+    if (square_index >= 0 && square_index <= 63) {
+        return square_index & 7;
+    } else {
+        return -1;
+    }
 }
 
 Rank rank_index(Square square_index) {
-    return square_index >> 3;
+    if (square_index >= 0 && square_index <= 63) {
+        return square_index >> 3;
+    } else {
+        return -1;
+    }
 }
 
 Square square_index(File file_index, Rank rank_index) {

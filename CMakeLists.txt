@@ -24,8 +24,15 @@ include(CPack)
 enable_testing()
 
 add_executable(bitboard_test ./test/bitboard_test.cpp bitboard.cpp)
-
 target_link_libraries(bitboard_test gtest_main)
+
+add_executable(attackmaps_test ./test/attackmaps_test.cpp attackmaps.cpp bitboard.cpp)
+target_link_libraries(attackmaps_test gtest_main)
+
+add_executable(pieces_test ./test/pieces_test.cpp pieces.cpp attackmaps.cpp bitboard.cpp)
+target_link_libraries(pieces_test gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(bitboard_test)
+gtest_discover_tests(attackmaps_test)
+gtest_discover_tests(pieces_test)
