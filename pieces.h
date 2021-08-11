@@ -11,17 +11,6 @@
 
 namespace pieces {
 
-class SourceTargetPair {
-    private:
-        Square source;
-        Square target;
-
-    public:
-        SourceTargetPair(Square source_square, Square target_square) : source(source_square), target(target_square) {};
-        const Square get_target() { return target; };
-        const Square get_source() { return source; };
-};
-
 class PawnTargets {
     // PawnTargets store pawn move target bitboards and their source bitboards.
     private:
