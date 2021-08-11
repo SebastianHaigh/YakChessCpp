@@ -76,8 +76,16 @@ class Piece {
     public:
         virtual ~Piece() = default;
         virtual void make_move(Square source, Square target) = 0;
+        virtual bool has_piece_on_square(Square square_index) = 0;
 };
 
+class NullPiece : public Piece {
+    public:
+        NullPiece() = default;
+        ~NullPiece() = default;
+        void make_move(Square source, Square target) override {};
+        bool has_piece_on_square(Square square_index) override { return 0; };
+};
 
 class Pawns : public Piece {
 
@@ -99,6 +107,7 @@ class Pawns : public Piece {
         PawnTargets west_captures();
         PawnTargets east_captures();
         void make_move(Square source, Square target) override;
+        bool has_piece_on_square(Square square_index) override;
         Bitboard all_attacked_squares();
 };
 
@@ -110,6 +119,7 @@ class ChessMen {
     public:
         ChessMen(std::shared_ptr<Pawns> pawns) : pawns(pawns) {};
         std::shared_ptr<Pawns> get_pawns() { return pawns; };
+        std::shared_ptr<Piece> get_piece(Square square_index);
 };
 
 // class SlidingPieces {

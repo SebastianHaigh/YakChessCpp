@@ -3,6 +3,14 @@
 
 namespace pieces {
 
+std::shared_ptr<Piece> ChessMen::get_piece(Square square_index) {
+    if (pawns->has_piece_on_square(square_index)) {
+        return pawns;
+    } else {
+        return std::make_shared<NullPiece>();
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // Implementation of Pawns
@@ -58,6 +66,12 @@ void Pawns::make_move(Square source, Square target) {
     *board ^= source_and_target_bitboard;
     *empty_squares ^= source_and_target_bitboard;
     colour->make_move(source_and_target_bitboard);
+}
+
+bool Pawns::has_piece_on_square(Square square_index) {
+    auto target_bitboard = Bitboard(1) << square_index;
+    
+    return (target_bitboard & *board) > 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
