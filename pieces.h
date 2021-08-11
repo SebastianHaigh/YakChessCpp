@@ -80,13 +80,6 @@ class White : public Colour {
         Bitboard pawn_double_push_target() override;
 };
 
-// class Pieces {
-//     public:
-//         Pieces();
-//         virtual std::stack<SourceTargetPair> get_all_moves();
-//         virtual Bitboard get_all_attacks();
-//         void make_move(Square source, Square target);
-// };
 
 class Pawns {
 

@@ -3,25 +3,6 @@
 
 namespace pieces {
 
-// Pieces::Pieces(std::shared_ptr<Bitboard> board_ptr,
-//                std::shared_ptr<Bitboard> empty_squares_ptr) {
-//     board = board_ptr;
-//     empty_squares = empty_squares_ptr;
-// }
-
-// Bitboard Pieces::get_all_attacks() {
-//     return Bitboard(0);
-// }
-
-// void Pieces::make_move(Square source, Square target) {
-//     Bitboard source_bitboard, target_bitboard, source_target_bitboard;
-//     source_bitboard = Bitboard(1) << source;
-//     target_bitboard = Bitboard(1) << target;
-//     source_target_bitboard = source_bitboard ^ target_bitboard;
-//     *board ^= source_target_bitboard;
-//     *empty_squares ^=  source_target_bitboard;
-// }
-
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // Implementation of Pawns
