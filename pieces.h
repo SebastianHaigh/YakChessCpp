@@ -33,6 +33,7 @@ class Colour {
         virtual Bitboard pawn_west_attack_targets(Bitboard sources) = 0;
         virtual Bitboard pawn_west_attack_sources() = 0;
         virtual Bitboard pawn_double_push_target() = 0;
+        virtual void make_move(Bitboard source_and_target_bitboard) = 0;
 };
 
 class Black : public Colour {
@@ -50,6 +51,7 @@ class Black : public Colour {
         Bitboard pawn_west_attack_targets(Bitboard sources) override;
         Bitboard pawn_west_attack_sources() override;
         Bitboard pawn_double_push_target() override;
+        void make_move(Bitboard source_and_target_bitboard) override;
 };
 
 class White : public Colour {
@@ -67,10 +69,17 @@ class White : public Colour {
         Bitboard pawn_west_attack_targets(Bitboard sources) override;
         Bitboard pawn_west_attack_sources() override;
         Bitboard pawn_double_push_target() override;
+        void make_move(Bitboard source_and_target_bitboard) override;
+};
+
+class Piece {
+    public:
+        virtual ~Piece() = default;
+        virtual void make_move(Square source, Square target) = 0;
 };
 
 
-class Pawns {
+class Pawns : public Piece {
 
     private:
         std::shared_ptr<Bitboard> board;
@@ -84,11 +93,23 @@ class Pawns {
               std::shared_ptr<Bitboard> empty_squares,
               std::shared_ptr<Colour> colour) 
               : board(board), empty_squares(empty_squares) , colour(colour) {};
+        ~Pawns() = default;
         PawnTargets single_pushes();
         PawnTargets double_pushes();
         PawnTargets west_captures();
         PawnTargets east_captures();
+        void make_move(Square source, Square target) override;
         Bitboard all_attacked_squares();
+};
+
+
+class ChessMen {
+    private:
+        std::shared_ptr<Pawns> pawns;
+
+    public:
+        ChessMen(std::shared_ptr<Pawns> pawns) : pawns(pawns) {};
+        std::shared_ptr<Pawns> get_pawns() { return pawns; };
 };
 
 // class SlidingPieces {

@@ -50,6 +50,16 @@ PawnTargets Pawns::east_captures() {
     return PawnTargets(sources, targets);
 }
 
+void Pawns::make_move(Square source, Square target) {
+    auto source_bitboard = Bitboard(1) << source;
+    auto target_bitboard = Bitboard(1) << target;
+    auto source_and_target_bitboard = source_bitboard ^ target_bitboard;
+
+    *board ^= source_and_target_bitboard;
+    *empty_squares ^= source_and_target_bitboard;
+    colour->make_move(source_and_target_bitboard);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // Implementation of Sliding Pieces
@@ -162,6 +172,10 @@ Bitboard White::pawn_double_push_target() {
     return bitboard::RANK_4;
 }
 
+void White::make_move(Bitboard source_and_target_bitboard) {
+    *this_colour_pieces ^= source_and_target_bitboard;
+}
+
 
 Bitboard Black::pawn_push_targets(Bitboard sources) {
     return bitboard::south_one(sources);
@@ -189,6 +203,10 @@ Bitboard Black::pawn_west_attack_sources() {
 
 Bitboard Black::pawn_double_push_target() {
     return bitboard::RANK_5;
+}
+
+void Black::make_move(Bitboard source_and_target_bitboard) {
+    *this_colour_pieces ^= source_and_target_bitboard;
 }
 
 } // namespace pieces
