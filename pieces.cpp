@@ -68,6 +68,14 @@ void Pawns::make_move(Square source, Square target) {
     colour->make_move(source_and_target_bitboard);
 }
 
+void Pawns::make_capture(Square target) {
+    auto target_bitboard = Bitboard(1) << target;
+
+    *board ^= target_bitboard;
+    *empty_squares ^= target_bitboard;
+    colour->make_move(target_bitboard);
+}
+
 bool Pawns::has_piece_on_square(Square square_index) {
     auto target_bitboard = Bitboard(1) << square_index;
     

@@ -76,7 +76,9 @@ class Piece {
     public:
         virtual ~Piece() = default;
         virtual void make_move(Square source, Square target) = 0;
+        virtual void make_capture(Square target) = 0;
         virtual bool has_piece_on_square(Square square_index) = 0;
+        virtual bool is_null() = 0;
 };
 
 class NullPiece : public Piece {
@@ -84,7 +86,9 @@ class NullPiece : public Piece {
         NullPiece() = default;
         ~NullPiece() = default;
         void make_move(Square source, Square target) override {};
+        void make_capture(Square target) override {};
         bool has_piece_on_square(Square square_index) override { return 0; };
+        bool is_null() override { return 1; };
 };
 
 class Pawns : public Piece {
@@ -107,7 +111,9 @@ class Pawns : public Piece {
         PawnTargets west_captures();
         PawnTargets east_captures();
         void make_move(Square source, Square target) override;
+        void make_capture(Square target) override;
         bool has_piece_on_square(Square square_index) override;
+        bool is_null() override { return 0; };
         Bitboard all_attacked_squares();
 };
 
