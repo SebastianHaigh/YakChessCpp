@@ -10,6 +10,24 @@ typedef uint64_t Square;
 typedef uint64_t File;
 typedef uint64_t Rank;
 
+//  +- - - + - - - + - - - - - - - - - - - - - - - - - +
+//  |  RANK | RANK  |           SQUARE INDICES          |
+//  |       | INDEX |                                   |
+//  + - - - + - - - + - - - - - - - - - - - - - - - - - +
+//  |   8   |   7   |   56  57  58  59  60  61  62  63  |
+//  |   7   |   6   |   48  49  50  51  52  53  54  55  |
+//  |   6   |   5   |   40  41  42  43  44  45  46  47  |
+//  |   5   |   4   |   32  33  34  35  36  37  38  39  |
+//  |   4   |   3   |   24  25  26  27  28  29  30  31  |
+//  |   3   |   2   |   16  17  18  19  20  21  22  23  |
+//  |   2   |   1   |   8   9   10  11  12  13  14  15  |
+//  |   1   |   0   |   0   1   2   3   4   5   6   7   |
+//  + - - - + - - - + - - - - - - - - - - - - - - - - - +
+//  |   FILE INDEX  |   0   1   2   3   4   5   6   7   |
+//  | - - - - - - - + - - - - - - - - - - - - - - - - - +
+//  |     FILE      |   A   B   C   D   E   F   G   H   |
+//  | - - - - - - - + - - - - - - - - - - - - - - - - - +
+
 namespace bitboard {
 
 // Bitmasks of all ranks
@@ -50,7 +68,7 @@ const Bitboard NOT_FILE_F = 0xdfdfdfdfdfdfdfdf;
 const Bitboard NOT_FILE_G = 0xbfbfbfbfbfbfbfbf;
 const Bitboard NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
 
-// digonals
+// Diagonal Bitmasks
 const Bitboard DIAG_A1_H8 = 0x8040201008040201;
 const Bitboard DIAG_A8_H1 = 0x0102040810204080;
 
