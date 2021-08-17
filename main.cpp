@@ -15,9 +15,9 @@ int main(int, char**) {
     std::shared_ptr<Bitboard> empty_squares_ptr = std::make_shared<Bitboard> (~occupied_squares);
 
     auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
-    auto WhitePawns = pieces::Pawns(white_pawns, empty_squares_ptr, WhitePieces);
+    auto WhitePawns = pieces::Pawns(empty_squares_ptr, WhitePieces);
+    WhitePawns.standard_starting_position();
 
-    Bitboard pawn_targets = 0;
     auto pawn_moves = WhitePawns.single_pushes();
 
     print_board(pawn_moves.get_target());

@@ -18,18 +18,18 @@ std::shared_ptr<Piece> ChessMen::get_piece(Square square_index) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Bitboard Pawns::all_attacked_squares() {
-    return colour->pawn_west_attack_targets(*board) | colour->pawn_east_attack_targets(*board);
+    return colour->pawn_west_attack_targets(board) | colour->pawn_east_attack_targets(board);
 };
 
 Bitboard Pawns::single_push() {
-    return colour->pawn_push_sources(*empty_squares) & *board;;
+    return colour->pawn_push_sources(*empty_squares) & board;;
 }
 
 Bitboard Pawns::double_push() {
     Bitboard empty_targets, clear_to_target;
     empty_targets = colour->pawn_double_push_target() & *empty_squares;
     clear_to_target = colour->pawn_push_sources(empty_targets) & *empty_squares;
-    return colour->pawn_push_sources(clear_to_target) & *board;
+    return colour->pawn_push_sources(clear_to_target) & board;
 }
 
 PawnTargets Pawns::single_pushes() {
@@ -47,23 +47,31 @@ PawnTargets Pawns::double_pushes() {
 }
         
 PawnTargets Pawns::west_captures() {
-    auto sources = colour->pawn_west_attack_sources() & *board;
+    auto sources = colour->pawn_west_attack_sources() & board;
     auto targets = colour->pawn_west_attack_targets(sources);
     return PawnTargets(sources, targets);
 }
         
 PawnTargets Pawns::east_captures() {
-    auto sources = colour->pawn_east_attack_sources() & *board;
+    auto sources = colour->pawn_east_attack_sources() & board;
     auto targets = colour->pawn_east_attack_targets(sources);
     return PawnTargets(sources, targets);
 }
+
+void Pawns::standard_starting_position() {
+    board = colour->pawn_standard_starting_position();
+}
+
+Bitboard Pawns::current_position() { 
+    return board; 
+};
 
 void Pawns::make_move(Square source, Square target) {
     auto source_bitboard = Bitboard(1) << source;
     auto target_bitboard = Bitboard(1) << target;
     auto source_and_target_bitboard = source_bitboard ^ target_bitboard;
 
-    *board ^= source_and_target_bitboard;
+    board ^= source_and_target_bitboard;
     *empty_squares ^= source_and_target_bitboard;
     colour->make_move(source_and_target_bitboard);
 }
@@ -71,7 +79,7 @@ void Pawns::make_move(Square source, Square target) {
 void Pawns::make_capture(Square target) {
     auto target_bitboard = Bitboard(1) << target;
 
-    *board ^= target_bitboard;
+    board ^= target_bitboard;
     *empty_squares ^= target_bitboard;
     colour->make_move(target_bitboard);
 }
@@ -79,7 +87,7 @@ void Pawns::make_capture(Square target) {
 bool Pawns::has_piece_on_square(Square square_index) {
     auto target_bitboard = Bitboard(1) << square_index;
     
-    return (target_bitboard & *board) > 0;
+    return (target_bitboard & board) > 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -166,6 +174,10 @@ bool Pawns::has_piece_on_square(Square square_index) {
 //     piece_to_move.make_move(source, target);
 // }
 
+Bitboard White::pawn_standard_starting_position() {
+    return bitboard::RANK_2;
+}
+
 Bitboard White::pawn_push_targets(Bitboard sources) {
     return bitboard::north_one(sources);
 }
@@ -198,6 +210,10 @@ void White::make_move(Bitboard source_and_target_bitboard) {
     *this_colour_pieces ^= source_and_target_bitboard;
 }
 
+
+Bitboard Black::pawn_standard_starting_position() {
+    return bitboard::RANK_7;
+}
 
 Bitboard Black::pawn_push_targets(Bitboard sources) {
     return bitboard::south_one(sources);
