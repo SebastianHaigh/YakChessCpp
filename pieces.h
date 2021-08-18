@@ -26,6 +26,7 @@ class PawnTargets {
 
 class Colour {
     public:
+        virtual Bitboard pawn_standard_starting_position() = 0;
         virtual Bitboard pawn_push_targets(Bitboard sources) = 0;
         virtual Bitboard pawn_push_sources(Bitboard targets) = 0;
         virtual Bitboard pawn_east_attack_targets(Bitboard sources) = 0;
@@ -44,6 +45,7 @@ class Black : public Colour {
         Black(std::shared_ptr<Bitboard> this_colour_pieces, 
             std::shared_ptr<Bitboard> opponent_pieces)
             : this_colour_pieces(this_colour_pieces), opponent_pieces(opponent_pieces) {};
+        Bitboard pawn_standard_starting_position() override;
         Bitboard pawn_push_targets(Bitboard sources) override;
         Bitboard pawn_push_sources(Bitboard targets) override;
         Bitboard pawn_east_attack_targets(Bitboard sources) override;
@@ -62,6 +64,7 @@ class White : public Colour {
         White(std::shared_ptr<Bitboard> this_colour_pieces, 
             std::shared_ptr<Bitboard> opponent_pieces)
             : this_colour_pieces(this_colour_pieces), opponent_pieces(opponent_pieces) {};
+        Bitboard pawn_standard_starting_position() override;
         Bitboard pawn_push_targets(Bitboard sources) override;
         Bitboard pawn_push_sources(Bitboard targets) override;
         Bitboard pawn_east_attack_targets(Bitboard sources) override;
@@ -75,6 +78,7 @@ class White : public Colour {
 class Piece {
     public:
         virtual ~Piece() = default;
+        virtual Bitboard current_position() = 0;
         virtual void make_move(Square source, Square target) = 0;
         virtual void make_capture(Square target) = 0;
         virtual bool has_piece_on_square(Square square_index) = 0;
@@ -85,6 +89,7 @@ class NullPiece : public Piece {
     public:
         NullPiece() = default;
         ~NullPiece() = default;
+        Bitboard current_position() override { return Bitboard(0); };
         void make_move(Square source, Square target) override {};
         void make_capture(Square target) override {};
         bool has_piece_on_square(Square square_index) override { return 0; };
@@ -94,15 +99,17 @@ class NullPiece : public Piece {
 class Pawns : public Piece {
 
     private:
-        std::shared_ptr<Bitboard> board;
+        Bitboard board;
         std::shared_ptr<Bitboard> empty_squares;
         std::shared_ptr<Colour> colour;
         Bitboard single_push();
         Bitboard double_push();
         Bitboard all_attack();
     public:
-        Pawns(std::shared_ptr<Bitboard> board,
-              std::shared_ptr<Bitboard> empty_squares,
+        Pawns(std::shared_ptr<Bitboard> empty_squares,
+              std::shared_ptr<Colour> colour) 
+              : board(Bitboard(0)), empty_squares(empty_squares) , colour(colour) {};
+        Pawns(Bitboard board, std::shared_ptr<Bitboard> empty_squares,
               std::shared_ptr<Colour> colour) 
               : board(board), empty_squares(empty_squares) , colour(colour) {};
         ~Pawns() = default;
@@ -110,6 +117,8 @@ class Pawns : public Piece {
         PawnTargets double_pushes();
         PawnTargets west_captures();
         PawnTargets east_captures();
+        void standard_starting_position();
+        Bitboard current_position() override;
         void make_move(Square source, Square target) override;
         void make_capture(Square target) override;
         bool has_piece_on_square(Square square_index) override;
