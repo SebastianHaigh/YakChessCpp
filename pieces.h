@@ -9,7 +9,27 @@
 #include <stdint.h>
 #include <stdio.h>
 
+enum class PieceType {
+    PAWN,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
+    KING,
+    NULL_PIECE
+};
+
+enum class PieceColour {
+    BLACK,
+    WHITE,
+    NULL_COLOUR
+};
+
 namespace pieces {
+
+    PieceType fen_char_to_piece_type(const char fen_char);
+    PieceColour fen_char_to_piece_colour(const char fen_char);
+    
 
 class PawnTargets {
     // PawnTargets store pawn move target bitboards and their source bitboards.

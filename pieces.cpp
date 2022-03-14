@@ -3,6 +3,53 @@
 
 namespace pieces {
 
+
+    PieceType fen_char_to_piece_type(const char fen_char) {
+        switch (fen_char) {
+        case 'p':
+        case 'P':
+            return PieceType::PAWN;
+        case 'n':
+        case 'N':
+            return PieceType::KNIGHT;
+        case 'b':
+        case 'B':
+            return PieceType::BISHOP;
+        case 'r':
+        case 'R':
+            return PieceType::ROOK;
+        case 'q':
+        case 'Q':
+            return PieceType::QUEEN;
+        case 'k':
+        case 'K':
+            return PieceType::KING;
+        default:
+            return PieceType::NULL_PIECE;
+        }
+    }
+
+    PieceColour fen_char_to_piece_colour(const char fen_char) {
+        switch (fen_char) {
+        case 'p':
+        case 'n':
+        case 'b':
+        case 'r':
+        case 'q':
+        case 'k':
+            return PieceColour::BLACK;
+        case 'P':
+        case 'N':
+        case 'B':
+        case 'R':
+        case 'Q':
+        case 'K':
+            return PieceColour::WHITE;
+        default:
+            return PieceColour::NULL_COLOUR;
+        }
+    }
+
 std::shared_ptr<Piece> ChessMen::get_piece(Square square_index) {
     if (pawns->has_piece_on_square(square_index)) {
         return pawns;

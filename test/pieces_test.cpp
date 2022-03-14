@@ -289,3 +289,73 @@ TEST(BlackPawnsTest, OpponentPieceCanBeCaptured) {
     EXPECT_EQ(west_moves.get_target(), bitboard::RANK_6 & bitboard::FILE_C);
     EXPECT_EQ(east_moves.get_target(), bitboard::RANK_6 & bitboard::FILE_C);
 }
+
+TEST(FunctionTests, FenCharToPieceTypeTestForBlackPieces) {
+    // Arrange
+    std::string fen_chars{ "pnbrqkx" };
+    PieceType expected[7]{ PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING, PieceType::NULL_PIECE };
+    PieceType actual[7]{ PieceType::NULL_PIECE };
+
+    // Act
+    for (int i = 0; i < 7; i++) {
+        actual[i] = pieces::fen_char_to_piece_type(fen_chars[i]);
+    }
+
+    // Assert
+    for (int i = 0; i < 7; i++) {
+        EXPECT_EQ(actual[i], expected[i]);
+    }
+}
+
+TEST(FunctionTests, FenCharToPieceTypeTestForWhitePieces) {
+    // Arrange
+    std::string fen_chars{ "PNBRQKX" };
+    PieceType expected[7]{ PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING, PieceType::NULL_PIECE };
+    PieceType actual[7]{ PieceType::NULL_PIECE };
+
+    // Act
+    for (int i = 0; i < 7; i++) {
+        actual[i] = pieces::fen_char_to_piece_type(fen_chars[i]);
+    }
+
+    // Assert
+    for (int i = 0; i < 7; i++) {
+        EXPECT_EQ(actual[i], expected[i]);
+    }
+}
+
+TEST(FunctionTests, FenCharToPieceColourTestForBlackPieces) {
+    // Arrange
+    std::string fen_chars{ "pnbrqkx" };
+    std::vector<PieceColour> expected(6, PieceColour::BLACK);
+    expected.push_back(PieceColour::NULL_COLOUR);
+    std::vector<PieceColour> actual(7, PieceColour::NULL_COLOUR);
+
+    // Act
+    for (int i = 0; i < 7; i++) {
+        actual[i] = pieces::fen_char_to_piece_colour(fen_chars[i]);
+    }
+
+    // Assert
+    for (int i = 0; i < 7; i++) {
+        EXPECT_EQ(actual[i], expected[i]);
+    }
+}
+
+TEST(FunctionTests, FenCharToPieceColourTestForWhitePieces) {
+    // Arrange
+    std::string fen_chars{ "PNBRQKX" }; 
+    std::vector<PieceColour> expected(6, PieceColour::WHITE);
+    expected.push_back(PieceColour::NULL_COLOUR);
+    PieceColour actual[7]{ PieceColour::NULL_COLOUR };
+
+    // Act
+    for (int i = 0; i < 7; i++) {
+        actual[i] = pieces::fen_char_to_piece_colour(fen_chars[i]);
+    }
+
+    // Assert
+    for (int i = 0; i < 7; i++) {
+        EXPECT_EQ(actual[i], expected[i]);
+    }
+}
