@@ -83,12 +83,16 @@ Bitboard north_east_one(Bitboard board);
 Bitboard south_east_one(Bitboard board);
 Bitboard north_west_one(Bitboard board);
 Bitboard south_west_one(Bitboard board);
+void set_square(Bitboard& board, Square square);
+void set_square(Bitboard& board, Rank rank, File file);
 std::stack <Square> scan_forward(Bitboard board);
 std::stack <Square> scan_backward(Bitboard board);
 File file_index(Square square_index);
 Rank rank_index(Square square_index);
 Square square_index(File file_index, Rank rank_index);
+Bitboard to_bitboard(Square square);
 void print_board(Bitboard board);
+
 
 } // namespace bitboard
 

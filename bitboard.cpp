@@ -34,6 +34,15 @@ Bitboard south_west_one(Bitboard board) {
     return (board >> 9) & NOT_FILE_H;
 }
 
+void set_square(Bitboard& board, Square square) {
+    Bitboard piece_to_set{ 1 };
+    board |= piece_to_set << square;
+}
+
+void set_square(Bitboard& board, Rank rank, File file) {
+    set_square(board, square_index(file, rank));
+}
+
 std::stack <Square> scan_backward(Bitboard board) {
     std::stack <Square> serialised_board;
     Bitboard check = 1; 
@@ -90,6 +99,10 @@ Rank rank_index(Square square_index) {
 
 Square square_index(File file_index, Rank rank_index) {
     return (8 * rank_index) + file_index;
+}
+
+Bitboard to_bitboard(Square square) {
+    return Bitboard(1) << square;
 }
 
 void print_board(Bitboard board) { 

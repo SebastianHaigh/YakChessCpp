@@ -2,7 +2,7 @@
 #include "../bitboard.h"
 
 TEST(BitboardTest, SouthOne) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0x000000000000ff00; // RANK 2
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0x00000000000000ff; // RANK 1
@@ -15,7 +15,7 @@ TEST(BitboardTest, SouthOne) {
 }
 
 TEST(BitboardTest, SouthOneFromRank1) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0x00000000000000ff; // RANK 1
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0; // EMPTY BOARD
@@ -28,7 +28,7 @@ TEST(BitboardTest, SouthOneFromRank1) {
 
 
 TEST(BitboardTest, NorthOne) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0x000000000000ff00; // RANK 2
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0x0000000000ff0000; // RANK 3
@@ -41,7 +41,7 @@ TEST(BitboardTest, NorthOne) {
 }
 
 TEST(BitboardTest, NorthOneFromRank8) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0xff00000000000000; // RANK 8
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0; // EMPTY BOARD
@@ -54,7 +54,7 @@ TEST(BitboardTest, NorthOneFromRank8) {
 }
 
 TEST(BitboardTest, EastOne) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0x0202020202020202; // B FILE
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0x0404040404040404; // C FILE
@@ -67,7 +67,7 @@ TEST(BitboardTest, EastOne) {
 }
 
 TEST(BitboardTest, EastOneFromHFile) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0x8080808080808080; // H FILE
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0; // EMPTY BOARD
@@ -80,7 +80,7 @@ TEST(BitboardTest, EastOneFromHFile) {
 }
 
 TEST(BitboardTest, WestOne) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0x0202020202020202; // B FILE
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0x0101010101010101; // A FILE
@@ -93,7 +93,7 @@ TEST(BitboardTest, WestOne) {
 }
 
 TEST(BitboardTest, WestOneFromAFile) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0x0101010101010101; // A FILE
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0; // EMPTY BOARD
@@ -106,7 +106,7 @@ TEST(BitboardTest, WestOneFromAFile) {
 }
 
 TEST(BitboardTest, NorthEastOneFromMiddleOfBoard) { 
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 1 << 8; // A2
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 1 << 17; // A2 should go to B3 (square 17)
@@ -119,7 +119,7 @@ TEST(BitboardTest, NorthEastOneFromMiddleOfBoard) {
 }
 
 TEST(BitboardTest, SouthEastOneFromMiddleOfBoard) { 
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 1 << 8; // A2
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 1 << 1; // A2 should go to B1 (square 1)
@@ -132,7 +132,7 @@ TEST(BitboardTest, SouthEastOneFromMiddleOfBoard) {
 }
 
 TEST(BitboardTest, NorthWestOneFromMiddleOfBoard) { 
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0x0101010101010101; // A FILE
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0; // EMPTY BOARD
@@ -145,7 +145,7 @@ TEST(BitboardTest, NorthWestOneFromMiddleOfBoard) {
 }
 
 TEST(BitboardTest, SouthWestOneFromMiddleOfBoard) { 
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0x0101010101010101; // A FILE
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0; // EMPTY BOARD
@@ -158,7 +158,7 @@ TEST(BitboardTest, SouthWestOneFromMiddleOfBoard) {
 }
 
 TEST(BitboardTest, ScanForwardOnEmptyBoardReturnsEmptyStack) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0;
     std::stack<Square> serialised_bitboard;
 
@@ -170,7 +170,7 @@ TEST(BitboardTest, ScanForwardOnEmptyBoardReturnsEmptyStack) {
 }
 
 TEST(BitboardTest, ScanForwardForPieceOnE4) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 1 << 28;  // E4
     std::stack<Square> serialised_bitboard;
 
@@ -182,7 +182,7 @@ TEST(BitboardTest, ScanForwardForPieceOnE4) {
 }
 
 TEST(BitboardTest, ScanBackwardOnEmptyBoardReturnsEmptyStack) {
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 0;
     std::stack<Square> serialised_bitboard;
 
@@ -194,7 +194,7 @@ TEST(BitboardTest, ScanBackwardOnEmptyBoardReturnsEmptyStack) {
 }
 
 TEST(BitboardTest, ScanBackwardForPieceOnE4) { 
-    // Assemble
+    // Arrange
     Bitboard initial_bitboard = 1 << 28;  // E4
     std::stack<Square> serialised_bitboard;
 
@@ -206,7 +206,7 @@ TEST(BitboardTest, ScanBackwardForPieceOnE4) {
 }
 
 TEST(BitboardTest, CanGetFileIndexOfSquareOnTheBoard) { 
-    // Assemble
+    // Arrange
     Square square_index = 7;  // I think this is A8
     File expected_file = 7;
     File file_of_a8;
@@ -219,7 +219,7 @@ TEST(BitboardTest, CanGetFileIndexOfSquareOnTheBoard) {
 }
 
 TEST(BitboardTest, FileIndexReturnsMinusOneWhenSquareIndexIsOutOfRange) { 
-    // Assemble
+    // Arrange
     Square square_index = 65;
     File file_of_invalid_square;
 
@@ -231,7 +231,7 @@ TEST(BitboardTest, FileIndexReturnsMinusOneWhenSquareIndexIsOutOfRange) {
 }
 
 TEST(BitboardTest, CanGetRankIndexOfSquareOnTheBoard) {
-    // Assemble
+    // Arrange
     Square square_index = 7;  // I think this is A8
     Rank expected_rank = 0; // First Rank
     Rank rank_of_a8;
@@ -244,7 +244,7 @@ TEST(BitboardTest, CanGetRankIndexOfSquareOnTheBoard) {
 }
 
 TEST(BitboardTest, RankIndexReturnsMinusOneWhenSquareIndexIsOutOfRange) { 
-    // Assemble
+    // Arrange
     Square square_index = 65;
     Rank rank_of_invalid_square;
 
@@ -256,7 +256,7 @@ TEST(BitboardTest, RankIndexReturnsMinusOneWhenSquareIndexIsOutOfRange) {
 }
 
 TEST(BitboardTest, CanGetSquareIndexFromVaildRankAndFileIndices) {
-    // Assemble
+    // Arrange
     File valid_file = 7;
     Rank valid_rank = 0;
     Square expected_square = 7;
@@ -267,4 +267,43 @@ TEST(BitboardTest, CanGetSquareIndexFromVaildRankAndFileIndices) {
 
     // Assert
     EXPECT_EQ(valid_square, expected_square);
+}
+
+TEST(BitboardTest, SetSquareCanCorrectlySetAnUnsetSquareOnBitboard) {
+    // Arrange
+    Square square{ 0 };
+    Bitboard expected{ 1 };
+    Bitboard actual{ 0 };
+
+    // Act
+    bitboard::set_square(actual, square);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(BitboardTest, SetSquareCanCorrectlySetAnUnsetSquareOnBitboardWithRankAndFile) {
+    // Arrange
+    Rank rank{ 0 };
+    File file{ 0 };
+    Bitboard expected{ 1 };
+    Bitboard actual{ 0 };
+
+    // Act
+    bitboard::set_square(actual, rank, file);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(BitboardTest, SquareToBitboardDetectsE4) {
+    // Arrange
+    Square square{ 28 }; // E4
+    Bitboard expected{ bitboard::RANK_4 & bitboard::FILE_E };
+
+    // Act
+    Bitboard actual = bitboard::to_bitboard(square);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
 }
