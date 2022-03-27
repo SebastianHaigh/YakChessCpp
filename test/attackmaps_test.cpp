@@ -22,7 +22,7 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
 }
 
@@ -47,9 +47,9 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 4);
-    EXPECT_EQ(serialised_ray.top(), 24);
+    EXPECT_EQ(serialised_ray[0], 24);
 }
 
 TEST(NorthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
@@ -73,9 +73,9 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
-    EXPECT_EQ(serialised_ray.top(), 61);
+    EXPECT_EQ(serialised_ray[0], 61);
 }
 
 TEST(NorthRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheEightRank) {
@@ -123,7 +123,7 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
 }
 
@@ -148,9 +148,9 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 4);
-    EXPECT_EQ(serialised_ray.top(), 8);
+    EXPECT_EQ(serialised_ray[0], 8);
 }
 
 TEST(SouthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
@@ -174,9 +174,9 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
-    EXPECT_EQ(serialised_ray.top(), 45);
+    EXPECT_EQ(serialised_ray[0], 45);
 }
 
 TEST(SouthRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheFirstRank) {
@@ -224,7 +224,7 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 7);
 }
 
@@ -249,9 +249,9 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
-    EXPECT_EQ(serialised_ray.top(), 41);
+    EXPECT_EQ(serialised_ray[0], 41);
 }
 
 TEST(EastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
@@ -275,9 +275,9 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
-    EXPECT_EQ(serialised_ray.top(), 54);
+    EXPECT_EQ(serialised_ray[0], 54);
 }
 
 TEST(EastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
@@ -286,7 +286,7 @@ TEST(EastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
     auto ray = attacks::EastRay();
     Square serialised_pieces[8] = {7, 15, 23, 31, 39, 47, 55, 63}; // H1, ..., H8
     Bitboard occupied_squares = 0;
-    Bitboard attack_ray[8];
+    std::vector<Bitboard>attack_ray(8, 0);
 
     // Act
     for (int i = 0; i < 8; i++) {
@@ -294,14 +294,9 @@ TEST(EastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
     }
 
     // Assert
-    EXPECT_EQ(attack_ray[0], 0);
-    EXPECT_EQ(attack_ray[1], 0);
-    EXPECT_EQ(attack_ray[2], 0);
-    EXPECT_EQ(attack_ray[3], 0);
-    EXPECT_EQ(attack_ray[4], 0);
-    EXPECT_EQ(attack_ray[5], 0);
-    EXPECT_EQ(attack_ray[6], 0);
-    EXPECT_EQ(attack_ray[7], 0);
+    for (auto r : attack_ray) {
+        EXPECT_EQ(r, 0);
+    }
 }
 
 
@@ -325,7 +320,7 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 7);
 }
 
@@ -350,9 +345,9 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
-    EXPECT_EQ(serialised_ray.top(), 42);
+    EXPECT_EQ(serialised_ray[0], 42);
 }
 
 TEST(WestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
@@ -376,9 +371,9 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
-    EXPECT_EQ(serialised_ray.top(), 52);
+    EXPECT_EQ(serialised_ray[0], 52);
 }
 
 TEST(WestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
@@ -426,7 +421,7 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 4);
 }
 
@@ -451,9 +446,9 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 3);
-    EXPECT_EQ(serialised_ray.top(), 35);
+    EXPECT_EQ(serialised_ray[0], 35);
 }
 
 TEST(NorthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
@@ -477,9 +472,9 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
-    EXPECT_EQ(serialised_ray.top(), 62);
+    EXPECT_EQ(serialised_ray[0], 62);
 }
 
 TEST(NorthEastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
@@ -527,7 +522,7 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 3);
 }
 
@@ -552,9 +547,9 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 2);
-    EXPECT_EQ(serialised_ray.top(), 12);
+    EXPECT_EQ(serialised_ray[0], 12);
 }
 
 TEST(SouthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
@@ -578,9 +573,9 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
-    EXPECT_EQ(serialised_ray.top(), 46);
+    EXPECT_EQ(serialised_ray[0], 46);
 }
 
 TEST(SouthEastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
@@ -628,7 +623,7 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
 }
 
@@ -653,9 +648,9 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 3);
-    EXPECT_EQ(serialised_ray.top(), 28);
+    EXPECT_EQ(serialised_ray[0], 28);
 }
 
 TEST(NorthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
@@ -679,9 +674,9 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
-    EXPECT_EQ(serialised_ray.top(), 60);
+    EXPECT_EQ(serialised_ray[0], 60);
 }
 
 TEST(NorthWestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
@@ -729,7 +724,7 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
 }
 
@@ -754,9 +749,9 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 3);
-    EXPECT_EQ(serialised_ray.top(), 26);
+    EXPECT_EQ(serialised_ray[0], 26);
 }
 
 TEST(SouthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
@@ -780,9 +775,9 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     attack_ray = ray.get(serialised_piece, occupied_squares);
 
     // Assert
-    std::stack<Square> serialised_ray = bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
-    EXPECT_EQ(serialised_ray.top(), 44);
+    EXPECT_EQ(serialised_ray[0], 44);
 }
 
 TEST(SouthWestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {

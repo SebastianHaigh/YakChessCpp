@@ -2,14 +2,33 @@
 
 namespace attacks {
 
+    KnightAttacks::KnightAttacks() {
+        for (int i = 0; i < 64; i++) {
+            Bitboard knight_square = bitboard::to_bitboard(i);
+            maps[i] = bitboard::north_one(bitboard::north_east_one(knight_square)); // north-north-east
+            maps[i] |= bitboard::north_one(bitboard::north_west_one(knight_square)); // north-north-west
+            maps[i] |= bitboard::east_one(bitboard::north_east_one(knight_square)); // north-east-east
+            maps[i] |= bitboard::west_one(bitboard::north_west_one(knight_square)); // north-west_west
+            maps[i] |= bitboard::east_one(bitboard::south_east_one(knight_square)); // south-east-east
+            maps[i] |= bitboard::west_one(bitboard::south_west_one(knight_square)); // south-west-west
+            maps[i] |= bitboard::south_one(bitboard::south_east_one(knight_square)); // south-south-east
+            maps[i] |= bitboard::south_one(bitboard::south_west_one(knight_square)); // south-south-west
+        }
+    }
+
+
+    Bitboard KnightAttacks::get(Square serialised_piece) {
+        return maps[serialised_piece];
+    }
+
 Bitboard Ray::get(Square serialised_piece, Bitboard occupied_squares) {
 
     Bitboard ray = 0;
-    std::stack<Square> blockers;
+    std::vector<Square> blockers;
 
     blockers = get_blockers(serialised_piece, occupied_squares);
     if (!blockers.empty()){
-        ray = ray_maps[serialised_piece] ^ ray_maps[blockers.top()];
+        ray = ray_maps[serialised_piece] ^ ray_maps[blockers[0]];
     } else {
         ray = ray_maps[serialised_piece] ^ bitboard::EMPTY;
     }
@@ -17,19 +36,19 @@ Bitboard Ray::get(Square serialised_piece, Bitboard occupied_squares) {
     return ray;
 }
 
-std::stack<Square> Ray::get_blockers(Square serialised_piece, 
+std::vector<Square> Ray::get_blockers(Square serialised_piece, 
                                      Bitboard occupied_squares) {
 
-    std::stack<Square> blockers;
+    std::vector<Square> blockers;
 
     return blockers;
 }
 
-std::stack<Square> PositiveRay::get_blockers(Square serialised_piece,
+std::vector<Square> PositiveRay::get_blockers(Square serialised_piece,
                                              Bitboard occupied_squares) {
 
     Bitboard pieces_in_ray;
-    std::stack<Square> blockers;
+    std::vector<Square> blockers;
 
     pieces_in_ray = ray_maps[serialised_piece] & occupied_squares;
     blockers = bitboard::scan_forward(pieces_in_ray);
@@ -37,11 +56,11 @@ std::stack<Square> PositiveRay::get_blockers(Square serialised_piece,
     return blockers;
 }
 
-std::stack<Square> NegativeRay::get_blockers(Square serialised_piece, 
+std::vector<Square> NegativeRay::get_blockers(Square serialised_piece,
                                              Bitboard occupied_squares) {
 
     Bitboard pieces_in_ray;
-    std::stack<Square> blockers;
+    std::vector<Square> blockers;
 
     pieces_in_ray = ray_maps[serialised_piece] & occupied_squares;
     blockers = bitboard::scan_backward(pieces_in_ray);

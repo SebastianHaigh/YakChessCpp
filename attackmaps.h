@@ -3,8 +3,19 @@
 
 #include <stdint.h>
 #include "bitboard.h"
+#include <stack>
 
 namespace attacks {
+
+
+    class KnightAttacks {
+        private:
+            Bitboard maps[64] = { 0 };
+
+        public:
+            KnightAttacks();
+            Bitboard get(Square serialised_piece);
+    };
 
 // Ray is a pure virtual class that serves as the base class for attack ray 
 // generation. Attack rays are used to generate attack maps for the sliding 
@@ -20,7 +31,7 @@ class Ray {
     private:
         // Returns the square index of the first blocker in the ray extending
         // from the square index: serialised_piece.
-        virtual std::stack<Square> get_blockers(Square serialised_piece, Bitboard occupied_squares);
+        virtual std::vector<Square> get_blockers(Square serialised_piece, Bitboard occupied_squares);
 
     public:
         // Returns a bitboard of every square attacked by the serialied_piece.
@@ -30,7 +41,7 @@ class Ray {
 // PositiveRays are those that extend in the North, and East directions.
 class PositiveRay: virtual public Ray {
     private:
-        std::stack<Square> get_blockers(Square serialised_piece, Bitboard occupied_squares) override;
+        std::vector<Square>get_blockers(Square serialised_piece, Bitboard occupied_squares) override;
 };
 
 // NegativeRay are those that extend in the South, and West directions.
@@ -38,7 +49,7 @@ class NegativeRay: virtual public Ray {
     private:
         // Returns the square index of the first blocker in the ray extending
         // from the square index: serialised_piece.
-        std::stack<Square> get_blockers(Square serialised_piece, Bitboard occupied_squares) override;
+        std::vector<Square>get_blockers(Square serialised_piece, Bitboard occupied_squares) override;
 };
 
 
