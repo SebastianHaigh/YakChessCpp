@@ -160,10 +160,8 @@ TEST(BitboardTest, SouthWestOneFromMiddleOfBoard) {
 TEST(BitboardTest, ScanForwardOnEmptyBoardReturnsEmptyStack) {
     // Arrange
     Bitboard initial_bitboard = 0;
-    std::stack<Square> serialised_bitboard;
-
     // Act
-    serialised_bitboard = bitboard::scan_forward(initial_bitboard);
+    std::vector<Square> serialised_bitboard = bitboard::scan_forward(initial_bitboard);
 
     // Assert
     EXPECT_EQ(serialised_bitboard.size(), 0);
@@ -172,22 +170,20 @@ TEST(BitboardTest, ScanForwardOnEmptyBoardReturnsEmptyStack) {
 TEST(BitboardTest, ScanForwardForPieceOnE4) {
     // Arrange
     Bitboard initial_bitboard = 1 << 28;  // E4
-    std::stack<Square> serialised_bitboard;
 
     // Act
-    serialised_bitboard = bitboard::scan_forward(initial_bitboard);
+    std::vector<Square> serialised_bitboard = bitboard::scan_forward(initial_bitboard);
 
     // Assert
-    EXPECT_EQ(serialised_bitboard.top(), 28);
+    EXPECT_EQ(serialised_bitboard[0], 28);
 }
 
 TEST(BitboardTest, ScanBackwardOnEmptyBoardReturnsEmptyStack) {
     // Arrange
     Bitboard initial_bitboard = 0;
-    std::stack<Square> serialised_bitboard;
 
     // Act
-    serialised_bitboard = bitboard::scan_backward(initial_bitboard);
+    std::vector<Square> serialised_bitboard = bitboard::scan_backward(initial_bitboard);
 
     // Assert
     EXPECT_EQ(serialised_bitboard.size(), 0); // Force Fail
@@ -196,13 +192,12 @@ TEST(BitboardTest, ScanBackwardOnEmptyBoardReturnsEmptyStack) {
 TEST(BitboardTest, ScanBackwardForPieceOnE4) { 
     // Arrange
     Bitboard initial_bitboard = 1 << 28;  // E4
-    std::stack<Square> serialised_bitboard;
 
     // Act
-    serialised_bitboard = bitboard::scan_backward(initial_bitboard);
+    std::vector<Square> serialised_bitboard = bitboard::scan_backward(initial_bitboard);
 
     // Assert
-    EXPECT_EQ(serialised_bitboard.top(), 28); // Force Fail   
+    EXPECT_EQ(serialised_bitboard[0], 28); // Force Fail   
 }
 
 TEST(BitboardTest, CanGetFileIndexOfSquareOnTheBoard) { 
@@ -306,4 +301,69 @@ TEST(BitboardTest, SquareToBitboardDetectsE4) {
 
     // Assert
     EXPECT_EQ(actual, expected);
+}
+
+TEST(BitboardTest, CanConvertAlgebraicSquareNotationToSquareIndex) {
+    // Arrange
+    Square expected{ 0 }; // Start at A1
+    Square actual[8][8]{0};
+    char ranks[8]{'1', '2', '3', '4', '5', '6', '7', '8'};
+    char files[8]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+
+    // Act
+    for (int iRank = 0; iRank < 8; ++iRank) {
+        for (int iFile = 0; iFile < 8; ++iFile) {
+            std::string algebraic_square{ files[iFile], ranks[iRank] };
+            actual[iRank][iFile] = bitboard::algebraic_square_to_square_index(algebraic_square);
+        }
+    }
+
+    // Assert
+    for (int iRank = 0; iRank < 8; ++iRank) {
+        for (int iFile = 0; iFile < 8; ++iFile) {
+            EXPECT_EQ(actual[iRank][iFile], expected++);
+        }
+    }
+}
+
+TEST(BitboardTest, CanConvertAlgebraicSquareNotationToSquareIndexWithCapitalFile) {
+    // Arrange
+    Square expected{ 0 }; // Start at A1
+    Square actual[8][8]{ 0 };
+    char ranks[8]{ '1', '2', '3', '4', '5', '6', '7', '8' };
+    char files[8]{ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
+
+    // Act
+    for (int iRank = 0; iRank < 8; ++iRank) {
+        for (int iFile = 0; iFile < 8; ++iFile) {
+            std::string algebraic_square{ files[iFile], ranks[iRank] };
+            actual[iRank][iFile] = bitboard::algebraic_square_to_square_index(algebraic_square);
+        }
+    }
+
+    // Assert
+    for (int iRank = 0; iRank < 8; ++iRank) {
+        for (int iFile = 0; iFile < 8; ++iFile) {
+            EXPECT_EQ(actual[iRank][iFile], expected++);
+        }
+    }
+}
+
+TEST(BitboardTest, CanConvertSquareIndexToAlgebraicSquareNotation) {
+    // Arrange
+    Square square{ 0 };
+    std::vector<std::string> expected{ "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+        "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+        "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+        "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+        "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+        "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+        "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+        "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8" };
+
+    // Act & Assert
+    for (int i = 0; i < 64; i++) {
+        std::string actual = bitboard::square_index_to_algebraic_square(i);
+        EXPECT_EQ(actual, expected[i]);
+    }
 }

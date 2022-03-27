@@ -1,4 +1,5 @@
 #include "bitboard.h"
+#include <string>
 
 namespace bitboard {
 
@@ -43,42 +44,33 @@ void set_square(Bitboard& board, Rank rank, File file) {
     set_square(board, square_index(file, rank));
 }
 
-std::stack <Square> scan_backward(Bitboard board) {
-    std::stack <Square> serialised_board;
-    Bitboard check = 1; 
-    for (Square square = 0; square < 64; square++) {
-        if (board & check) {
-            // The conditional will check if the union of board and check is 
-            // non-zero. The check variable is an unsigned 64-bit integer, 
-            // initialized as one before the loop begins. The board variable is 
-            // also a 64-bit integer which is a bitboard representation of a 
-            // chessboard. 
-            //
-            // Every iteration of the for loop, the check variable is 
-            // left-shifted by one bit. Therefore, the check will always be 
-            // 64-bits with exactly one non-zero bit, where the index of the 
-            // non-zero bit corresponds to the iteration index square. 
-            //
-            // For any given square index, if (board & check) is non-zero, then 
-            // it means that the chessboard represented by board has a piece on 
-            // the square with index square.
-
-            serialised_board.push(square);
+std::vector<Square> scan_backward(Bitboard board) {
+    std::vector<Square> serialised_board;
+    for (Square square = 64; square > 0; square--) {
+        if (board & to_bitboard(square - 1)) {
+            serialised_board.push_back(square - 1);
         }
-        check = check << 1;
     }
     return serialised_board;
 }
 
-std::stack <Square> scan_forward(Bitboard board) {
-    std::stack <Square> backward_serialised_board;
-    std::stack <Square> serialised_board;
-    backward_serialised_board = scan_backward(board);
-    while (!backward_serialised_board.empty()) {
-        serialised_board.push(backward_serialised_board.top());
-        backward_serialised_board.pop();
+std::vector<Square> scan_forward(Bitboard board) {
+    std::vector<Square> serialised_board;
+    for (Square square = 0; square < 64; square++) {
+        if (board & to_bitboard(square)) {
+            serialised_board.push_back(square);
+        }
     }
     return serialised_board;
+}
+
+Square first_occupied_square(Bitboard board) {
+    for (Square square = 0; square < 64; square++) {
+        if (board & to_bitboard(square)) {
+            return square;
+        }
+    }
+    return Square(64);
 }
 
 File file_index(Square square_index) {
@@ -105,30 +97,98 @@ Bitboard to_bitboard(Square square) {
     return Bitboard(1) << square;
 }
 
+Bitboard to_bitboard(File file, Rank rank) { 
+    return to_bitboard(square_index(file, rank)); 
+};
+
 void print_board(Bitboard board) { 
-    std::stack <bool> board_stack[8];
-    Bitboard unity = 1;
+    std::vector<std::vector<bool>> board_vector(8, std::vector<bool>(8, false));
+
     for (Rank rank = 0; rank < 8; rank++) {
         for (File file = 0; file < 8; file++)
         {
-            board_stack[file].push((board & (unity << square_index(file, rank))));
+            board_vector[file][rank] = (board & to_bitboard(file, rank)) > 0;
         }
     }
 
     for (Rank rank = 0; rank < 8; rank++) {
         for (File file = 0; file < 8; file++)
         {
-            if (board_stack[file].top()) {
+            if (board_vector[file][rank]) {
                 std::cout << " 1";
             } else {
                 std::cout << " 0";
             }
-            board_stack[file].pop();
         }
         std::cout << std::endl;
     }
     std::cout << std::endl;
 
+}
+
+Square algebraic_square_to_square_index(std::string algebraic_square) {
+    File file = algebraic_file_to_file_index(algebraic_square[0]);
+    Rank rank = algebraic_rank_to_rank_index(algebraic_square[1]);
+    return square_index(file, rank);
+}
+
+std::string square_index_to_algebraic_square(Square square) {
+    std::string files{ "abcdefgh" };
+    return files[file_index(square)] + std::to_string(rank_index(square) + 1);
+}
+
+File algebraic_file_to_file_index(char algebraic_file) {
+    switch (algebraic_file) {
+        case 'a':
+        case 'A':
+            return 0;
+        case 'b':
+        case 'B':
+            return 1;
+        case 'c':
+        case 'C':
+            return 2;
+        case 'd':
+        case 'D':
+            return 3;
+        case 'e':
+        case 'E':
+            return 4;
+        case 'f':
+        case 'F':
+            return 5;
+        case 'g':
+        case 'G':
+            return 6;
+        case 'h':
+        case 'H':
+            return 7;
+        default:
+            return -1;
+    }
+}
+
+Rank algebraic_rank_to_rank_index(char algebraic_rank) {
+    switch (algebraic_rank) {
+    case '1':
+        return 0;
+    case '2':
+        return 1;
+    case '3':
+        return 2;
+    case '4':
+        return 3;
+    case '5':
+        return 4;
+    case '6':
+        return 5;
+    case '7':
+        return 6;
+    case '8':
+        return 7;
+    default:
+        return -1;
+    }
 }
 
 } // namespace bitboard
