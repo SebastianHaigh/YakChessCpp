@@ -7,14 +7,28 @@
 
 namespace attacks {
 
+    class AttackMap {
+    public:
+        AttackMap() {}
+        virtual ~AttackMap() {}
+        virtual Bitboard get(Square serialised_piece) = 0;
+    };
 
-    class KnightAttacks {
+    class KnightAttacks : public AttackMap {
         private:
             Bitboard maps[64] = { 0 };
 
         public:
             KnightAttacks();
-            Bitboard get(Square serialised_piece);
+            Bitboard get(Square serialised_piece) override;
+    };
+
+    class KingAttacks : public AttackMap {
+        private:
+            Bitboard maps[64] = { 0 };
+        public:
+            KingAttacks();
+            Bitboard get(Square serialised_piece) override;
     };
 
 // Ray is a pure virtual class that serves as the base class for attack ray 
@@ -31,22 +45,23 @@ class Ray {
     private:
         // Returns the square index of the first blocker in the ray extending
         // from the square index: serialised_piece.
-        virtual std::vector<Square> get_blockers(Square serialised_piece, Bitboard occupied_squares);
+        
 
     public:
         // Returns a bitboard of every square attacked by the serialied_piece.
         Bitboard get(Square serialised_piece, Bitboard occupied_squares);
+        virtual std::vector<Square> get_blockers(Square serialised_piece, Bitboard occupied_squares);
 };
 
 // PositiveRays are those that extend in the North, and East directions.
 class PositiveRay: virtual public Ray {
-    private:
+    public:
         std::vector<Square>get_blockers(Square serialised_piece, Bitboard occupied_squares) override;
 };
 
 // NegativeRay are those that extend in the South, and West directions.
 class NegativeRay: virtual public Ray {
-    private:
+    public:
         // Returns the square index of the first blocker in the ray extending
         // from the square index: serialised_piece.
         std::vector<Square>get_blockers(Square serialised_piece, Bitboard occupied_squares) override;

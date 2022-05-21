@@ -21,6 +21,25 @@ namespace attacks {
         return maps[serialised_piece];
     }
 
+    KingAttacks::KingAttacks() {
+        for (int i = 0; i < 64; i++) {
+            Bitboard king_square = bitboard::to_bitboard(i);
+            maps[i] = bitboard::north_one(king_square);
+            maps[i] |= bitboard::north_east_one(king_square);
+            maps[i] |= bitboard::east_one(king_square);
+            maps[i] |= bitboard::south_east_one(king_square);
+            maps[i] |= bitboard::south_one(king_square);
+            maps[i] |= bitboard::south_west_one(king_square);
+            maps[i] |= bitboard::west_one(king_square);
+            maps[i] |= bitboard::north_west_one(king_square);  
+        }
+    }
+
+
+    Bitboard KingAttacks::get(Square serialised_piece) {
+        return maps[serialised_piece];
+    }
+
 Bitboard Ray::get(Square serialised_piece, Bitboard occupied_squares) {
 
     Bitboard ray = 0;
