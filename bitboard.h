@@ -126,6 +126,8 @@ Square first_occupied_square(Bitboard board);
 /// <param name="square_index">The index of a square on the board.</param>
 /// <returns>The File that the square is on.</returns>
 File file_index(Square square_index);
+File file_index(char algebraic_file);
+File file_index(std::string algebraic_square);
 
 /// <summary>
 /// Returns the rank index of the specified Square
@@ -133,15 +135,20 @@ File file_index(Square square_index);
 /// <param name="square_index">The index of a square on the board.</param>
 /// <returns>The Rank that the square is on.</returns>
 Rank rank_index(Square square_index);
+Rank rank_index(char algebraic_file);
+Rank rank_index(std::string algebraic_square);
+
 Square square_index(File file_index, Rank rank_index);
+Square square_index(std::string square);
+
 Bitboard to_bitboard(Square square);
 Bitboard to_bitboard(File file, Rank rank);
+Bitboard to_bitboard(std::string algebraic_square);
+
 void print_board(Bitboard board);
 
-Square algebraic_square_to_square_index(std::string algebraic_square);
-std::string square_index_to_algebraic_square(Square square);
-File algebraic_file_to_file_index(char algebraic_file);
-Rank algebraic_rank_to_rank_index(char algebraic_rank);
+std::string to_algebraic(Square square);
+std::string to_algebraic(File file_index, Rank rank_index);
 
 } // namespace bitboard
 

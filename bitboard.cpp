@@ -81,6 +81,14 @@ File file_index(Square square_index) {
     }
 }
 
+File file_index(char algebraic_file) {
+    return toupper(algebraic_file) - 'A';
+}
+
+File file_index(std::string algebraic_square) {
+    return file_index(algebraic_square[0]);
+}
+
 Rank rank_index(Square square_index) {
     if (square_index >= 0 && square_index <= 63) {
         return square_index >> 3;
@@ -89,8 +97,22 @@ Rank rank_index(Square square_index) {
     }
 }
 
+Rank rank_index(char algebraic_rank) {
+    return algebraic_rank - '1';
+}
+
+Rank rank_index(std::string algebraic_square) {
+    return file_index(algebraic_square[1]);
+}
+
 Square square_index(File file_index, Rank rank_index) {
     return (8 * rank_index) + file_index;
+}
+
+Square square_index(std::string square) {
+    File file = file_index(square[0]);
+    Rank rank = rank_index(square[1]);
+    return square_index(file, rank);
 }
 
 Bitboard to_bitboard(Square square) {
@@ -101,20 +123,25 @@ Bitboard to_bitboard(File file, Rank rank) {
     return to_bitboard(square_index(file, rank)); 
 };
 
+Bitboard to_bitboard(std::string square) {
+    return Bitboard(1) << square_index(square);
+}
+
 void print_board(Bitboard board) { 
     std::vector<std::vector<bool>> board_vector(8, std::vector<bool>(8, false));
 
     for (Rank rank = 0; rank < 8; rank++) {
         for (File file = 0; file < 8; file++)
         {
-            board_vector[file][rank] = (board & to_bitboard(file, rank)) > 0;
+            board_vector[rank][file] = (board & to_bitboard(file, rank)) > 0;
         }
     }
 
-    for (Rank rank = 0; rank < 8; rank++) {
-        for (File file = 0; file < 8; file++)
+    for (auto rit = board_vector.rbegin(); rit != board_vector.rend(); ++rit) {
+        //for (File file = 0; file < 8; file++)
+        for (auto file : *rit)
         {
-            if (board_vector[file][rank]) {
+            if (file) {
                 std::cout << " 1";
             } else {
                 std::cout << " 0";
@@ -126,69 +153,14 @@ void print_board(Bitboard board) {
 
 }
 
-Square algebraic_square_to_square_index(std::string algebraic_square) {
-    File file = algebraic_file_to_file_index(algebraic_square[0]);
-    Rank rank = algebraic_rank_to_rank_index(algebraic_square[1]);
-    return square_index(file, rank);
-}
-
-std::string square_index_to_algebraic_square(Square square) {
+std::string to_algebraic(Square square) {
     std::string files{ "abcdefgh" };
     return files[file_index(square)] + std::to_string(rank_index(square) + 1);
 }
 
-File algebraic_file_to_file_index(char algebraic_file) {
-    switch (algebraic_file) {
-        case 'a':
-        case 'A':
-            return 0;
-        case 'b':
-        case 'B':
-            return 1;
-        case 'c':
-        case 'C':
-            return 2;
-        case 'd':
-        case 'D':
-            return 3;
-        case 'e':
-        case 'E':
-            return 4;
-        case 'f':
-        case 'F':
-            return 5;
-        case 'g':
-        case 'G':
-            return 6;
-        case 'h':
-        case 'H':
-            return 7;
-        default:
-            return -1;
-    }
-}
-
-Rank algebraic_rank_to_rank_index(char algebraic_rank) {
-    switch (algebraic_rank) {
-    case '1':
-        return 0;
-    case '2':
-        return 1;
-    case '3':
-        return 2;
-    case '4':
-        return 3;
-    case '5':
-        return 4;
-    case '6':
-        return 5;
-    case '7':
-        return 6;
-    case '8':
-        return 7;
-    default:
-        return -1;
-    }
+std::string to_algebraic(File file_index, Rank rank_index) {
+    std::string files{ "abcdefgh" };
+    return files[file_index] + std::to_string(rank_index + 1);
 }
 
 } // namespace bitboard
