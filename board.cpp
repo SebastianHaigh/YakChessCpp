@@ -100,12 +100,19 @@ std::vector<Move> Board::generate_moves() {
 	moves = generate_piece_moves_and_captures(PieceType::KING, moves);
 	moves = generate_castling_moves(moves);
 	move_list.clear();
-	for (const Move& move : moves) {
-		make_move(move);
-		if (!is_check(previous_state.side_to_move())) {
+	for (Move move : moves) {
+
+		// Castles have alredy been checked for legality
+		if (!move.is_castle()) {
+			make_move(move);
+			if (!is_check(previous_state.side_to_move())) {
+				move_list.push_back(move);
+			}
+			undo_move();
+		}
+		else {
 			move_list.push_back(move);
 		}
-		undo_move();
 	}
 
 	return move_list;
@@ -278,7 +285,6 @@ void Board::process_move(Move move) {
 		colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
 		piece_type_bitboard[static_cast<int>(move.get_moved_piece())] ^= move.ep_capture_square_bb();
 		colour_bitboard[static_cast<int>(pieces::other_colour(current_state.side_to_move()))] ^= move.ep_capture_square_bb();
-
 	}
 	else if (move.is_capture() && !move.is_en_passant()) {
 		//reset the half move counter
@@ -289,11 +295,49 @@ void Board::process_move(Move move) {
 		colour_bitboard[static_cast<int>(pieces::other_colour(current_state.side_to_move()))] ^= move.to_bitboard();
 
 	}
+	else if (move.is_castle()) {
+		if (move.get_castle_side() == PieceType::KING && current_state.can_king_side_castle()) {
+			Bitboard from_bitboard = get_position(current_state.side_to_move(), PieceType::KING);
+			Bitboard to_bitboard = bitboard::east_one(bitboard::east_one(from_bitboard));
+			Bitboard from_to_bitboard = from_bitboard ^ to_bitboard;
+			bitboard::print_board(from_to_bitboard);
+			piece_type_bitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
+			colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+
+			from_bitboard = bitboard::FILE_H & get_position(current_state.side_to_move(), PieceType::ROOK);
+			to_bitboard = bitboard::west_one(bitboard::west_one(from_bitboard));
+			from_to_bitboard = from_bitboard ^ to_bitboard;
+			piece_type_bitboard[static_cast<int>(PieceType::ROOK)] ^= from_to_bitboard;
+			colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+		}
+		else if (move.get_castle_side() == PieceType::QUEEN && current_state.can_queen_side_castle()) {
+			Bitboard from_bitboard = get_position(current_state.side_to_move(), PieceType::KING);
+			Bitboard to_bitboard = bitboard::west_one(bitboard::west_one(from_bitboard));
+			Bitboard from_to_bitboard = from_bitboard ^ to_bitboard;
+			bitboard::print_board(from_to_bitboard);
+			piece_type_bitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
+			colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+
+			from_bitboard = bitboard::FILE_A & get_position(current_state.side_to_move(), PieceType::ROOK);
+			to_bitboard = bitboard::east_one(bitboard::east_one(bitboard::east_one(from_bitboard)));
+			from_to_bitboard = from_bitboard ^ to_bitboard;
+			piece_type_bitboard[static_cast<int>(PieceType::ROOK)] ^= from_to_bitboard;
+			colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+		}
+	}
 	else {
 		// must be quiet move
 		Bitboard from_to_bitboard = move.from_bitboard() ^ move.to_bitboard();
 		piece_type_bitboard[static_cast<int>(move.get_moved_piece())] ^= from_to_bitboard;
 		colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+	}
+
+	if (move.is_promotion()) {
+		piece_type_bitboard[static_cast<int>(PieceType::PAWN)] ^= move.to_bitboard();
+		colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= move.to_bitboard();
+		piece_type_bitboard[static_cast<int>(move.get_promotion_piece())] ^= move.to_bitboard();
+		colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= move.to_bitboard();
+
 	}
 }
 
@@ -423,11 +467,21 @@ bool CastlingRights::queen_side(PieceColour colour) {
 	}
 }
 
-void CastlingRights::update(Move move) {
+void CastlingRights::update(Move move, PieceColour side) {
 	white[0] = !(move.from_square() == 7 || move.to_square() == 7 || move.from_square() == 4) && white[0];
 	white[1] = !(move.from_square() == 0 || move.to_square() == 0 || move.from_square() == 4) && white[1];
 	black[0] = !(move.from_square() == 63 || move.to_square() == 63 || move.from_square() == 60) && black[0];
 	black[1] = !(move.from_square() == 56 || move.to_square() == 56 || move.from_square() == 60) && black[1];
+	if (move.is_castle()) {
+		if (side == PieceColour::WHITE) {
+			white[0] = false;
+			white[1] = false;
+		}
+		else {
+			black[0] = false;
+			black[1] = false;
+		}
+	}
 }
 
 std::string CastlingRights::fen() {
@@ -497,7 +551,7 @@ void GameState::update(Move move) {
 		has_ep_target = false;
 	}
 
-	castling_rights.update(move);
+	castling_rights.update(move, side);
 	if (side == PieceColour::BLACK) {
 		move_clock++;
 	}

@@ -38,7 +38,7 @@ int main(int, char**) {
 
     for (int i = 0; i < 1000000; i++) {
         Move move(56, 0, a[i]);
-        cr.update(move);
+        cr.update(move, PieceColour::WHITE);
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);

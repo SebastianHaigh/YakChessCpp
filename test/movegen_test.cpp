@@ -52,34 +52,7 @@ TEST(MoveTest, CanMakeEpCapture) {
 }
 
 
-TEST(MoveTest, FirstMoveOfTheGameHas20LegalMoves) {
-    // Arrange
-    std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-    auto board = std::make_shared<Board>(fen);
-    auto move_generator = move_generation::MoveGenerator(board);
 
-    // Act
-    auto move_stack = move_generator.generate_pseudo_legal_moves(*board);
-
-    // Assert
-    EXPECT_EQ(move_stack.size(), 20);
-}
-
-TEST(MoveGenTest, ThisPositionHasSevenMoves) {
-    // Arrange
-    std::string fen{ "8/7P/8/8/8/8/8/k6K w - - 0 1" };
-    auto board = std::make_shared<Board>(fen);
-    auto move_generator = move_generation::MoveGenerator(board);
-
-    // Act
-    auto move_stack = move_generator.generate_pseudo_legal_moves(*board);
-    std::string move_list = "";
-    for (auto move : move_stack) {
-        move_list += move.to_algebraic() + ", ";
-    }
-    // Assert
-    EXPECT_EQ(move_stack.size(), 7);
-}
 
 TEST(MoveTest, CanConvertPawnMoveToAlgebraic) {
     // Arrange

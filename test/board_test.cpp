@@ -498,6 +498,128 @@ TEST(BoardMoveGenerationTests, CanGenerateAndMakeEpCapture) {
 	// Assert
 	EXPECT_EQ(board.to_fen(), expected);
 }
+
+TEST(BoardMoveGenerationTests, CanCastleKingSideWhite) {
+	// Arrange
+	std::string fen{ "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1" };
+	std::string expected{ "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 0 1" };
+	Board board = Board(fen);
+
+	std::vector<Move> moves = board.generate_moves();
+
+	// Act
+	for (Move move : moves) {
+		if (move.is_castle()) {
+			board.make_move(move);
+			break;
+		}
+
+	}
+
+	// Assert
+	EXPECT_EQ(board.to_fen(), expected);
+}
+
+TEST(BoardMoveGenerationTests, CanCastleKingSideBlack) {
+	// Arrange
+	std::string fen{ "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 1" };
+	std::string expected{ "rnbq1rk1/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 w - - 0 2" };
+	Board board = Board(fen);
+
+	std::vector<Move> moves = board.generate_moves();
+
+	// Act
+	for (Move move : moves) {
+		if (move.is_castle()) {
+			board.make_move(move);
+			break;
+		}
+
+	}
+
+	// Assert
+	EXPECT_EQ(board.to_fen(), expected);
+}
+
+TEST(BoardMoveGenerationTests, CanCastleQueenSideWhite) {
+	// Arrange
+	std::string fen{ "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/R3K1NR w KQkq - 0 1" };
+	std::string expected{ "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/2KR2NR b kq - 0 1" };
+	Board board = Board(fen);
+
+	std::vector<Move> moves = board.generate_moves();
+
+	// Act
+	for (Move move : moves) {
+		if (move.is_castle()) {
+			board.make_move(move);
+			break;
+		}
+
+	}
+
+	// Assert
+	EXPECT_EQ(board.to_fen(), expected);
+}
+
+TEST(BoardMoveGenerationTests, CanCastleQueenSideBlack) {
+	// Arrange
+	std::string fen{ "r3kbnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR b KQkq - 0 1" };
+	std::string expected{ "2kr1bnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR w KQ - 0 2" };
+	Board board = Board(fen);
+
+	std::vector<Move> moves = board.generate_moves();
+
+	// Act
+	for (Move move : moves) {
+		if (move.is_castle()) {
+			board.make_move(move);
+			break;
+		}
+
+	}
+
+	// Assert
+	EXPECT_EQ(board.to_fen(), expected);
+}
+
+TEST(BoardMoveGenerationTests, PawnCanPromote) {
+	// Arrange
+	std::string fen{ "8/P7/8/8/8/8/8/8 w - - 0 1" };
+	Board board = Board(fen);
+
+	std::vector<Move> moves = board.generate_moves();
+
+	// Act & Assert
+	
+	board.make_move(moves[0]);
+	EXPECT_EQ(board.to_fen(), "N7/8/8/8/8/8/8/8 b - - 0 1");
+	board.undo_move();
+
+	board.make_move(moves[1]);
+	EXPECT_EQ(board.to_fen(), "B7/8/8/8/8/8/8/8 b - - 0 1");
+	board.undo_move();
+
+	board.make_move(moves[2]);
+	EXPECT_EQ(board.to_fen(), "R7/8/8/8/8/8/8/8 b - - 0 1");
+	board.undo_move();
+
+	board.make_move(moves[3]);
+	EXPECT_EQ(board.to_fen(), "Q7/8/8/8/8/8/8/8 b - - 0 1");
+	board.undo_move();
+}
+
+TEST(MoveTest, FirstMoveOfTheGameHas20LegalMoves) {
+	// Arrange
+	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
+	Board board = Board(fen);
+
+	// Act
+	std::vector<Move> moves = board.generate_moves();
+
+	// Assert
+	EXPECT_EQ(moves.size(), 20);
+}
 TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition) {
 
 	//   Test Board       W Pawn Targets           Targets
@@ -732,7 +854,7 @@ TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForWhite) {
 	Move move(bitboard::square_index("e1"), bitboard::square_index("e1"), PieceType::KING);
 
 	// Act
-	castling_rights.update(move);
+	castling_rights.update(move, PieceColour::WHITE);
 
 	// Assert
 	EXPECT_EQ(castling_rights.fen(), "kq");
@@ -745,7 +867,7 @@ TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForBlack) {
 	Move move(bitboard::square_index("e8"), bitboard::square_index("e1"), PieceType::KING);
 
 	// Act
-	castling_rights.update(move);
+	castling_rights.update(move, PieceColour::BLACK);
 
 	// Assert
 	EXPECT_EQ(castling_rights.fen(), "KQ");
@@ -758,7 +880,7 @@ TEST(CastlingRightsTests, H1RookMoveRemovesRightToCastleForWhite) {
 	Move move(bitboard::square_index("h1"), bitboard::square_index("e1"), PieceType::ROOK);
 
 	// Act
-	castling_rights.update(move);
+	castling_rights.update(move, PieceColour::WHITE);
 
 	// Assert
 	EXPECT_EQ(castling_rights.fen(), "Qkq");
@@ -771,7 +893,7 @@ TEST(CastlingRightsTests, A8RookMoveRemovesRightToCastleForBlack) {
 	Move move(bitboard::square_index("a8"), bitboard::square_index("e1"), PieceType::ROOK);
 
 	// Act
-	castling_rights.update(move);
+	castling_rights.update(move, PieceColour::BLACK);
 
 	// Assert
 	EXPECT_EQ(castling_rights.fen(), "KQk");

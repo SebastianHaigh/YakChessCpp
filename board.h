@@ -39,6 +39,7 @@ public:
 	PieceType get_moved_piece() { return piece_to_move; }
 	PieceType get_captured_piece() { return piece_to_capture; }
 	PieceType get_castle_side() { return castle; }
+	PieceType get_promotion_piece() { return promotion_piece; }
 
 	Square to_square() { return to; };
 	Square from_square() { return from; };
@@ -101,7 +102,7 @@ public:
 	CastlingRights(std::string fen);
 	bool king_side(PieceColour colour);
 	bool queen_side(PieceColour colour);
-	void update(Move move);
+	void update(Move move, PieceColour side);
 	std::string fen();
 };
 
