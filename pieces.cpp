@@ -3,6 +3,17 @@
 
 namespace pieces {
 
+    PieceColour other_colour(PieceColour colour) {
+        if (colour == PieceColour::WHITE) {
+            return PieceColour::BLACK;
+        }
+        else if (colour == PieceColour::BLACK) {
+            return PieceColour::WHITE;
+        }
+        else {
+            return PieceColour::NULL_COLOUR;
+        }
+    }
 
     PieceType fen_char_to_piece_type(const char fen_char) {
         switch (fen_char) {
@@ -50,13 +61,50 @@ namespace pieces {
         }
     }
 
-std::shared_ptr<Piece> ChessMen::get_piece(Square square_index) {
-    if (pawns->has_piece_on_square(square_index)) {
-        return pawns;
-    } else {
-        return std::make_shared<NullPiece>();
+    char piece_to_fen_char(const PieceType type, const PieceColour colour) {
+        if (colour == PieceColour::WHITE) {
+            return white_piece_type_to_fen_char(type);
+        }
+        else {
+            return black_piece_type_to_fen_char(type);
+        }
     }
-}
+
+    char black_piece_type_to_fen_char(const PieceType type) {
+        switch (type) {
+            case PieceType::PAWN:
+                return 'p';
+            case PieceType::KNIGHT:
+                return 'n';
+            case PieceType::BISHOP:
+                return 'b';
+            case PieceType::ROOK:
+                return 'r';
+            case PieceType::QUEEN:
+                return 'q';
+            case PieceType::KING:
+                return 'k';
+        }
+    }
+
+    char white_piece_type_to_fen_char(const PieceType type) {
+        switch (type) {
+            case PieceType::PAWN:
+                return 'P';
+            case PieceType::KNIGHT:
+                return 'N';
+            case PieceType::BISHOP:
+                return 'B';
+            case PieceType::ROOK:
+                return 'R';
+            case PieceType::QUEEN:
+                return 'Q';
+            case PieceType::KING:
+                return 'K';
+        }
+    }
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,78 +112,7 @@ std::shared_ptr<Piece> ChessMen::get_piece(Square square_index) {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-Bitboard Pawns::all_attacked_squares() {
-    return colour->pawn_west_attack_targets(board) | colour->pawn_east_attack_targets(board);
-};
 
-Bitboard Pawns::single_push() {
-    return colour->pawn_push_sources(*empty_squares) & board;;
-}
-
-Bitboard Pawns::double_push() {
-    Bitboard empty_targets, clear_to_target;
-    empty_targets = colour->pawn_double_push_target() & *empty_squares;
-    clear_to_target = colour->pawn_push_sources(empty_targets) & *empty_squares;
-    return colour->pawn_push_sources(clear_to_target) & board;
-}
-
-PawnTargets Pawns::single_pushes() {
-    auto sources = single_push();
-    auto targets = colour->pawn_push_targets(sources);
-
-    return PawnTargets(sources, targets);
-}
-
-PawnTargets Pawns::double_pushes() {
-    auto sources = double_push();
-    auto targets = colour->pawn_double_push_target();
-
-    return PawnTargets(sources, targets);
-}
-        
-PawnTargets Pawns::west_captures() {
-    auto sources = colour->pawn_west_attack_sources() & board;
-    auto targets = colour->pawn_west_attack_targets(sources);
-    return PawnTargets(sources, targets);
-}
-        
-PawnTargets Pawns::east_captures() {
-    auto sources = colour->pawn_east_attack_sources() & board;
-    auto targets = colour->pawn_east_attack_targets(sources);
-    return PawnTargets(sources, targets);
-}
-
-void Pawns::standard_starting_position() {
-    board = colour->pawn_standard_starting_position();
-}
-
-Bitboard Pawns::current_position() { 
-    return board; 
-};
-
-void Pawns::make_move(Square source, Square target) {
-    auto source_bitboard = Bitboard(1) << source;
-    auto target_bitboard = Bitboard(1) << target;
-    auto source_and_target_bitboard = source_bitboard ^ target_bitboard;
-
-    board ^= source_and_target_bitboard;
-    *empty_squares ^= source_and_target_bitboard;
-    colour->make_move(source_and_target_bitboard);
-}
-
-void Pawns::make_capture(Square target) {
-    auto target_bitboard = Bitboard(1) << target;
-
-    board ^= target_bitboard;
-    *empty_squares ^= target_bitboard;
-    colour->make_move(target_bitboard);
-}
-
-bool Pawns::has_piece_on_square(Square square_index) {
-    auto target_bitboard = Bitboard(1) << square_index;
-    
-    return (target_bitboard & board) > 0;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,113 +162,251 @@ bool Pawns::has_piece_on_square(Square square_index) {
 //     return moves;
 // }
 
-
-// ///////////////////////////////////////////////////////////////////////////////
-// ///////////////////////////////////////////////////////////////////////////////
-// // Implementation of Rooks
-// ///////////////////////////////////////////////////////////////////////////////
-// ///////////////////////////////////////////////////////////////////////////////
-
-// Rooks::Rooks(std::shared_ptr <Bitboard> board_ptr, std::shared_ptr <Bitboard> empty_squares_ptr) : SlidingPieces(board_ptr, empty_squares_ptr) {
-//     rays.push_back(std::make_unique <attacks::NorthRay>());
-//     rays.push_back(std::make_unique <attacks::EastRay>());
-//     rays.push_back(std::make_unique <attacks::SouthRay>());
-//     rays.push_back(std::make_unique <attacks::WestRay>());
-// }
-
-// Bishops::Bishops(std::shared_ptr <Bitboard> board_ptr, std::shared_ptr <Bitboard> empty_squares_ptr) : SlidingPieces(board_ptr, empty_squares_ptr) {
-//     rays.push_back(std::make_unique <attacks::NorthWestRay>());
-//     rays.push_back(std::make_unique <attacks::NorthEastRay>());
-//     rays.push_back(std::make_unique <attacks::SouthWestRay>());
-//     rays.push_back(std::make_unique <attacks::SouthEastRay>());
-// }
-
-// Queens::Queens(std::shared_ptr <Bitboard> board_ptr, std::shared_ptr <Bitboard> empty_squares_ptr) : SlidingPieces(board_ptr, empty_squares_ptr) {
-//     rays.push_back(std::make_unique <attacks::NorthRay>());
-//     rays.push_back(std::make_unique <attacks::EastRay>());
-//     rays.push_back(std::make_unique <attacks::SouthRay>());
-//     rays.push_back(std::make_unique <attacks::WestRay>());
-//     rays.push_back(std::make_unique <attacks::NorthWestRay>());
-//     rays.push_back(std::make_unique <attacks::NorthEastRay>());
-//     rays.push_back(std::make_unique <attacks::SouthWestRay>());
-//     rays.push_back(std::make_unique <attacks::SouthEastRay>());
-// }
-
-// void Move::execute() {
-//     piece_to_move.make_move(source, target);
-// }
-
-Bitboard White::pawn_standard_starting_position() {
-    return bitboard::RANK_2;
+std::vector<std::pair<Square, Square>> Pawns::quiet_moves(Bitboard pawn_positions, Bitboard empty_squares) {
+    std::vector<std::pair<Square, Square>> moves;
+    if (pawn_positions == 0) {
+        return moves;
+    }
+    std::vector<std::pair<Square, Square>> single_pushes = single_push(pawn_positions, empty_squares);
+    std::vector<std::pair<Square, Square>> double_pushes = double_push(pawn_positions, empty_squares);
+    std::copy(single_pushes.begin(), single_pushes.end(), std::back_inserter(double_pushes));
+    return double_pushes;
 }
 
-Bitboard White::pawn_push_targets(Bitboard sources) {
+std::vector<std::pair<Square, Square>> Pawns::captures(Bitboard pawn_positions, Bitboard opponent_pieces) {
+    if (pawn_positions == 0) {
+        return std::vector<std::pair<Square, Square>>();
+    }
+    std::vector<std::pair<Square, Square>> west_caps = west_captures(pawn_positions, opponent_pieces);
+    std::vector<std::pair<Square, Square>> east_caps = east_captures(pawn_positions, opponent_pieces);
+    std::copy(west_caps.begin(), west_caps.end(), std::back_inserter(east_caps));
+    return east_caps;
+}
+
+std::vector<std::pair<Square, Square>> Pawns::single_push(Bitboard pawn_positions, Bitboard empty_squares) {
+    Bitboard sources = push_sources(empty_squares) & pawn_positions;
+    Bitboard targets = push_targets(sources);
+    return zip_moves(sources, targets);
+};
+
+std::vector<std::pair<Square, Square>> Pawns::double_push(Bitboard pawn_positions, Bitboard empty_squares) {
+    Bitboard targets = double_push_target() & empty_squares;
+    Bitboard clear_to_target = push_sources(targets) & empty_squares;
+    Bitboard sources = push_sources(clear_to_target) & pawn_positions;
+    targets = push_targets(push_targets(sources));
+    return zip_moves(sources, targets);
+};
+
+std::vector<std::pair<Square, Square>> Pawns::west_captures(Bitboard pawn_positions, Bitboard opponent_pieces) {
+    Bitboard sources = west_attack_sources(opponent_pieces) & pawn_positions;
+    Bitboard targets = west_attack_targets(sources);
+    return zip_moves(sources, targets);
+};
+
+std::vector<std::pair<Square, Square>> Pawns::east_captures(Bitboard pawn_positions, Bitboard opponent_pieces) {
+    Bitboard sources = east_attack_sources(opponent_pieces) & pawn_positions;
+    Bitboard targets = east_attack_targets(sources);
+    return zip_moves(sources, targets);
+};
+
+std::vector<std::pair<Square, Square>> Pawns::zip_moves(const Bitboard& sources, const Bitboard& targets) {
+    std::vector<Square> serialised_sources = bitboard::scan_forward(sources);
+    std::vector<Square> serialised_targets = bitboard::scan_forward(targets);
+    std::vector<std::pair<Square, Square>> zipped_moves;
+
+    for (int i = 0; i < serialised_sources.size(); i++) {
+        zipped_moves.push_back(std::make_pair(serialised_sources[i], serialised_targets[i]));
+    }
+
+    return zipped_moves;
+}
+
+Bitboard Pawns::all_attacked_squares(Bitboard pawn_positions) {
+    return east_attack_targets(pawn_positions) | west_attack_targets(pawn_positions);
+}
+
+Bitboard WhitePawns::push_targets(Bitboard sources) {
     return bitboard::north_one(sources);
-}
+};
 
-Bitboard White::pawn_push_sources(Bitboard targets) {
+Bitboard WhitePawns::push_sources(Bitboard targets) {
     return bitboard::south_one(targets);
-}
+};
 
-Bitboard White::pawn_east_attack_targets(Bitboard sources) {
+Bitboard WhitePawns::east_attack_targets(Bitboard sources) {
     return bitboard::north_east_one(sources);
-}
+};
 
-Bitboard White::pawn_east_attack_sources() {
-    return bitboard::south_west_one(*opponent_pieces);
-}
+Bitboard WhitePawns::east_attack_sources(Bitboard opponent_pieces) {
+    return bitboard::south_west_one(opponent_pieces);
+};
 
-Bitboard White::pawn_west_attack_targets(Bitboard sources) {
+Bitboard WhitePawns::west_attack_targets(Bitboard sources) {
     return bitboard::north_west_one(sources);
-}
+};
 
-Bitboard White::pawn_west_attack_sources() {
-    return bitboard::south_east_one(*opponent_pieces);
-}
+Bitboard WhitePawns::west_attack_sources(Bitboard opponent_pieces) {
+    return bitboard::south_east_one(opponent_pieces);
+};
 
-Bitboard White::pawn_double_push_target() {
-    return bitboard::RANK_4;
-}
-
-void White::make_move(Bitboard source_and_target_bitboard) {
-    *this_colour_pieces ^= source_and_target_bitboard;
-}
-
-
-Bitboard Black::pawn_standard_starting_position() {
-    return bitboard::RANK_7;
-}
-
-Bitboard Black::pawn_push_targets(Bitboard sources) {
+Bitboard BlackPawns::push_targets(Bitboard sources) {
     return bitboard::south_one(sources);
-}
+};
 
-Bitboard Black::pawn_push_sources(Bitboard targets) {
+Bitboard BlackPawns::push_sources(Bitboard targets) {
     return bitboard::north_one(targets);
-}
+};
 
-Bitboard Black::pawn_east_attack_targets(Bitboard sources) {
+Bitboard BlackPawns::east_attack_targets(Bitboard sources) {
     return bitboard::south_east_one(sources);
-}
+};
 
-Bitboard Black::pawn_east_attack_sources() {
-    return bitboard::north_west_one(*opponent_pieces);
-}
+Bitboard BlackPawns::east_attack_sources(Bitboard opponent_pieces) {
+    return bitboard::north_west_one(opponent_pieces);
+};
 
-Bitboard Black::pawn_west_attack_targets(Bitboard sources) {
+Bitboard BlackPawns::west_attack_targets(Bitboard sources) {
     return bitboard::south_west_one(sources);
+};
+
+Bitboard BlackPawns::west_attack_sources(Bitboard opponent_pieces) {
+    return bitboard::north_east_one(opponent_pieces);
+};
+
+
+std::vector<std::pair<Square, Square>> JumpingPiece::quiet_moves(Bitboard piece_positions, Bitboard empty_squares) {
+    std::vector<std::pair<Square, Square>> moves;
+    if (piece_positions == 0) {
+        return moves;
+    }
+    std::vector<Square> serialised_pieces = bitboard::scan_forward(piece_positions);
+    for (auto piece : serialised_pieces) {
+        Bitboard targets = attack_map->get(piece) & empty_squares;
+        std::vector<Square> target_squares = bitboard::scan_forward(targets);
+        for (auto target : target_squares) {
+            moves.push_back(std::make_pair(piece, target));
+        }
+    }
+    return moves;
+};
+
+std::vector<std::pair<Square, Square>> JumpingPiece::captures(Bitboard piece_positions, Bitboard occupied_squares, Bitboard opponent_pieces) {
+
+    return quiet_moves(piece_positions, opponent_pieces);
+
+};
+
+Bitboard JumpingPiece::attacks(Bitboard piece_positions, Bitboard occupied_squares, Bitboard opponent_pieces) {
+    if (piece_positions == 0) {
+        return Bitboard{ 0 };
+    }
+    std::vector<Square> serialised_pieces = bitboard::scan_forward(piece_positions);
+    Bitboard targets{ 0 };
+    for (auto piece : serialised_pieces) {
+        Bitboard friendly = occupied_squares & ~opponent_pieces;
+        Bitboard squares_targeted = attack_map->get(piece);
+        Bitboard squares_attacked = squares_targeted & ~friendly;
+        targets |= squares_attacked;
+
+    }
+    return targets;
+};
+
+std::vector<std::pair<Square, Square>> SlidingPiece::quiet_moves(Bitboard piece_positions, Bitboard empty_squares) {
+    std::vector<std::pair<Square, Square>> moves;
+    if (piece_positions == 0) {
+        return moves;
+    }
+    std::vector<Square> serialised_pieces = bitboard::scan_forward(piece_positions);
+    for (auto piece : serialised_pieces) {
+        Bitboard targets{ 0 };
+        for (auto ray : rays) {
+            targets |= ray->get(piece, ~empty_squares) & empty_squares;
+        }
+        std::vector<Square> target_squares = bitboard::scan_forward(targets);
+        for (auto target : target_squares) {
+            moves.push_back(std::make_pair(piece, target));
+        }
+    }
+    return moves;
+};
+
+std::vector<std::pair<Square, Square>> SlidingPiece::captures(Bitboard piece_positions, Bitboard occupied_squares, Bitboard opponent_pieces) {
+    std::vector<std::pair<Square, Square>> captures;
+    if (piece_positions == 0) {
+        return captures;
+    }
+    std::vector<Square> serialised_pieces = bitboard::scan_forward(piece_positions);
+    for (auto piece : serialised_pieces) {
+        Bitboard targets{ 0 };
+        for (auto ray : rays) {
+            targets |= ray->get(piece, occupied_squares);
+        }
+        targets &= opponent_pieces;
+        std::vector<Square> target_squares = bitboard::scan_forward(targets);
+        for (auto target : target_squares) {
+            captures.push_back(std::make_pair(piece, target));
+        }
+    }
+
+    return captures;
+
+};
+
+Bitboard SlidingPiece::attacks(Bitboard piece_positions, Bitboard occupied_squares, Bitboard opponent_pieces) {
+    if (piece_positions == 0) {
+        return Bitboard{ 0 };
+    }
+    std::vector<Square> serialised_pieces = bitboard::scan_forward(piece_positions);
+    Bitboard targets{ 0 };
+    for (auto piece : serialised_pieces) {
+        for (auto ray : rays) {
+            Bitboard friendly = occupied_squares & ~opponent_pieces;
+            Bitboard squares_targeted = ray->get(piece, occupied_squares);
+            Bitboard squares_attacked = squares_targeted & ~friendly;
+            // This will return a ray upto and including the blocking piece
+            targets |= squares_attacked;
+
+            // Whether or not the blocking piece is included as a target that can 
+            // be moved to (i.e., attacked) will depend on if the piece is friendly 
+            // or not. If it is friendly, it is not attack, but otherwise it is.
+
+            // friendly = occupied_squares & ~opponent_pieces
+            // therfore, ~friendly = ~occupied_squares | opponent_pieces
+            //targets &= (~occupied_squares | opponent_pieces);
+        }
+    }
+    return targets;
 }
 
-Bitboard Black::pawn_west_attack_sources() {
-    return bitboard::north_east_one(*opponent_pieces);
-}
 
-Bitboard Black::pawn_double_push_target() {
-    return bitboard::RANK_5;
-}
+std::unique_ptr<Pawns> StandardPieceFactory::make_pawns(PieceColour colour) { 
+    if (colour == PieceColour::BLACK) {
+        return std::make_unique<BlackPawns>();
+    }
+    else {
+        return std::make_unique<WhitePawns>();
+    }
+     
+};
 
-void Black::make_move(Bitboard source_and_target_bitboard) {
-    *this_colour_pieces ^= source_and_target_bitboard;
-}
+std::unique_ptr<Piece> StandardPieceFactory::make_piece(PieceType type) {
+    switch (type) {
+    case PieceType::KING:
+        return std::make_unique<JumpingPiece>(&king_attacks);
+    case PieceType::KNIGHT:
+        return std::make_unique<JumpingPiece>(&knight_attacks);
+    case PieceType::ROOK:
+        return std::make_unique<SlidingPiece>(std::vector<attacks::Ray*>{ &north_ray, & east_ray, & south_ray, & west_ray });
+    case PieceType::BISHOP:
+        return std::make_unique<SlidingPiece>(std::vector<attacks::Ray*>{ &north_east_ray, & south_east_ray, & south_west_ray, & north_west_ray });
+    case PieceType::QUEEN:
+        return std::make_unique<SlidingPiece>(std::vector<attacks::Ray*>{ &north_ray, & east_ray, & south_ray, & west_ray, &north_east_ray, & south_east_ray, & south_west_ray, & north_west_ray });
+    default:
+        return std::make_unique<NullPiece>();
+    }
+    
+
+};
 
 } // namespace pieces
