@@ -2,226 +2,46 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "../pieces.h"
 #include "../bitboard.h"
 
-TEST(WhitePawnsTest, CanGenerateSinglePushesFromUnobstructedStartingPosition) {
-    // Assemble
-    auto pawns_bitboard = bitboard::RANK_2;
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~pawns_bitboard);
-    auto black_pieces = std::make_shared<Bitboard> (0);
-    auto white_pieces = std::make_shared<Bitboard> (pawns_bitboard);
-
-    auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, WhitePieces);
-    pawns.standard_starting_position();
-
-    // Act
-    auto single_push_moves = pawns.single_pushes();
-
-    // Assert
-    EXPECT_EQ(single_push_moves.get_source(), bitboard::RANK_2);
-    EXPECT_EQ(single_push_moves.get_target(), bitboard::RANK_3);
-}
-
-TEST(WhitePawnsTest, DoublePushOnlyAllowedFromRank2) {
-    // Assemble
-    auto pawns_bitboard = bitboard::RANK_2;
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~pawns_bitboard);
-    auto black_pieces = std::make_shared<Bitboard> (0);
-    auto white_pieces = std::make_shared<Bitboard> (pawns_bitboard);
-
-    auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, WhitePieces);
-    pawns.standard_starting_position();
-
-    std::vector<pieces::PawnTargets> moves;
-
-    // Act
-    for (int i = 2; i <= 8; i++) {
-        moves.push_back(pawns.double_pushes());
-        pawns_bitboard = bitboard::north_one(pawns_bitboard);
-    }
-
-    // Assert
-    EXPECT_EQ(moves[0].get_source(), bitboard::RANK_2);
-    EXPECT_EQ(moves[1].get_source(), bitboard::RANK_2);
-    EXPECT_EQ(moves[2].get_source(), bitboard::RANK_2);
-    EXPECT_EQ(moves[3].get_source(), bitboard::RANK_2);
-    EXPECT_EQ(moves[4].get_source(), bitboard::RANK_2);
-    EXPECT_EQ(moves[5].get_source(), bitboard::RANK_2);
-    EXPECT_EQ(moves[6].get_source(), bitboard::RANK_2); 
-}
-
-TEST(WhitePawnsTest, OpponentPieceBlocksPawnPushes) {
-    // Tests if an opponent piece can block pawn pushes
-
-    // Assemble
-    auto pawns_bitboard = bitboard::RANK_2;
-    auto black_pieces = std::make_shared<Bitboard> (bitboard::RANK_3 & bitboard::FILE_C);
-    auto white_pieces = std::make_shared<Bitboard> (pawns_bitboard);
-    auto occupied_squares = *black_pieces ^ *white_pieces;
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~occupied_squares);
-
-    auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, WhitePieces);
-    pawns.standard_starting_position();
-    // Act
-    auto moves = pawns.single_pushes();
-
-    // Assert
-    EXPECT_EQ(moves.get_source(), bitboard::RANK_2 & bitboard::NOT_FILE_C);
-    EXPECT_EQ(moves.get_target(), bitboard::RANK_3 & bitboard::NOT_FILE_C);
-}
-
-TEST(WhitePawnsTest, FriendlyPieceBlocksPawnPushes) {
-    // Tests if an friendly piece can block pawn pushes.
-
-    // . . . . . . . . 
-    // . . . . . . . .
-    // . . . . . . . .
-    // . . . . . . . .
-    // . . . . . . . .
-    // . . B . . . . .
-    // P P P P P P P P
-    // . . . . . . . .
-
-    // Assemble
-    auto pawns_bitboard = bitboard::RANK_2;
-    auto black_pieces = std::make_shared<Bitboard>(0);
-    auto extra_white_piece = bitboard::RANK_3 & bitboard::FILE_C;
-    auto white_pieces = std::make_shared<Bitboard> (pawns_bitboard ^ extra_white_piece);
-    auto occupied_squares = *black_pieces ^ *white_pieces;
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~occupied_squares);
-
-    auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, WhitePieces);
-    pawns.standard_starting_position();
-
-    // Act
-    auto moves = pawns.single_pushes();
-
-    // Assert
-    EXPECT_EQ(moves.get_source(), bitboard::RANK_2 & bitboard::NOT_FILE_C);
-    EXPECT_EQ(moves.get_target(), bitboard::RANK_3 & bitboard::NOT_FILE_C);
-}
-
-TEST(WhitePawnsTest, OpponentPieceCanBeCaptured) {
-    // Tests if the white pawns on their starting squares can return valid 
-    // capture moves for the situation on the board shown below.
-
-    // . . . . . . . . 
-    // . . . . . . . .
-    // . . . . . . . .
-    // . . . . . . . .
-    // . . . . . . . .
-    // . . b . . . . .
-    // P P P P P P P P
-    // . . . . . . . .
-
-    // Assemble
-    auto pawn_bitboard = bitboard::RANK_2;
-    auto black_pieces = std::make_shared<Bitboard> (bitboard::RANK_3 & bitboard::FILE_C);
-    auto white_pieces = std::make_shared<Bitboard> (pawn_bitboard);
-    auto occupied_squares = *black_pieces ^ *white_pieces;
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~occupied_squares);
-
-    auto WhitePieces = std::make_shared<pieces::White>(white_pieces, black_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, WhitePieces);
-    pawns.standard_starting_position();
-
-    // Act
-    auto west_moves = pawns.west_captures();
-    auto east_moves = pawns.east_captures();
-
-    // Assert
-    EXPECT_EQ(west_moves.get_source(), bitboard::RANK_2 & bitboard::FILE_D);
-    EXPECT_EQ(east_moves.get_source(), bitboard::RANK_2 & bitboard::FILE_B);
-    EXPECT_EQ(west_moves.get_target(), bitboard::RANK_3 & bitboard::FILE_C);
-    EXPECT_EQ(east_moves.get_target(), bitboard::RANK_3 & bitboard::FILE_C);
-}
 
 TEST(BlackPawnsTest, CanGenerateSinglePushesFromUnobstructedStartingPosition) {
     // Assemble
-    auto pawn_bitboard = std::make_shared<Bitboard>(bitboard::RANK_7);
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~*pawn_bitboard);
-    auto black_pieces = std::make_shared<Bitboard> (0);
-    auto white_pieces = std::make_shared<Bitboard> (*pawn_bitboard);
-
-    auto BlackPieces = std::make_shared<pieces::Black>(black_pieces, white_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, BlackPieces);
-    pawns.standard_starting_position();
+    auto pawn_bitboard = bitboard::RANK_7;
+    auto empty_squares = ~pawn_bitboard;
+    auto pawns = pieces::BlackPawns();
 
     // Act
-    auto single_push_moves = pawns.single_pushes();
+    auto single_push_moves = pawns.single_push(pawn_bitboard, empty_squares);
 
     // Assert
 
-    EXPECT_EQ(single_push_moves.get_source(), bitboard::RANK_7);
-    EXPECT_EQ(single_push_moves.get_target(), bitboard::RANK_6);
+    EXPECT_EQ(single_push_moves.size(), 8);
 }
 
 TEST(BlackPawnsTest, DoublePushOnlyAllowedFromRank7) {
     // Assemble
-    auto pawn_bitboard = std::make_shared<Bitboard>(bitboard::RANK_7);
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~*pawn_bitboard);
-    auto black_pieces = std::make_shared<Bitboard>(0);
-    auto white_pieces = std::make_shared<Bitboard>(*pawn_bitboard);
+    auto pawn_bitboard = bitboard::RANK_7;
+    auto empty_squares = ~pawn_bitboard;
+    auto pawns = pieces::BlackPawns();
 
-    auto BlackPieces = std::make_shared<pieces::Black>(black_pieces, white_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, BlackPieces);
-    pawns.standard_starting_position();
-
-    std::vector<pieces::PawnTargets> moves;
 
     // Act
-    for (int i = 2; i <= 8; i++) {
-        moves.push_back(pawns.double_pushes());
-    }
+    auto moves = pawns.double_push(pawn_bitboard, empty_squares);
+
 
     // Assert
-    EXPECT_EQ(moves[0].get_source(), bitboard::RANK_7);
-    EXPECT_EQ(moves[1].get_source(), bitboard::RANK_7);
-    EXPECT_EQ(moves[2].get_source(), bitboard::RANK_7);
-    EXPECT_EQ(moves[3].get_source(), bitboard::RANK_7);
-    EXPECT_EQ(moves[4].get_source(), bitboard::RANK_7);
-    EXPECT_EQ(moves[5].get_source(), bitboard::RANK_7);
-    EXPECT_EQ(moves[6].get_source(), bitboard::RANK_7);
+    EXPECT_EQ(bitboard::rank_index(moves[0].first), 6); // If the source square has rank index of 6 it means that square is on the 7th rank.
+    EXPECT_EQ(bitboard::rank_index(moves[1].first), 6);
+    EXPECT_EQ(bitboard::rank_index(moves[2].first), 6);
+    EXPECT_EQ(bitboard::rank_index(moves[3].first), 6);
+    EXPECT_EQ(bitboard::rank_index(moves[4].first), 6);
+    EXPECT_EQ(bitboard::rank_index(moves[5].first), 6);
+    EXPECT_EQ(bitboard::rank_index(moves[6].first), 6);
 }
-
-TEST(BlackPawnsTest, OpponentPieceBlocksPawnPushes) {
-    // Tests if an opponent piece can block pawn pushes
-
-    //   Test Board           Sources           Targets
-    // . . . . . . . .    . . . . . . . .    . . . . . . . . 
-    // p p p p p p p p    1 1 . 1 1 1 1 1    . . . . . . . . 
-    // . . B . . . . .    . . . . . . . .    1 1 . 1 1 1 1 1 
-    // . . . . . . . .    . . . . . . . .    . . . . . . . . 
-    // . . . . . . . .    . . . . . . . .    . . . . . . . . 
-    // . . . . . . . .    . . . . . . . .    . . . . . . . . 
-    // . . . . . . . .    . . . . . . . .    . . . . . . . . 
-    // . . . . . . . .    . . . . . . . .    . . . . . . . . 
-
-    // Assemble
-    auto pawn_bitboard = std::make_shared<Bitboard>(bitboard::RANK_7);
-    auto white_pieces = std::make_shared<Bitboard> (bitboard::RANK_6 & bitboard::FILE_C);
-    auto black_pieces = std::make_shared<Bitboard> (*pawn_bitboard);
-    auto occupied_squares = *black_pieces ^ *white_pieces;
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~occupied_squares);
-
-    auto BlackPieces = std::make_shared<pieces::Black>(black_pieces, white_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, BlackPieces);
-    pawns.standard_starting_position();
-
-    // Act
-    auto moves = pawns.single_pushes();
-
-    // Assert
-    EXPECT_EQ(moves.get_source(), bitboard::RANK_7 & bitboard::NOT_FILE_C);
-    EXPECT_EQ(moves.get_target(), bitboard::RANK_6 & bitboard::NOT_FILE_C);
-}
-
 TEST(BlackPawnsTest, FriendlyPieceBlocksPawnPushes) {
     // Tests if an friendly piece can block pawn pushes.
 
@@ -236,22 +56,16 @@ TEST(BlackPawnsTest, FriendlyPieceBlocksPawnPushes) {
     // . . . . . . . .    . . . . . . . .    . . . . . . . . 
 
     // Assemble
-    auto pawn_bitboard = std::make_shared<Bitboard>(bitboard::RANK_7);
-    auto white_pieces = std::make_shared<Bitboard>(0);
-    auto extra_black_piece = bitboard::RANK_6 & bitboard::FILE_C;
-    auto black_pieces = std::make_shared<Bitboard> (*pawn_bitboard ^ extra_black_piece);
-    auto occupied_squares = *black_pieces ^ *white_pieces;
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~occupied_squares);
+    auto pawn_bitboard = bitboard::RANK_7;
+    auto extra_piece = bitboard::RANK_6 & bitboard::FILE_C;
+    auto empty_squares = ~(pawn_bitboard ^ extra_piece);
+    auto pawns = pieces::BlackPawns();
 
-    auto BlackPieces = std::make_shared<pieces::Black>(black_pieces, white_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, BlackPieces);
-    pawns.standard_starting_position();
     // Act
-    auto moves = pawns.single_pushes();
+    auto moves = pawns.single_push(pawn_bitboard, empty_squares);
 
     // Assert
-    EXPECT_EQ(moves.get_source(), bitboard::RANK_7 & bitboard::NOT_FILE_C);
-    EXPECT_EQ(moves.get_target(), bitboard::RANK_6 & bitboard::NOT_FILE_C);
+    EXPECT_EQ(moves.size(), 7);
 }
 
 TEST(BlackPawnsTest, OpponentPieceCanBeCaptured) {
@@ -269,25 +83,332 @@ TEST(BlackPawnsTest, OpponentPieceCanBeCaptured) {
     // . . . . . . . .    . . . . . . . .    . . . . . . . . 
 
     // Assemble
-    auto pawn_bitboard = std::make_shared<Bitboard>(bitboard::RANK_7);
-    auto white_pieces = std::make_shared<Bitboard> (bitboard::RANK_6 & bitboard::FILE_C);
-    auto black_pieces = std::make_shared<Bitboard> (*pawn_bitboard);
-    auto occupied_squares = *black_pieces ^ *white_pieces;
-    auto empty_squares_ptr = std::make_shared<Bitboard>(~occupied_squares);
-
-    auto BlackPieces = std::make_shared<pieces::Black>(black_pieces, white_pieces);
-    auto pawns = pieces::Pawns(empty_squares_ptr, BlackPieces);
-    pawns.standard_starting_position();
+    Bitboard pawn_bitboard = bitboard::RANK_7;
+    Bitboard opponent_pieces = bitboard::RANK_6 & bitboard::FILE_C;
+    pieces::BlackPawns pawns = pieces::BlackPawns();
 
     // Act
-    auto west_moves = pawns.west_captures();
-    auto east_moves = pawns.east_captures();
+    auto west_moves = pawns.west_captures(pawn_bitboard, opponent_pieces);
+    auto east_moves = pawns.east_captures(pawn_bitboard, opponent_pieces);
 
     // Assert
-    EXPECT_EQ(west_moves.get_source(), bitboard::RANK_7 & bitboard::FILE_D);
-    EXPECT_EQ(east_moves.get_source(), bitboard::RANK_7 & bitboard::FILE_B);
-    EXPECT_EQ(west_moves.get_target(), bitboard::RANK_6 & bitboard::FILE_C);
-    EXPECT_EQ(east_moves.get_target(), bitboard::RANK_6 & bitboard::FILE_C);
+    EXPECT_EQ(west_moves.size(), 1);
+    EXPECT_EQ(east_moves.size(), 1);
+}
+
+TEST(WhitePawnTests, CanGenerateSinglePushesFromUnobstructedStartingPosition) {
+    // Assemble
+    pieces::WhitePawns pawns = pieces::WhitePawns();
+    Bitboard pawn_bitboard = bitboard::RANK_2;
+    Bitboard empty_squares = ~pawn_bitboard;
+
+    // Act
+    auto single_push_moves = pawns.single_push(pawn_bitboard, empty_squares);
+
+    // Assert
+    EXPECT_EQ(single_push_moves.size(), 8);
+}
+
+TEST(WhitePawnTests, CanGenerateDoublePushesFromUnobstructedStartingPosition) {
+    // Assemble
+    pieces::WhitePawns pawns = pieces::WhitePawns();
+    Bitboard pawn_bitboard = bitboard::RANK_2;
+    Bitboard empty_squares = ~pawn_bitboard;
+
+    // Act
+    auto single_push_moves = pawns.double_push(pawn_bitboard, empty_squares);
+
+    // Assert
+    EXPECT_EQ(single_push_moves.size(), 8);
+}
+
+TEST(WhitePawnTests, PieceObstructsSinglePush) {
+    // Tests if a piece can block pawn pushes.
+
+    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . B . . . . .
+    // P P P P P P P P
+    // . . . . . . . .
+  
+    // Arrange
+    auto pawns = pieces::WhitePawns();
+    auto pawn_bitboard = bitboard::RANK_2;
+    auto extra_piece = bitboard::RANK_3 & bitboard::FILE_C;
+    auto empty_squares = ~(pawn_bitboard ^ extra_piece);
+
+    // Act
+    auto moves = pawns.single_push(pawn_bitboard, empty_squares);
+
+    // Assert
+    EXPECT_EQ(moves.size(), 7);
+
+}
+
+TEST(WhitePawnTests, PiecesObstructsDoublePush) {
+    // Tests if pieces can block pawn double pushes.
+
+    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . R . . .
+    // . . B . . . . .
+    // P P P P P P P P
+    // . . . . . . . .
+
+    // Arrange
+    auto pawns = pieces::WhitePawns();
+    auto pawn_bitboard = bitboard::RANK_2;
+    auto extra_piece_1 = bitboard::RANK_3 & bitboard::FILE_C;
+    auto extra_piece_2 = bitboard::RANK_4 & bitboard::FILE_E;
+    auto empty_squares = ~(pawn_bitboard ^ extra_piece_1 ^ extra_piece_2);
+
+    // Act
+    auto moves = pawns.double_push(pawn_bitboard, empty_squares);
+
+    // Assert
+    EXPECT_EQ(moves.size(), 6);
+
+}
+
+TEST(WhitePawnTests, OpponentPieceCanBeCaptured) {
+    // Tests if the white pawns on their starting squares can return valid 
+    // capture moves for the situation on the board shown below.
+
+    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . b . . . . .
+    // P P P P P P P P
+    // . . . . . . . .
+
+    // Assemble
+    pieces::WhitePawns pawns = pieces::WhitePawns();
+    Bitboard pawn_bitboard = bitboard::RANK_2;
+    Bitboard opponent_pieces = bitboard::RANK_3 & bitboard::FILE_C;
+    
+
+    // Act
+    auto west_moves = pawns.west_captures(pawn_bitboard, opponent_pieces);
+    auto east_moves = pawns.east_captures(pawn_bitboard, opponent_pieces);
+
+    // Assert
+    EXPECT_EQ(west_moves.size(), 1);
+    EXPECT_EQ(east_moves.size(), 1);
+}
+
+TEST(KnightTests, KnightOnA1AttacksTheCorrectSquares) {
+    // Arrange
+    attacks::KnightAttacks knight_attacks;
+    pieces::JumpingPiece knight(&knight_attacks);
+    Square starting_square{0};
+
+    // Act
+    std::vector<std::pair<Square, Square>> moves = knight.quiet_moves(bitboard::to_bitboard(starting_square), bitboard::UNIVERSAL);
+  
+    // Assert
+    EXPECT_EQ(moves.size(), 2);
+    EXPECT_EQ(moves[0].second, bitboard::square_index("c2"));
+    EXPECT_EQ(moves[1].second, bitboard::square_index("b3"));
+}
+
+TEST(KnightTests, KnightOnD4AttacksTheCorrectSquares) {
+    // Arrange
+    attacks::KnightAttacks knight_attacks;
+    pieces::JumpingPiece knight(&knight_attacks);
+    Square starting_square = bitboard::square_index("d4");
+
+    // Act
+    std::vector<std::pair<Square, Square>> moves = knight.quiet_moves(bitboard::to_bitboard(starting_square), bitboard::UNIVERSAL);
+
+    // Assert
+    EXPECT_EQ(moves.size(), 8);
+    EXPECT_EQ(moves[0].second, bitboard::square_index("c2"));
+    EXPECT_EQ(moves[1].second, bitboard::square_index("e2"));
+    EXPECT_EQ(moves[2].second, bitboard::square_index("b3"));
+    EXPECT_EQ(moves[3].second, bitboard::square_index("f3"));
+    EXPECT_EQ(moves[4].second, bitboard::square_index("b5"));
+    EXPECT_EQ(moves[5].second, bitboard::square_index("f5"));
+    EXPECT_EQ(moves[6].second, bitboard::square_index("c6"));
+    EXPECT_EQ(moves[7].second, bitboard::square_index("e6"));
+}
+
+
+
+TEST(KingTests, KnightOnA1AttacksTheCorrectSquares) {
+    // Arrange
+    attacks::KingAttacks king_attacks;
+    pieces::JumpingPiece king(&king_attacks);
+    Square starting_square{ 0 };
+
+    // Act
+    std::vector<std::pair<Square, Square>> moves = king.quiet_moves(bitboard::to_bitboard(starting_square), bitboard::UNIVERSAL);
+
+    // Assert
+    EXPECT_EQ(moves.size(), 3);
+    EXPECT_EQ(moves[0].second, bitboard::square_index("b1"));
+    EXPECT_EQ(moves[1].second, bitboard::square_index("a2"));
+    EXPECT_EQ(moves[2].second, bitboard::square_index("b2"));
+}
+
+TEST(KingTests, KnightOnD4AttacksTheCorrectSquares) {
+    // Arrange
+    attacks::KingAttacks king_attacks;
+    pieces::JumpingPiece king(&king_attacks);
+    Square starting_square = bitboard::square_index("d4");
+
+    // Act
+    std::vector<std::pair<Square, Square>> moves = king.quiet_moves(bitboard::to_bitboard(starting_square), bitboard::UNIVERSAL);
+
+    // Assert
+    EXPECT_EQ(moves.size(), 8);
+    EXPECT_EQ(moves[0].second, bitboard::square_index("c3"));
+    EXPECT_EQ(moves[1].second, bitboard::square_index("d3"));
+    EXPECT_EQ(moves[2].second, bitboard::square_index("e3"));
+    EXPECT_EQ(moves[3].second, bitboard::square_index("c4"));
+    EXPECT_EQ(moves[4].second, bitboard::square_index("e4"));
+    EXPECT_EQ(moves[5].second, bitboard::square_index("c5"));
+    EXPECT_EQ(moves[6].second, bitboard::square_index("d5"));
+    EXPECT_EQ(moves[7].second, bitboard::square_index("e5"));
+}
+
+TEST(RookTests, RookAttacksProperly) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+    std::unique_ptr<pieces::Piece> rooks = factory.make_piece(PieceType::ROOK);
+    Bitboard rook_bb = Bitboard{ 1 };
+    Bitboard obstruction = bitboard::to_bitboard(bitboard::square_index("a5"));
+
+    // Act
+    std::vector<std::pair<Square, Square>> quiet_moves = rooks->quiet_moves(rook_bb, ~obstruction);
+    std::vector<std::pair<Square, Square>> captures = rooks->captures(rook_bb, obstruction, obstruction);
+
+    // Assert
+    EXPECT_EQ(quiet_moves.size(), 10);
+    EXPECT_EQ(captures.size(), 1);
+}
+
+TEST(QueenTests, CanCalculateQueenAttackBitboard) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+    std::unique_ptr<pieces::Piece> queens = factory.make_piece(PieceType::QUEEN);
+    Bitboard queen_bb = Bitboard{ 1 };
+    Bitboard opponent_pieces = bitboard::to_bitboard(bitboard::square_index("a8"));
+    Bitboard friendly_pieces = queen_bb | bitboard::to_bitboard(bitboard::square_index("h8"));
+    Bitboard occupied = opponent_pieces | friendly_pieces;
+    Bitboard expected = (bitboard::FILE_A | bitboard::RANK_1 | bitboard::DIAG_A1_H8) & ~friendly_pieces;
+
+    // Act
+    Bitboard actual = queens->attacks(queen_bb, occupied, opponent_pieces);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(BishopTests, CanCalculateBishopAttackBitboardWithTwoBishops) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+    std::unique_ptr<pieces::Piece> bishops = factory.make_piece(PieceType::BISHOP);
+    Bitboard bishop_bb = bitboard::to_bitboard("a1") | bitboard::to_bitboard("a8");
+    Bitboard opponent_pieces = bitboard::to_bitboard("a8");
+    Bitboard friendly_pieces = bishop_bb | bitboard::to_bitboard("h8");
+    Bitboard occupied = opponent_pieces | friendly_pieces;
+    Bitboard expected = (bitboard::DIAG_A8_H1 | bitboard::DIAG_A1_H8) & ~friendly_pieces;
+
+    // Act
+    Bitboard actual = bishops->attacks(bishop_bb, occupied, opponent_pieces);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+
+TEST(FactoryTests, FactoryCanCreateWhitePawns) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+
+    // Act
+    std::unique_ptr<pieces::Pawns> pawns = factory.make_pawns(PieceColour::WHITE);
+
+    // Assert
+    EXPECT_EQ(pawns->double_push_target(), bitboard::RANK_4);
+}
+
+TEST(FactoryTests, FactoryCanCreateBlackPawns) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+
+    // Act
+    std::unique_ptr<pieces::Pawns> pawns = factory.make_pawns(PieceColour::BLACK);
+
+    // Assert
+    EXPECT_EQ(pawns->double_push_target(), bitboard::RANK_5);
+}
+
+TEST(FactoryTests, FactoryCanCreateKnights) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+
+    // Act
+    std::unique_ptr<pieces::Piece> knights = factory.make_piece(PieceType::KNIGHT);
+
+    // Assert
+    auto knight_moves = knights->quiet_moves(Bitboard{1}, bitboard::UNIVERSAL);
+    EXPECT_EQ(knight_moves.size(), 2);
+}
+
+TEST(FactoryTests, FactoryCanCreateRook) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+
+    // Act
+    std::unique_ptr<pieces::Piece> rooks = factory.make_piece(PieceType::ROOK);
+
+    // Assert
+    auto rook_moves = rooks->quiet_moves(Bitboard{ 1 }, bitboard::UNIVERSAL);
+    EXPECT_EQ(rook_moves.size(), 14);
+}
+
+TEST(FactoryTests, FactoryCanCreateBishop) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+
+    // Act
+    std::unique_ptr<pieces::Piece> rooks = factory.make_piece(PieceType::BISHOP);
+
+    // Assert
+    auto rook_moves = rooks->quiet_moves(Bitboard{ 1 }, bitboard::UNIVERSAL);
+    EXPECT_EQ(rook_moves.size(), 7);
+}
+
+TEST(FactoryTests, FactoryCanCreateQueen) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+
+    // Act
+    std::unique_ptr<pieces::Piece> queen = factory.make_piece(PieceType::QUEEN);
+
+    // Assert
+    auto queen_moves = queen->quiet_moves(Bitboard{ 1 }, bitboard::UNIVERSAL);
+    EXPECT_EQ(queen_moves.size(), 21);
+}
+
+TEST(FactoryTests, FactoryCanCreateKing) {
+    // Arrange
+    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
+
+    // Act
+    std::unique_ptr<pieces::Piece> king = factory.make_piece(PieceType::KING);
+
+    // Assert
+    auto king_moves = king->quiet_moves(Bitboard{ 1 }, bitboard::UNIVERSAL);
+    EXPECT_EQ(king_moves.size(), 3);
 }
 
 TEST(FunctionTests, FenCharToPieceTypeTestForBlackPieces) {
@@ -359,3 +480,4 @@ TEST(FunctionTests, FenCharToPieceColourTestForWhitePieces) {
         EXPECT_EQ(actual[i], expected[i]);
     }
 }
+

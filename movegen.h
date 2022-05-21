@@ -3,8 +3,10 @@
 
 #include "bitboard.h"
 #include "pieces.h"
-#include <stack>
+#include "board.h"
+#include <vector>
 #include <memory>
+#include <utility>
 
 namespace move_generation
 {
@@ -35,68 +37,97 @@ namespace move_generation
     //  
     //  Also note that there must be a pawn on square B2 and square B4 must be 
     //  empty for the `execute()` function to have the expected and desired 
-    //  effect on the underlying board representation. The pieces::Pawns class 
-    //  method that will allow you to ensure that the move is at least pseudo 
-    //  legal.
+    //  effect on the underlying board representation.
+    /*
     class Move {
         public:
             virtual ~Move() = default;
-            virtual void execute() = 0;
-            virtual void undo() = 0;
+            virtual void execute(Board& board) = 0;
+            virtual void undo(Board& board) = 0;
     };
 
     class PseudoLegalMove : public Move {
         private:
-            std::shared_ptr<pieces::Piece> piece_to_move;
+            PieceType type_of_piece;
+            PieceColour colour_of_piece;
             Square source;
             Square target;
             bool move_made = 0;
 
         public:
-            PseudoLegalMove(std::shared_ptr<pieces::Piece> piece_to_move,
-                Square source, Square target)
-                : piece_to_move(piece_to_move), source(source), target(target){};
-            ~PseudoLegalMove() = default;
-            void execute() override;
-            void undo() override;
+            PseudoLegalMove(PieceType type, PieceColour colour, Square source, Square target)
+                : type_of_piece(type), colour_of_piece(colour), source(source), target(target){};
+            void execute(Board& board) override;
+            void undo(Board & board) override;
     };
 
     class PseudoLegalCapture : public Move {
         private:
-            std::shared_ptr<pieces::Piece> piece_to_move;
+            PieceType piece_to_move;
+            PieceType piece_to_capture;
             Square source;
             Square target;
-            std::shared_ptr<pieces::Piece> piece_to_capture;
+            
             bool move_made = 0;
 
         public:
-            PseudoLegalCapture(std::shared_ptr<pieces::Piece> piece_to_move,
-                Square source, Square target,
-                std::shared_ptr<pieces::Piece> piece_to_capture)
+            PseudoLegalCapture(PieceType piece_to_move, Square source, Square target, PieceType piece_to_capture)
                 : piece_to_move(piece_to_move), source(source), target(target), piece_to_capture(piece_to_capture){};
-            ~PseudoLegalCapture() = default;
-            void execute() override;
-            void undo() override;
+            void execute(Board& board) override;
+            void undo(Board& board) override;
     };
 
+    class DoublePushMove : public Move {
+        private:
+            PieceType type_of_piece;
+            PieceColour colour_of_piece;
+            Square source;
+            Square target;
+
+            bool move_made = 0;
+
+        public:
+            DoublePushMove(PieceColour colour_of_piece, Square source, Square target)
+                : type_of_piece(PieceType::PAWN), colour_of_piece(colour_of_piece), source(source), target(target) {};
+            void execute(Board& board) override;
+            void undo(Board& board) override;
+    };
+
+    class EpCapture : public Move {
+        private:
+            PieceColour colour_of_piece;
+            Square source;
+            Square target;
+
+            bool move_made = 0;
+        public:
+            EpCapture(PieceColour colour_of_piece, Square source, Square target)
+                : colour_of_piece(colour_of_piece), source(source), target(target) {};
+            void execute(Board& board) override;
+            void undo(Board& board) override;
+    };
+    */
+    /**
+    * Class for generating lists of all possible moves on the board
+    */
     class MoveGenerator {
         private:
             bool side_to_move;
-            pieces::ChessMen white_pieces;
-            pieces::ChessMen black_pieces;
-            std::stack<std::shared_ptr<Move>> process_quiet_moves(std::shared_ptr<pieces::Piece> piece_to_move, 
-                pieces::PawnTargets targets, std::stack<std::shared_ptr<Move>> move_stack);
-            std::stack<std::shared_ptr<Move>> process_captures(std::shared_ptr<pieces::Piece> piece_to_move, 
-                pieces::PawnTargets targets, std::stack<std::shared_ptr<Move>> move_stack, 
-                pieces::ChessMen opponent_pieces);
-            std::stack<std::shared_ptr<Move>> pseudo_legal_moves(pieces::ChessMen friendly_pieces, 
-                pieces::ChessMen opponent_pieces);
+            std::shared_ptr<Board> board;
+
+            std::vector<Move> process_quiet_moves(Board& board, pieces::PawnTargets targets, std::vector<Move> move_stack);
+            std::vector<Move> process_captures(Board& board, pieces::PawnTargets targets, std::vector<Move> move_stack);
+            std::vector<Move> piece_moves_and_captures(Board& board, PieceType type, PieceColour friendly, PieceColour enemy, std::vector<Move> move_stack);
+            std::vector<Move> process_ep_captures(Board& board, pieces::PawnTargets targets, std::vector<Move> move_stack, PieceColour move_colour);
+            std::vector<Move> pseudo_legal_moves(Board& board, PieceColour friendly, PieceColour enemy);
+            std::vector<std::pair<Square, Square>> zip(std::vector<Square> sources, std::vector<Square> targets);
+            pieces::StandardPieceFactory factory;
+            bool target_is_promotion(Square square) { return (square < 8 || square > 55) ? 1 : 0;  }
 
         public:
-            MoveGenerator(pieces::ChessMen white_pieces,
-                pieces::ChessMen black_pieces)
-                : side_to_move(1), white_pieces(white_pieces), black_pieces(black_pieces){};
-            std::stack<std::shared_ptr<Move>> generate_pseudo_legal_moves();
+            MoveGenerator(std::shared_ptr<Board> board)
+                : side_to_move(1), board(board) {};
+            std::vector<Move> generate_pseudo_legal_moves(Board& board);
     };
 
 } // namespace move_generation

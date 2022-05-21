@@ -303,6 +303,17 @@ TEST(BitboardTest, SquareToBitboardDetectsE4) {
     EXPECT_EQ(actual, expected);
 }
 
+TEST(BitboardTest, AlgebraicToBitboardDetectsE4) {
+    // Arrange
+    std::string square = "e4";
+    Bitboard expected{ bitboard::RANK_4 & bitboard::FILE_E };
+
+    // Act
+    Bitboard actual = bitboard::to_bitboard(square);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
 TEST(BitboardTest, CanConvertAlgebraicSquareNotationToSquareIndex) {
     // Arrange
     Square expected{ 0 }; // Start at A1
@@ -314,7 +325,7 @@ TEST(BitboardTest, CanConvertAlgebraicSquareNotationToSquareIndex) {
     for (int iRank = 0; iRank < 8; ++iRank) {
         for (int iFile = 0; iFile < 8; ++iFile) {
             std::string algebraic_square{ files[iFile], ranks[iRank] };
-            actual[iRank][iFile] = bitboard::algebraic_square_to_square_index(algebraic_square);
+            actual[iRank][iFile] = bitboard::square_index(algebraic_square);
         }
     }
 
@@ -337,7 +348,7 @@ TEST(BitboardTest, CanConvertAlgebraicSquareNotationToSquareIndexWithCapitalFile
     for (int iRank = 0; iRank < 8; ++iRank) {
         for (int iFile = 0; iFile < 8; ++iFile) {
             std::string algebraic_square{ files[iFile], ranks[iRank] };
-            actual[iRank][iFile] = bitboard::algebraic_square_to_square_index(algebraic_square);
+            actual[iRank][iFile] = bitboard::square_index(algebraic_square);
         }
     }
 
@@ -363,7 +374,7 @@ TEST(BitboardTest, CanConvertSquareIndexToAlgebraicSquareNotation) {
 
     // Act & Assert
     for (int i = 0; i < 64; i++) {
-        std::string actual = bitboard::square_index_to_algebraic_square(i);
+        std::string actual = bitboard::to_algebraic(i);
         EXPECT_EQ(actual, expected[i]);
     }
 }
