@@ -14,7 +14,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_subdirectory (Benchmarking)
+add_subdirectory (benchmarking)
 list(APPEND EXTRA_LIBS Benchmarking)
 
 add_executable(YakChess main.cpp board.cpp bitboard.cpp pieces.cpp attackmaps.cpp "benchmarking/timer.cpp" "benchmarking/benchmark_tests.cpp" "benchmarking/benchmark_tests.h"  "magic.h")
