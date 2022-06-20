@@ -585,7 +585,7 @@ TEST(BoardMoveGenerationTests, KiwipeteFast) {
 		board.empty_squares(), board.get_position(PieceColour::BLACK));
 
 	// Assert
-	EXPECT_EQ(move_counter, 8);
+	EXPECT_EQ(move_counter, 13);
 }
 
 TEST(BoardMoveGenerationTests, CanGenerateAndMakeEpCapture) {
