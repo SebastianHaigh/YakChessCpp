@@ -31,6 +31,22 @@ typedef uint64_t Rank;
 //  |     FILE      |   A   B   C   D   E   F   G   H   |                     |
 //  | - - - - - - - + - - - - - - - - - - - - - - - - - + - - - - - - - - - - +
 
+enum class RayType {
+    POSITIVE,
+    NEGATIVE
+};
+
+enum class Direction {
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST,
+    NORTH_EAST,
+    NORTH_WEST,
+    SOUTH_EAST,
+    SOUTH_WEST
+};
+
 namespace bitboard {
 
 // Bitmasks of all ranks
@@ -78,13 +94,15 @@ const Bitboard DIAG_A8_H1 = 0x0102040810204080;
 const Bitboard UNIVERSAL = 0xffffffffffffffff;
 const Bitboard EMPTY = 0x0000000000000000;
 
+
+
 /**
 * Shifts a Bitboard south by one rank.
 * 
 * @param The Bitbaord to be shifted.
 * @returns The shifted Bitboard.
 */
-Bitboard south_one(Bitboard board);
+inline Bitboard south_one(Bitboard board) { return board >> 8; }
 
 /**
 * Shifts a Bitboard north by one rank.
@@ -92,7 +110,7 @@ Bitboard south_one(Bitboard board);
 * @param The Bitbaord to be shifted.
 * @returns The shifted Bitboard.
 */
-Bitboard north_one(Bitboard board);
+inline Bitboard north_one(Bitboard board) { return board << 8; }
 
 /**
 * Shifts a Bitboard east by one file.
@@ -100,7 +118,7 @@ Bitboard north_one(Bitboard board);
 * @param The Bitbaord to be shifted.
 * @returns The shifted Bitboard.
 */
-Bitboard east_one(Bitboard board);
+inline Bitboard east_one(Bitboard board) { return (board << 1) & NOT_FILE_A; }
 
 /**
 * Shifts a Bitboard west by one file.
@@ -108,11 +126,11 @@ Bitboard east_one(Bitboard board);
 * @param The Bitbaord to be shifted.
 * @returns The shifted Bitboard.
 */
-Bitboard west_one(Bitboard board);
-Bitboard north_east_one(Bitboard board);
-Bitboard south_east_one(Bitboard board);
-Bitboard north_west_one(Bitboard board);
-Bitboard south_west_one(Bitboard board);
+inline Bitboard west_one(Bitboard board) { return (board >> 1) & NOT_FILE_H; }
+inline Bitboard north_east_one(Bitboard board) { return (board << 9) & NOT_FILE_A; }
+inline Bitboard south_east_one(Bitboard board) { return (board >> 7) & NOT_FILE_A; }
+inline Bitboard north_west_one(Bitboard board) { return (board << 7) & NOT_FILE_H; }
+inline Bitboard south_west_one(Bitboard board) { return (board >> 9) & NOT_FILE_H; }
 void set_square(Bitboard& board, Square square);
 void set_square(Bitboard& board, Rank rank, File file);
 std::vector<Square> scan_forward(Bitboard board);
@@ -120,20 +138,20 @@ std::vector<Square> scan_backward(Bitboard board);
 
 Square first_occupied_square(Bitboard board);
 
-/// <summary>
-/// Returns the file index of the specified Square
-/// </summary>
-/// <param name="square_index">The index of a square on the board.</param>
-/// <returns>The File that the square is on.</returns>
+/* 
+ * \brief Returns the file index of the specified square.
+ * \param[in] square_index - The index of the square.
+ * \return The file that the square is on.
+ */
 File file_index(Square square_index);
 File file_index(char algebraic_file);
 File file_index(std::string algebraic_square);
 
-/// <summary>
-/// Returns the rank index of the specified Square
-/// </summary>
-/// <param name="square_index">The index of a square on the board.</param>
-/// <returns>The Rank that the square is on.</returns>
+/*
+ * \brief Returns the rank index of the specified square.
+ * \param[in] square_index - The index of the square.
+ * \return The rank that the square is on.
+ */
 Rank rank_index(Square square_index);
 Rank rank_index(char algebraic_file);
 Rank rank_index(std::string algebraic_square);

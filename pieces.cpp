@@ -1,5 +1,169 @@
 #include "pieces.h"
-#include <memory>
+
+namespace faster {
+   
+    void generate_pawn_moves(PieceColour colour, Move* move_list, int& move_counter, Bitboard pawn_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
+
+        Bitboard promotable = (colour == PieceColour::BLACK ? bitboard::RANK_2 : bitboard::RANK_7) & pawn_positions;
+        Bitboard not_promotable = pawn_positions & ~promotable;
+
+        /* NOT PROMOTITIONS              */ 
+        /* ----------------------------- */ 
+        Bitboard sources = (colour == PieceColour::BLACK ? bitboard::north_one(empty_squares) : bitboard::south_one(empty_squares)) & not_promotable;
+        Bitboard targets = colour == PieceColour::BLACK ? bitboard::south_one(sources) : bitboard::north_one(sources);
+        while (sources)
+        {
+            *move_list++ = make_quiet(pop_first(sources), pop_first(targets));
+            move_counter++;
+        }
+
+        targets = ((colour == PieceColour::BLACK) ? bitboard::RANK_5 : bitboard::RANK_4) & empty_squares;
+        sources = (colour == PieceColour::BLACK) ? bitboard::north_one(targets) : bitboard::south_one(targets) & empty_squares;
+        sources = (colour == PieceColour::BLACK) ? bitboard::north_one(sources) : bitboard::south_one(sources) & not_promotable;
+        while (sources)
+        {
+            *move_list++ = make_capture(pop_first(sources), pop_first(targets));
+            move_counter++;
+        }
+
+        sources = (colour == PieceColour::BLACK ? bitboard::north_west_one(opponent_pieces) : bitboard::south_west_one(opponent_pieces)) & not_promotable;
+        targets = colour == PieceColour::BLACK ? bitboard::south_east_one(sources) : bitboard::north_east_one(sources);
+        while (sources)
+        {
+            *move_list++ = make_capture(pop_first(sources), pop_first(targets));
+            move_counter++;
+        }
+
+        sources = (colour == PieceColour::BLACK ? bitboard::north_east_one(opponent_pieces) : bitboard::south_east_one(opponent_pieces)) & not_promotable;
+        targets = colour == PieceColour::BLACK ? bitboard::south_west_one(sources) : bitboard::north_west_one(sources);
+        while (sources)
+        {
+            *move_list++ = make_capture(pop_first(sources), pop_first(targets));
+            move_counter++;
+        }
+            
+        // PROMOTIONS
+        sources = (colour == PieceColour::BLACK ? bitboard::north_one(empty_squares) : bitboard::south_one(empty_squares)) & promotable;
+        targets = colour == PieceColour::BLACK ? bitboard::south_one(sources) : bitboard::north_one(sources);
+        while (sources) {
+            Square from = pop_first(sources);
+            Square to = pop_first(targets);
+            *move_list++ = make_quiet_promotion(from, to, PieceType::KNIGHT);
+            *move_list++ = make_quiet_promotion(from, to, PieceType::BISHOP);
+            *move_list++ = make_quiet_promotion(from, to, PieceType::ROOK);
+            *move_list++ = make_quiet_promotion(from, to, PieceType::QUEEN);
+            move_counter += 4;
+        }
+
+        sources = (colour == PieceColour::BLACK ? bitboard::north_west_one(opponent_pieces) : bitboard::south_west_one(opponent_pieces)) & promotable;
+        targets = colour == PieceColour::BLACK ? bitboard::south_east_one(sources) : bitboard::north_east_one(sources);
+        while (sources) {
+            Square from = pop_first(sources);
+            Square to = pop_first(targets);
+            *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
+            *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
+            *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
+            *move_list++ = make_capture_promotion(from, to, PieceType::QUEEN);
+            move_counter += 4;
+        }
+
+        sources = (colour == PieceColour::BLACK ? bitboard::north_east_one(empty_squares) : bitboard::south_east_one(empty_squares)) & promotable;
+        targets = colour == PieceColour::BLACK ? bitboard::south_west_one(sources) : bitboard::north_west_one(sources);
+        while (sources) {
+            Square from = pop_first(sources);
+            Square to = pop_first(targets);
+            *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
+            *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
+            *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
+            *move_list++ = make_capture_promotion(from, to, PieceType::QUEEN);
+            move_counter += 4;
+        }
+    }
+
+    void jumping_piece_moves(attacks::AttackMap* atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
+        
+        while (piece_positions) {
+            Square from = pop_first(piece_positions);
+            Bitboard quiet = atk_map->get(from) & empty_squares;
+            while (quiet)
+            {
+                *move_list++ = make_quiet(from, pop_first(quiet));
+                move_counter++;
+            }
+                
+
+            Bitboard capture = atk_map->get(from) & opponent_pieces;
+            while (capture)
+            {
+                *move_list++ = make_capture(from, pop_first(capture));
+                move_counter++;
+            }
+                
+        }
+    }
+
+    void generate_sliding_piece_moves(const std::vector<faster::Ray*>& atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
+
+        while (piece_positions) {
+            Square from = pop_first(piece_positions);
+            for (auto map : atk_map) {
+                Bitboard quiet = map->get(from, ~empty_squares) & empty_squares;
+                while (quiet)
+                {
+                    *move_list++ = make_quiet(from, pop_first(quiet));
+                    move_counter++;
+                }
+                    
+
+                Bitboard capture = map->get(from, ~empty_squares) & opponent_pieces;
+                while (capture)
+                {
+                    *move_list++ = make_capture(from, pop_first(capture));
+                    move_counter++;
+                }
+                    
+            }
+        }
+
+    }
+
+    void generate_sliding_piece_moves(const faster::SlidingPieceAttackMap* atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
+
+        while (piece_positions) {
+            Square from = pop_first(piece_positions);
+            Bitboard atk_bb = atk_map->attacks(from, ~empty_squares);
+            
+            Bitboard quiet = atk_bb & empty_squares;
+            while (quiet)
+            {
+                *move_list++ = make_quiet(from, pop_first(quiet));
+                move_counter++;
+            }
+
+            Bitboard capture = atk_bb & opponent_pieces;
+            while (capture)
+            {
+                *move_list++ = make_capture(from, pop_first(capture));
+                move_counter++;
+            }
+        }
+
+    }
+
+
+    int pop_1st_bit(Bitboard* bb) {
+
+        Bitboard b = *bb ^ (*bb - 1);
+
+        unsigned int fold = (unsigned)((b & 0xffffffff) ^ (b >> 32));
+        *bb &= (*bb - 1);
+        unsigned int fold2 = fold * 0x783a9b23;
+        unsigned int bit_table_idx = fold2 >> 26;
+        //return BitTable[(fold * 0x783a9b23) >> 26];
+        return (fold * 0x783a9b23) >> 26;
+    }
+
+}
 
 namespace pieces {
 

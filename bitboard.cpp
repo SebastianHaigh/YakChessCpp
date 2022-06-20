@@ -1,39 +1,9 @@
 #include "bitboard.h"
 #include <string>
-
+#include <intrin.h>
 namespace bitboard {
 
-Bitboard south_one(Bitboard board) {
-    return board >> 8;
-}
 
-Bitboard north_one(Bitboard board) {
-    return board << 8;
-}
-
-Bitboard east_one(Bitboard board) {
-    return (board << 1) & NOT_FILE_A;
-}
-
-Bitboard west_one(Bitboard board) {
-    return (board >> 1) & NOT_FILE_H;
-}
-
-Bitboard north_east_one(Bitboard board) {
-    return (board << 9) & NOT_FILE_A;
-}
-
-Bitboard south_east_one(Bitboard board) {
-    return (board >> 7) & NOT_FILE_A;
-}
-
-Bitboard north_west_one(Bitboard board) {
-    return (board << 7) & NOT_FILE_H;
-}
-
-Bitboard south_west_one(Bitboard board) {
-    return (board >> 9) & NOT_FILE_H;
-}
 
 void set_square(Bitboard& board, Square square) {
     Bitboard piece_to_set{ 1 };
@@ -56,10 +26,11 @@ std::vector<Square> scan_backward(Bitboard board) {
 
 std::vector<Square> scan_forward(Bitboard board) {
     std::vector<Square> serialised_board;
-    for (Square square = 0; square < 64; square++) {
-        if (board & to_bitboard(square)) {
-            serialised_board.push_back(square);
-        }
+    unsigned long idx;
+    while (board) {
+        _BitScanForward64(&idx, board);
+        board &= board - 1;
+        serialised_board.push_back(idx);
     }
     return serialised_board;
 }

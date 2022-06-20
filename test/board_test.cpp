@@ -552,6 +552,42 @@ TEST(BoardMoveGenerationTests, DetectsLegalCapturesWithBlackPawns) {
 	EXPECT_EQ(moves.size(), 3);
 }
 
+TEST(BoardMoveGenerationTests, Kiwipete) {
+	// Arrange
+	std::string fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
+	Board board = Board(fen);
+
+	// Act
+	std::vector<Move> moves = board.generate_moves();
+
+	// Assert
+	EXPECT_EQ(moves.size(), 48);
+}
+
+TEST(BoardMoveGenerationTests, KiwipeteFast) {
+	// Arrange
+	std::string fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
+	Board board = Board(fen);
+	faster::Move move_list[330];
+	faster::SpecialisedRay<Direction::NORTH> n_ray;
+	faster::SpecialisedRay<Direction::EAST> e_ray;
+	faster::SpecialisedRay<Direction::SOUTH> s_ray;
+	faster::SpecialisedRay<Direction::WEST> w_ray;
+	std::vector<faster::Ray*> rook_atks{&n_ray, & e_ray, & s_ray, & w_ray};
+	int move_counter{ 0 };
+
+	// Act
+	faster::generate_pawn_moves(PieceColour::WHITE, &move_list[0], move_counter,
+		board.get_position(PieceColour::WHITE, PieceType::PAWN),
+		board.empty_squares(), board.get_position(PieceColour::BLACK));
+	faster::generate_sliding_piece_moves(rook_atks, &move_list[0], move_counter,
+		board.get_position(PieceColour::WHITE, PieceType::ROOK),
+		board.empty_squares(), board.get_position(PieceColour::BLACK));
+
+	// Assert
+	EXPECT_EQ(move_counter, 8);
+}
+
 TEST(BoardMoveGenerationTests, CanGenerateAndMakeEpCapture) {
 	// Arrange
 	std::string fen{ "8/8/8/8/Pp6/1P6/8/8 b - a3 0 1" };
