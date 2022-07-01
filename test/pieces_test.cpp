@@ -329,53 +329,44 @@ TEST(WhitePawnTests, OpponentPieceCanBeCaptured) {
     // Assert
     EXPECT_EQ(move_counter, 2);
 }
-
-TEST(KnightTests, a) {
-    bitboard::print_board(faster::jump_map<PieceType::KING>::value[F6]);
-
-
-    EXPECT_TRUE(false);
-}
 TEST(KnightTests, KnightOnA1AttacksTheCorrectSquares) {
     // Arrange
-    //attacks::KnightAttacks knight_attacks;
-    Square starting_square{0};
     faster::Move move_list[50];
     int move_counter{ 0 };
+    Bitboard knights = bitboard::static_bitboard<A1>::value;
     Bitboard empty_squares = bitboard::UNIVERSAL;
     Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    //faster::jumping_piece_moves(&knight_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
+    faster::generate_piece_moves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty_squares, opponent_pieces);
   
     // Assert
     EXPECT_EQ(move_counter, 2);
-    EXPECT_EQ(move_list[0].to, bitboard::square_index("c2"));
-    EXPECT_EQ(move_list[1].to, bitboard::square_index("b3"));
+    EXPECT_EQ(move_list[0].to, C2);
+    EXPECT_EQ(move_list[1].to, B3);
 }
 
 TEST(KnightTests, KnightOnD4AttacksTheCorrectSquares) {
     // Arrange
-    //attacks::KnightAttacks knight_attacks;
-    Square starting_square = bitboard::square_index("d4");
     faster::Move move_list[50];
     int move_counter{ 0 };
+    Bitboard knights = bitboard::static_bitboard<D4>::value;
     Bitboard empty_squares = bitboard::UNIVERSAL;
     Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    //faster::jumping_piece_moves(&knight_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
+    faster::generate_piece_moves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty_squares, opponent_pieces);
 
     // Assert
     EXPECT_EQ(move_counter, 8);
-    EXPECT_EQ(move_list[0].to, bitboard::square_index("c2"));
-    EXPECT_EQ(move_list[1].to, bitboard::square_index("e2"));
-    EXPECT_EQ(move_list[2].to, bitboard::square_index("b3"));
-    EXPECT_EQ(move_list[3].to, bitboard::square_index("f3"));
-    EXPECT_EQ(move_list[4].to, bitboard::square_index("b5"));
-    EXPECT_EQ(move_list[5].to, bitboard::square_index("f5"));
-    EXPECT_EQ(move_list[6].to, bitboard::square_index("c6"));
-    EXPECT_EQ(move_list[7].to, bitboard::square_index("e6"));
+    EXPECT_EQ(move_list[0].to, C2);
+    EXPECT_EQ(move_list[1].to, E2);
+    EXPECT_EQ(move_list[2].to, B3);
+    EXPECT_EQ(move_list[3].to, F3);
+    EXPECT_EQ(move_list[4].to, B5);
+    EXPECT_EQ(move_list[5].to, F5);
+    EXPECT_EQ(move_list[6].to, C6);
+    EXPECT_EQ(move_list[7].to, E6);
 }
 
 
@@ -426,8 +417,8 @@ TEST(RookTests, RookAttacksProperly) {
     faster::RookMap atk_map;
     faster::Move list[100];
     int move_counter{ 0 };
-    Bitboard rook_bb = Bitboard{ 1 };
-    Bitboard obstruction = bitboard::to_bitboard(bitboard::square_index("a5"));
+    Bitboard rook_bb = bitboard::static_bitboard<A1>::value;
+    Bitboard obstruction = bitboard::static_bitboard<A5>::value;
 
     // Act
     faster::generate_sliding_piece_moves(atk_map, &list[0], move_counter, rook_bb, ~obstruction, obstruction);
@@ -441,9 +432,9 @@ TEST(QueenTests, CanCalculateQueenAttackBitboard) {
     faster::RookMap atk_map;
     faster::Move list[100];
     int move_counter{ 0 };
-    Bitboard queen_bb = Bitboard{ 1 };
-    Bitboard opponent_pieces = bitboard::to_bitboard(bitboard::square_index("a8"));
-    Bitboard friendly_pieces = queen_bb | bitboard::to_bitboard(bitboard::square_index("h8"));
+    Bitboard queen_bb = bitboard::static_bitboard<A1>::value;
+    Bitboard opponent_pieces = bitboard::static_bitboard<A8>::value;
+    Bitboard friendly_pieces = queen_bb | bitboard::static_bitboard<H8>::value;
     Bitboard occupied = opponent_pieces | friendly_pieces;
     Bitboard expected = (bitboard::FILE_A | bitboard::RANK_1 | bitboard::DIAG_A1_H8) & ~queen_bb;
 
@@ -456,9 +447,9 @@ TEST(QueenTests, CanCalculateQueenAttackBitboard) {
 
 TEST(BishopTests, CanCalculateBishopAttackBitboardWithTwoBishops) {
     // Arrange
-    Bitboard bishop_bb = bitboard::to_bitboard("a1") | bitboard::to_bitboard("a8");
-    Bitboard opponent_pieces = bitboard::to_bitboard("a8");
-    Bitboard friendly_pieces = bishop_bb | bitboard::to_bitboard("h8");
+    Bitboard bishop_bb = bitboard::static_bitboard<A1, A8>::value;
+    Bitboard opponent_pieces = bitboard::static_bitboard<A8>::value;
+    Bitboard friendly_pieces = bishop_bb | bitboard::static_bitboard<H8>::value;
     Bitboard occupied = opponent_pieces | friendly_pieces;
     Bitboard expected = (bitboard::DIAG_A8_H1 | bitboard::DIAG_A1_H8) & bitboard::NOT_FILE_A;
 
@@ -468,9 +459,6 @@ TEST(BishopTests, CanCalculateBishopAttackBitboardWithTwoBishops) {
     // Assert
     EXPECT_EQ(actual, expected);
 }
-
-
-
 TEST(FunctionTests, FenCharToPieceTypeTestForBlackPieces) {
     // Arrange
     std::string fen_chars{ "pnbrqkx" };
