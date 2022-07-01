@@ -4,20 +4,145 @@
 #include <stdint.h>
 #include "bitboard.h"
 #include <stack>
+#include <array>
 
 namespace faster {
+
     template<RayType type>
     Square get_blocker_in_ray(Bitboard ray) 
     {
-        unsigned long idx;
         if (type == RayType::POSITIVE)
-            _BitScanForward64(&idx, ray);
+            return bitboard::LS1B(ray);
         else
-            _BitScanReverse64(&idx, ray);
+            return bitboard::MS1B(ray);
 
-        return idx;
     }
 
+
+
+    template<Direction D>
+    constexpr Bitboard shifta(Bitboard board) {
+        if (D == Direction::NORTH) return board << 8;
+        if (D == Direction::SOUTH) return board >> 8;
+        if (D == Direction::EAST) return (board << 1) & bitboard::NOT_FILE_A;
+        if (D == Direction::WEST) return (board >> 1) & bitboard::NOT_FILE_H;
+        if (D == Direction::NORTH_EAST) return (board << 9) & bitboard::NOT_FILE_A;
+        if (D == Direction::SOUTH_EAST) return (board >> 7) & bitboard::NOT_FILE_A;
+        if (D == Direction::NORTH_WEST) return (board << 7) & bitboard::NOT_FILE_H;
+        if (D == Direction::SOUTH_WEST) return (board >> 9) & bitboard::NOT_FILE_H;
+        return board;
+    };
+
+
+    /* ------------------------------------------------------------------ */
+    /* GENERATE STATIC TABLE FOR RAY MAP LOOKUP                           */
+    /* ------------------------------------------------------------------ */
+
+    /*
+     * \brief Metafunction for ray generation.
+     * \tparam D - Ray direction.
+     * \tparam S - Square of the piece casting the ray.
+     */
+    template<Direction D, Square S, Bitboard B = shifta<D>(Bitboard{ 1 } << S) >
+    struct ray {
+        static constexpr Bitboard value = B | ray<D, S, shifta<D>(B)>::value;
+    };
+
+    /*
+     * \brief Base case specialisation when bitboard is equal to 0.
+     * \tparam D - Ray direction.
+     * \tparam S - Square of the piece casting the ray.
+     */
+    template<Direction D, Square S>
+    struct ray<D, S, 0> {
+        static constexpr Bitboard value{ 0 };
+    };
+
+    /*
+     * \brief Static table of sliding piece rays.
+     * \tparam D - The direction of the ray.
+     * \details
+     * Usage: ray_map<Direction::NORTH>::value[42];
+     */
+    template<Direction D, Square S = 0, Bitboard... B>
+    struct ray_map : ray_map<D, S + 1, B..., ray<D, S>::value> { };
+
+    template<Direction D, Bitboard... B>
+    struct ray_map<D, 63, B...> {
+        static constexpr std::array<Bitboard, 64> value = { B... };
+    };
+
+    template<Direction D> struct is_positive_ray : std::true_type { };
+    template<> struct is_positive_ray<Direction::SOUTH> : std::false_type { };
+    template<> struct is_positive_ray<Direction::WEST> : std::false_type { };
+    template<> struct is_positive_ray<Direction::SOUTH_EAST> : std::false_type { };
+    template<> struct is_positive_ray<Direction::SOUTH_WEST> : std::false_type { };
+
+
+
+    template<Direction D>
+    Bitboard blocked_ray(Square square, Bitboard occupied)
+    {
+        Bitboard pieces_in_ray = ray_map<D>::value[square] & occupied;
+
+        if (pieces_in_ray == 0) return ray_map<D>::value[square];
+
+        Square blocker_square{ 0 };
+
+        if (is_positive_ray<D>::value) {
+            blocker_square = bitboard::LS1B(pieces_in_ray);
+        }
+        else {
+            blocker_square = bitboard::MS1B(pieces_in_ray);
+        }
+        return ray_map<D>::value[square] ^ ray_map<D>::value[blocker_square];
+    }
+
+    class RookMap
+    {
+    public:
+        static Bitboard attacks(Square square, Bitboard occupied_squares)
+        {
+            Bitboard atk_bb{ 0 };
+            atk_bb |= blocked_ray<Direction::NORTH>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::EAST>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::SOUTH>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::WEST>(square, occupied_squares);
+            return atk_bb;
+        }
+    };
+
+    class BishopMap
+    {
+    public:
+        static Bitboard attacks(Square square, Bitboard occupied_squares)
+        {
+            Bitboard atk_bb{ 0 };
+            atk_bb |= blocked_ray<Direction::NORTH_EAST>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::NORTH_WEST>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::SOUTH_EAST>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::SOUTH_WEST>(square, occupied_squares);
+            return atk_bb;
+        }
+    };
+
+    class QueenMap
+    {
+        public:
+        static Bitboard attacks(Square square, Bitboard occupied_squares)
+        {
+            Bitboard atk_bb{ 0 };
+            atk_bb |= blocked_ray<Direction::NORTH>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::EAST>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::SOUTH>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::WEST>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::NORTH_EAST>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::NORTH_WEST>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::SOUTH_EAST>(square, occupied_squares);
+            atk_bb |= blocked_ray<Direction::SOUTH_WEST>(square, occupied_squares);
+            return atk_bb;
+        }
+    };
     /*
      * \brief Returns the corner in which to start generating a ray map.
      * \param[in] dir - the direction of the ray.
@@ -83,10 +208,10 @@ namespace faster {
      * \param[in] board - the bitboard to be shifted.
      * \return The shifted bitboard.
      */
-    template<Direction dir>
+    template<Direction DIR>
     Bitboard ray_gen_first_shift(Bitboard board)
     {
-        if (dir == Direction::NORTH || dir == Direction::EAST || dir == Direction::NORTH_EAST || dir == Direction::SOUTH_EAST)
+        if (DIR == Direction::NORTH || DIR == Direction::EAST || DIR == Direction::NORTH_EAST || DIR == Direction::SOUTH_EAST)
             return bitboard::east_one(board);
 
         return bitboard::west_one(board);
@@ -152,6 +277,7 @@ namespace faster {
 
         Square read_index = temp_start_index(dir);
         for (size_t i = 0; i < 7; i++) {
+            
             Square write_index = temp_shift<dir>(read_index);               // Create write index by shifting the read index.
             temp[write_index] = ray_gen_first_shift<dir>(temp[read_index]); // Create a new ray as a shifted version of a previous ray.
             read_index = temp_shift<dir>(read_index);                       // Update the read_index.
@@ -179,6 +305,9 @@ namespace faster {
         }
     }
 
+   
+
+
     class Ray {
     public:
         Ray() {}
@@ -188,6 +317,7 @@ namespace faster {
 
     /*
      * \brief A sliding piece attack ray with direction DIR.
+     * \tparam DIR - The direction of the ray.
      */
     template<Direction DIR>
     class SpecialisedRay : public Ray
@@ -217,7 +347,7 @@ namespace faster {
             return map[square] ^ map[blocker];
         }
     };
-
+    /*
     class SlidingPieceAttackMap 
     {
     public:
@@ -258,6 +388,8 @@ namespace faster {
         }
     };
 
+    
+
     class BishopAttackMap : public SlidingPieceAttackMap
     {
     private:
@@ -289,7 +421,7 @@ namespace faster {
             return atk_bb;
         }
     };
-
+    
     class QueenAttackMap : public SlidingPieceAttackMap
     {
     private:
@@ -325,6 +457,7 @@ namespace faster {
             return atk_bb;
         }
     };
+    */
 }
 
 namespace attacks {
@@ -358,145 +491,7 @@ namespace attacks {
 // Ray is a pure virtual class that serves as the base class for attack ray 
 // generation. Attack rays are used to generate attack maps for the sliding 
 // pieces (Bishop, Rook, and Queen).
-//
-// Rays are generated 
-class Ray {
-    protected:
-        // Ray map array, contains a bitboard map of this ray for all 64 squares 
-        // of the chessboard.
-        Bitboard ray_maps[64] = {0};
 
-    private:
-        // Returns the square index of the first blocker in the ray extending
-        // from the square index: serialised_piece.
-        
-
-    public:
-        // Returns a bitboard of every square attacked by the serialied_piece.
-        Bitboard get(Square serialised_piece, Bitboard occupied_squares);
-        virtual std::vector<Square> get_blockers(Square serialised_piece, Bitboard occupied_squares);
-};
-
-// PositiveRays are those that extend in the North, and East directions.
-class PositiveRay: virtual public Ray {
-    public:
-        std::vector<Square>get_blockers(Square serialised_piece, Bitboard occupied_squares) override;
-};
-
-// NegativeRay are those that extend in the South, and West directions.
-class NegativeRay: virtual public Ray {
-    public:
-        // Returns the square index of the first blocker in the ray extending
-        // from the square index: serialised_piece.
-        std::vector<Square>get_blockers(Square serialised_piece, Bitboard occupied_squares) override;
-};
-
-
-// NorthRay provides attack rays extending to the north of a sliding piece, 
-// where north refers to the direction on the board from the 1st rank to the 
-// 8th rank.
-// Example:
-//     std::unique_ptr <NorthRay> ray = std::new_unique <NorthRay>();
-//     int square = 19;
-//     uitn64_t occupied_squares = bitboard::RANK_3 & bitboard::FILE_D;
-//     bitboard::print_board(ray->get(square, occupied_squares));
-//
-//     0 0 0 1 0 0 0 0
-//     0 0 0 1 0 0 0 0
-//     0 0 0 1 0 0 0 0
-//     0 0 0 1 0 0 0 0
-//     0 0 0 1 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-class NorthRay: public PositiveRay {
-    public:
-        NorthRay();
-};
-
-// EastRay provides attack rays extending to the east of a sliding piece, 
-// where east refers to the direction on the board from the a file to the h file.
-// Example:
-//     std::unique_ptr <EastRay> ray = std::new_unique <EastRay>();
-//     int square = 19;
-//     uitn64_t occupied_squares = bitboard::RANK_3 & bitboard::FILE_D;
-//     bitboard::print_board(ray->get(square, occupied_squares));
-//
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 1 1 1 1
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-class EastRay: public PositiveRay {
-    public:
-        EastRay();
-};
-
-// SouthRay provides attack rays extending to the south of a sliding piece, 
-// where south refers to the direction on the board from the 8th rank to the 1st 
-// rank.
-// Example:
-//     std::unique_ptr <SouthRay> ray = std::new_unique <SouthRay>();
-//     int square = 19;
-//     uitn64_t occupied_squares = bitboard::RANK_3 & bitboard::FILE_D;
-//     bitboard::print_board(ray->get(square, occupied_squares));
-//
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 1 0 0 0 0
-//     0 0 0 1 0 0 0 0
-class SouthRay: public NegativeRay {
-    public:
-        SouthRay();
-};
-
-// WestRay provides attack rays extending to the west of a sliding piece, 
-// where west refers to the direction on the board from the h file to the a file.
-// Example:
-//     std::unique_ptr <WestRay> ray = std::new_unique <WestRay>();
-//     int square = 19;
-//     uitn64_t occupied_squares = bitboard::RANK_3 & bitboard::FILE_D;
-//     bitboard::print_board(ray->get(square, occupied_squares));
-//
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     1 1 1 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-//     0 0 0 0 0 0 0 0
-class WestRay: public NegativeRay {
-    public:
-        WestRay();
-};
-
-class NorthEastRay: public PositiveRay {
-    public:
-        NorthEastRay();
-};
-
-class SouthEastRay: public NegativeRay {
-    public:
-        SouthEastRay();
-};
-
-class NorthWestRay: public PositiveRay {
-    public:
-        NorthWestRay();
-};
-
-class SouthWestRay: public NegativeRay {
-    public:
-        SouthWestRay();
-};
 
 } // namespace attacks
 
