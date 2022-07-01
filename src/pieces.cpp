@@ -167,18 +167,6 @@ namespace faster {
     }
 
 
-    int pop_1st_bit(Bitboard* bb) {
-
-        Bitboard b = *bb ^ (*bb - 1);
-
-        unsigned int fold = (unsigned)((b & 0xffffffff) ^ (b >> 32));
-        *bb &= (*bb - 1);
-        unsigned int fold2 = fold * 0x783a9b23;
-        unsigned int bit_table_idx = fold2 >> 26;
-        //return BitTable[(fold * 0x783a9b23) >> 26];
-        return (fold * 0x783a9b23) >> 26;
-    }
-
 }
 
 namespace pieces {
