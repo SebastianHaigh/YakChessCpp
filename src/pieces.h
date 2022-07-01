@@ -30,10 +30,10 @@ enum class PieceColour {
 
 
 
-/* faster_pieces namespace for benchmark testing. */
+/** faster_pieces namespace for benchmark testing. */
 namespace faster {
 
-    /*
+    /**
      * \brief Target squares of a pawn single push.
      * \tparam COLOUR - the colour of the pawns.
      * \param[in] source - the source squares for which to find the targets.
@@ -46,7 +46,7 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::south_one(source) : source;
     }
 
-    /*
+    /**
      * \brief Source squares of a pawn single push.
      * \tparam COLOUR - the colour of the pawns.
      * \param[in] target - the target squares for which to find the sources.
@@ -59,7 +59,7 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::north_one(target) : target;
     }
 
-    /*
+    /**
      * \brief The target squares for a double push from the starting rank.
      * \tparam COLOUR - the colour of the pawns.
      * \return The Bitboard of the target squares.
@@ -71,7 +71,7 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::RANK_5 : bitboard::EMPTY;
     }
 
-    /*
+    /**
      * \brief Source squares of pawns attacking to the west.
      * \tparam COLOUR - the colour of the pawns.
      * \param[in] target - the target squares for which to find the sources.
@@ -84,7 +84,7 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::north_east_one(target) : target;
     }
 
-    /*
+    /**
      * \brief Target squares of pawns attacking to the west.
      * \tparam COLOUR - the colour of the pawns.
      * \param[in] source - the source squares for which to find the targets.
@@ -97,7 +97,7 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::south_west_one(source) : source;
     }
 
-    /*
+    /**
      * \brief Target squares of pawns attacking to the east.
      * \tparam COLOUR - the colour of the pawns.
      * \param[in] source - the source squares for which to find the targets.
@@ -110,7 +110,7 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::north_west_one(target) : target;
     }
 
-    /*
+    /**
      * \brief Target squares of pawns attacking to the east.
      * \tparam COLOUR - the colour of the pawns.
      * \param[in] source - the source squares for which to find the targets.
@@ -282,7 +282,7 @@ namespace faster {
     
     void generate_sliding_piece_moves(const QueenMap&, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces);
 
-    /* 
+    /**
      * \brief Get all of the squares attacked by pawns of a given COLOUR.
      * \tparam COLOUR - The colour of the pawns.
      * \param[in] pawn_positions - Bitboard of the pawn positions.
@@ -296,7 +296,7 @@ namespace faster {
         return atk;
     }
 
-    /*
+    /**
      * \brief Get all of the squares attacked by a piece type.
      * \tparam TYPE - The piece type.
      * \param[in] piece_positions - Bitboard of the piece positions.
@@ -319,36 +319,77 @@ namespace faster {
         return atk_bb;
     }
 
+    /**
+     * \brief Constructs a quiet Move.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \return The constructed quiet move.
+     */
     inline Move make_quiet(Square from, Square to) {
         Move move;
         move.from = from; move.to = to;
         return move;
     }
 
+    /**
+     * \brief Constructs a double pawn push.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \return The constructed double push move.
+     * 
+     * \note Use this when constructing double push moves to ensure
+     * that the en passant target is properly set after making the move.
+     */
     inline Move make_double_push(Square from, Square to) {
         Move move;
         move.from = from; move.to = to; move.double_push = true;
         return move;
     }
 
+    /**
+     * \brief Constructs a move with capture.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \return The constructed capture move.
+     */
     inline Move make_capture(Square from, Square to) {
         Move move;
         move.from = from; move.to = to; move.capture = true;
         return move;
     };
 
+    /**
+     * \brief Constructs an en passant capture.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \return The constructed en passant capture.
+     */
     inline Move make_ep_capture(Square from, Square to) {
         Move move;
         move.from = from; move.to = to; move.capture = true; move.en_passant = true;
         return move;
     };
 
+    /**
+     * \brief Constructs a quiet move with promotion.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \param[in] type - The type of piece to promote to.
+     * \return The constructed quiet promotion.
+     */
     inline Move make_quiet_promotion(Square from, Square to, PieceType type) {
         Move move;
         move.from = from; move.to = to; move.promotion = type;
         return move;
     };
 
+    /**
+     * \brief Constructs a capture with promotion.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \param[in] type - The type of piece to promote to.
+     * \return The constructed capture promotion.
+     */
     inline Move make_capture_promotion(Square from, Square to, PieceType type) {
         Move move;
         move.from = from; move.to = to; move.capture = true; move.promotion = type;
