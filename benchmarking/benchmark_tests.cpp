@@ -1,9 +1,9 @@
 #include "benchmarking.h"
 #include "benchmark_tests.h"
-#include "../pieces.h"
-#include "../board.h"
-#include "../attackmaps.h"
-#include "../magic.h"
+#include "../src/pieces.h"
+#include "../src/board.h"
+#include "../src/attackmaps.h"
+#include "../src/magic.h"
 
 #include <vector>
 #include <iostream>

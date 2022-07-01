@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../bitboard.h"
+#include "../src/bitboard.h"
 
 TEST(BitboardTest, SouthOne) {
     // Arrange

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "../board.h"
-#include "../bitboard.h"
-#include "../pieces.h"
+#include "../src/board.h"
+#include "../src/bitboard.h"
+#include "../src/pieces.h"
 
 #include <string>
 

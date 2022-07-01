@@ -4,8 +4,8 @@
 #include <vector>
 #include <utility>
 
-#include "../pieces.h"
-#include "../bitboard.h"
+#include "../src/pieces.h"
+#include "../src/bitboard.h"
 
 
 TEST(BlackPawnsTest, CanGenerateSinglePushesFromUnobstructedStartingPosition) {

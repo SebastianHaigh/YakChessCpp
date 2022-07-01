@@ -155,8 +155,6 @@ template<PieceColour C> struct OppositeColour { static constexpr PieceColour val
 template<> struct OppositeColour<PieceColour::WHITE> { static constexpr PieceColour value = PieceColour::BLACK; };
 template<> struct OppositeColour<PieceColour::BLACK> { static constexpr PieceColour value = PieceColour::WHITE; };
 
-
-
 class Board {
 
 private:
@@ -227,7 +225,6 @@ private:
 
 
 	std::vector<faster::Move> generate_castling_moves(std::vector<faster::Move> moves);
-
 	void parse_fen(const std::string& fen);
 	std::string rank_to_fen(Rank rank);
 
@@ -248,6 +245,10 @@ public:
 	void make_move(const faster::Move& move);
 	void undo_move();
 
+	/**
+	 * \brief Check if the king of the current side to move is in check/
+	 * \return true if the king is in check, false otherwise.
+	 */
 	bool is_check();
 	bool is_check(PieceColour colour);
 	bool is_checkmate();
@@ -264,8 +265,26 @@ public:
 	bool can_king_side_castle(PieceColour colour);
 	bool can_queen_side_castle(PieceColour colour);
 
+	/**
+	 * \brief Get the bitboard for a particular piece type (both colours).
+	 * \param[in] type - The type of piece.
+	 * \return A bitboard containing the piece positions.
+	 */
 	Bitboard get_position(PieceType type) { return piece_type_bitboard[static_cast<int>(type)]; }
+
+	/**
+	 * \brief Get the bitboard for a particular colour.
+	 * \param[in] colour - The colour of the side.
+	 * \return A bitboard containing the piece positions.
+	 */
 	Bitboard get_position(PieceColour colour) { return colour_bitboard[static_cast<int>(colour)]; }
+
+	/**
+	 * \brief Get the bitboard for a particular colour and piece type.
+	 * \param[in] colour - The colour of the side.
+	 * \param[in] type - The type of piece.
+	 * \return A bitboard containing the piece positions.
+	 */
 	Bitboard get_position(PieceColour colour, PieceType type) { return get_position(type) & get_position(colour); }
 
 };
@@ -293,29 +312,22 @@ void Board::process_move(const faster::Move& move, bool undo) {
 	while (!(piece_check_bb & piece_type_bitboard[piece_to_move]))
 		piece_to_move++;
 
+	// Determine the piece type to be captured
 	int piece_to_capture = 0;
-
-	if (move.en_passant)
+	if (move.capture && !undo) 
 	{
-		piece_to_capture = static_cast<int>(PieceType::PAWN);
+		// If this is a make rather than unmake we need to determine the type of the piece to capture.
+		while (!(to_bitboard & piece_type_bitboard[piece_to_capture]))
+			piece_to_capture++;
+		previous_captured_piece = PieceType(piece_to_capture);
 	}
-	else
+	else if (move.capture && undo) 
 	{
-		if (move.capture && !undo) {
-			// If this is a make rather than unmake we need to determine the type of the piece to capture.
-			while (!(to_bitboard & piece_type_bitboard[piece_to_capture]))
-				piece_to_capture++;
-			previous_captured_piece = PieceType(piece_to_capture);
-		}
-		else if (move.capture && undo) {
-			piece_to_capture = static_cast<int>(previous_captured_piece);
-		}
+		piece_to_capture = static_cast<int>(previous_captured_piece);
 	}
 
 	int colour_to_move = static_cast<int>(C);
 	int opposing_colour = static_cast<int>(OppositeColour<C>::value);
-
-	
 
 	// Make the basic move.
 	piece_type_bitboard[piece_to_move] ^= from_to_bitboard;
@@ -378,130 +390,5 @@ void Board::process_castle(const faster::Move& move) {
 		colour_bitboard[static_cast<int>(C)] ^= from_to_bitboard;
 	}
 }
-
-
-namespace faster {
-
-	/*
-	class Board {
-	private:
-		// Piece positions
-		Bitboard piece_type_bitboard[6];
-		Bitboard colour_bitboard[2];
-
-		// Game state
-		GameState current_state;
-		GameState previous_state;
-
-		// Attack maps for move generation
-		attacks::KingAttacks king_atks;
-		attacks::KnightAttacks knight_atks;
-		RookAttackMap rook_atks;
-		BishopAttackMap bishop_atks;
-		QueenAttackMap queen_atks;
-
-		// Move storage
-		Move previous_move;
-		Move move_list[330];
-		int move_counter{ 0 };
-
-		PieceColour side_to_move = PieceColour::WHITE;
-
-		void parse_fen(const std::string& fen);
-		std::string rank_to_fen(Rank rank);
-		void process_move(Move move);
-
-
-		Bitboard piece_attacks(PieceType type, PieceColour colour);
-		Bitboard all_attacks(PieceColour colour);
-		bool target_is_promotion(Square square) { return (square < 8 || square > 55) ? 1 : 0; }
-
-		std::vector<Move> generate_piece_moves_and_captures(PieceType type, std::vector<Move> moves);
-		std::vector<Move> generate_castling_moves(std::vector<Move> moves);
-
-	public:
-		Board() : piece_type_bitboard{ 0 }, colour_bitboard{ 0 } {}
-		Board(const std::string& fen) : piece_type_bitboard{ 0 }, colour_bitboard{ 0 } { parse_fen(fen); }
-
-		PieceType get_piece_type_on(Square square) const 
-		{
-			Bitboard square_bb = bitboard::to_bitboard(square);
-			for (int i = 0; i < 6; i++)
-				if (square_bb & piece_type_bitboard[i]) return static_cast<PieceType>(i);
-
-		};
-
-		PieceColour get_piece_colour_on(Square square) const;
-
-		Bitboard occupied_squares() const;
-		Bitboard empty_squares() const;
-
-		std::vector<Move> generate_moves() {
-			Move temp_move_list[330];
-			int temp_move_counter{ 0 };
-			PieceColour side = current_state.side_to_move();
-			generate_pawn_moves(side, &temp_move_list[0], temp_move_counter, get_position(side, PieceType::PAWN),
-				empty_squares(), get_position(current_state.side_not_to_move()));
-			jumping_piece_moves(&knight_atks, &temp_move_list[temp_move_counter], temp_move_counter, get_position(side, PieceType::KNIGHT),
-				empty_squares(), get_position(current_state.side_not_to_move()));
-			jumping_piece_moves(&king_atks, &temp_move_list[temp_move_counter], temp_move_counter, get_position(side, PieceType::KING),
-				empty_squares(), get_position(current_state.side_not_to_move()));
-			generate_sliding_piece_moves(&bishop_atks, &temp_move_list[temp_move_counter], temp_move_counter, get_position(side, PieceType::BISHOP),
-				empty_squares(), get_position(current_state.side_not_to_move()));
-			generate_sliding_piece_moves(&rook_atks, &temp_move_list[temp_move_counter], temp_move_counter, get_position(side, PieceType::ROOK),
-				empty_squares(), get_position(current_state.side_not_to_move()));
-			generate_sliding_piece_moves(&queen_atks, &temp_move_list[temp_move_counter], temp_move_counter, get_position(side, PieceType::QUEEN),
-				empty_squares(), get_position(current_state.side_not_to_move()));
-
-			std::vector<Move> legal_moves;
-			for (int i = 0; i < temp_move_counter; i++)
-			{
-				make_move(temp_move_list[i]);
-				if (!is_check(previous_state.side_to_move())) legal_moves.push_back(temp_move_list[i]);
-				undo_move();
-			}
-			return legal_moves;
-		}
-
-		void make_move(PieceType type, PieceColour colour, Square from, Square to);
-		void make_move(Move move) 
-		{
-			process_move(move);
-
-			previous_state = current_state;
-			current_state.update(move);
-			current_state.toggle_side_to_move();
-			previous_move = move;
-		};
-
-		
-		void undo_move();
-
-		bool is_check() const;
-		bool is_check(PieceColour colour) const;
-		bool is_checkmate() const;
-
-		std::string to_fen();
-
-		Bitboard ep_target() { return current_state.ep_target(); }
-		Square ep_target_square() { return current_state.ep_target_square(); }
-
-		PieceColour to_move() { return current_state.side_to_move(); }
-
-		Bitboard attacked_by(PieceColour colour) { return all_attacks(colour); }
-
-		bool can_king_side_castle(PieceColour colour);
-		bool can_queen_side_castle(PieceColour colour);
-
-		Bitboard get_position(PieceType type) { return piece_type_bitboard[static_cast<int>(type)]; }
-		Bitboard get_position(PieceColour colour) { return colour_bitboard[static_cast<int>(colour)]; }
-		Bitboard get_position(PieceColour colour, PieceType type) { return get_position(type) & get_position(colour); }
-
-		std::vector<Move> generate_pawn_moves_and_captures();
-
-	};
-	*/
-}
-
 
 #endif // YAK_BOARD_H_

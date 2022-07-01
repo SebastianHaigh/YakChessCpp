@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../attackmaps.h"
-#include "../bitboard.h"
+#include "../src/attackmaps.h"
+#include "../src/bitboard.h"
 
 TEST(NorthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     // 1 . . . . . . . 
