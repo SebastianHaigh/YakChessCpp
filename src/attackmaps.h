@@ -18,8 +18,6 @@ namespace faster {
 
     }
 
-
-
     template<Direction D>
     constexpr Bitboard shifta(Bitboard board) {
         if (D == Direction::NORTH) return board << 8;
@@ -38,7 +36,7 @@ namespace faster {
     /* GENERATE STATIC TABLE FOR RAY MAP LOOKUP                           */
     /* ------------------------------------------------------------------ */
 
-    /*
+    /**
      * \brief Metafunction for ray generation.
      * \tparam D - Ray direction.
      * \tparam S - Square of the piece casting the ray.
@@ -48,7 +46,7 @@ namespace faster {
         static constexpr Bitboard value = B | ray<D, S, shifta<D>(B)>::value;
     };
 
-    /*
+    /**
      * \brief Base case specialisation when bitboard is equal to 0.
      * \tparam D - Ray direction.
      * \tparam S - Square of the piece casting the ray.
@@ -58,7 +56,7 @@ namespace faster {
         static constexpr Bitboard value{ 0 };
     };
 
-    /*
+    /**
      * \brief Static table of sliding piece rays.
      * \tparam D - The direction of the ray.
      * \details
@@ -78,8 +76,6 @@ namespace faster {
     template<> struct is_positive_ray<Direction::SOUTH_EAST> : std::false_type { };
     template<> struct is_positive_ray<Direction::SOUTH_WEST> : std::false_type { };
 
-
-
     template<Direction D>
     Bitboard blocked_ray(Square square, Bitboard occupied)
     {
@@ -98,9 +94,21 @@ namespace faster {
         return ray_map<D>::value[square] ^ ray_map<D>::value[blocker_square];
     }
 
+    /**
+     * \brief Attack map for rooks.
+     */
     class RookMap
     {
     public:
+        /**
+         * \brief Calculates all squares attacked by a single rook. 
+         * \param[in] square - the index of the square that the rook is on.
+         * \param[in] occupied_squares - a Bitboard of every occupied square.
+         * \return A Bitboard of all squares attacked by the rook.
+         * 
+         * \summary The returned bitboard will included as attacked squares 
+         * all blocking pieces, whether they are friendly or not.
+         */
         static Bitboard attacks(Square square, Bitboard occupied_squares)
         {
             Bitboard atk_bb{ 0 };
@@ -143,7 +151,7 @@ namespace faster {
             return atk_bb;
         }
     };
-    /*
+    /**
      * \brief Returns the corner in which to start generating a ray map.
      * \param[in] dir - the direction of the ray.
      * \return Square index of the corner to start generating
@@ -154,7 +162,7 @@ namespace faster {
         if (dir == Direction::SOUTH || dir == Direction::WEST || dir == Direction::SOUTH_WEST || dir == Direction::SOUTH_EAST) return 56;
     }
 
-    /*
+    /**
      * \brief Returns the index at which to start populating the temp array.
      * \param[in] dir - the direction of the ray.
      * \return The index of the temp array (0 or 7)
@@ -166,7 +174,7 @@ namespace faster {
     }
 
 
-    /*
+    /**
      * \brief Shifts the index of the temp array one place left or right depending on direction.
      * \param dir - The direction of the ray.
      * \param[in] square - the index to shift.
@@ -347,122 +355,9 @@ namespace faster {
             return map[square] ^ map[blocker];
         }
     };
-    /*
-    class SlidingPieceAttackMap 
-    {
-    public:
-        SlidingPieceAttackMap() {}
-        virtual ~SlidingPieceAttackMap() {}
-        virtual Bitboard attacks(Square square, Bitboard occupied_squares) const = 0;
-    };
-
-    class RookAttackMap : public SlidingPieceAttackMap
-    {
-    private:
-        std::vector<Ray*> rays;
-    public:
-        RookAttackMap()
-        {
-            rays.push_back(new SpecialisedRay<Direction::NORTH>());
-            rays.push_back(new SpecialisedRay<Direction::EAST>());
-            rays.push_back(new SpecialisedRay<Direction::SOUTH>());
-            rays.push_back(new SpecialisedRay<Direction::WEST>());
-        }
-
-        ~RookAttackMap() 
-        {
-            for (auto ray : rays) 
-                delete ray;
-        }
-
-        RookAttackMap(const RookAttackMap&) = delete;
-        RookAttackMap& operator= (const RookAttackMap&) = delete;
-
-        Bitboard attacks(Square square, Bitboard occupied_squares) const override
-        {
-            Bitboard atk_bb{ 0 };
-            for (auto ray : rays)
-                atk_bb |= ray->get(square, occupied_squares);
-
-            return atk_bb;
-        }
-    };
-
-    
-
-    class BishopAttackMap : public SlidingPieceAttackMap
-    {
-    private:
-        std::vector<Ray*> rays;
-    public:
-        BishopAttackMap()
-        {
-            rays.push_back(new SpecialisedRay<Direction::NORTH_EAST>());
-            rays.push_back(new SpecialisedRay<Direction::NORTH_WEST>());
-            rays.push_back(new SpecialisedRay<Direction::SOUTH_EAST>());
-            rays.push_back(new SpecialisedRay<Direction::SOUTH_WEST>());
-        }
-
-        ~BishopAttackMap()
-        {
-            for (auto ray : rays)
-                delete ray;
-        }
-
-        BishopAttackMap(const BishopAttackMap&) = delete;
-        BishopAttackMap& operator= (const BishopAttackMap&) = delete;
-
-        Bitboard attacks(Square square, Bitboard occupied_squares) const override
-        {
-            Bitboard atk_bb{ 0 };
-            for (auto ray : rays)
-                atk_bb |= ray->get(square, occupied_squares);
-
-            return atk_bb;
-        }
-    };
-    
-    class QueenAttackMap : public SlidingPieceAttackMap
-    {
-    private:
-        std::vector<Ray*> rays;
-    public:
-        QueenAttackMap()
-        {
-            rays.push_back(new SpecialisedRay<Direction::NORTH>());
-            rays.push_back(new SpecialisedRay<Direction::EAST>());
-            rays.push_back(new SpecialisedRay<Direction::SOUTH>());
-            rays.push_back(new SpecialisedRay<Direction::WEST>());
-            rays.push_back(new SpecialisedRay<Direction::NORTH_EAST>());
-            rays.push_back(new SpecialisedRay<Direction::NORTH_WEST>());
-            rays.push_back(new SpecialisedRay<Direction::SOUTH_EAST>());
-            rays.push_back(new SpecialisedRay<Direction::SOUTH_WEST>());
-        }
-
-        ~QueenAttackMap()
-        {
-            for (auto ray : rays)
-                delete ray;
-        }
-
-        QueenAttackMap(const QueenAttackMap&) = delete;
-        QueenAttackMap& operator= (const QueenAttackMap&) = delete;
-
-        Bitboard attacks(Square square, Bitboard occupied_squares) const override
-        {
-            Bitboard atk_bb{ 0 };
-            for (auto ray : rays)
-                atk_bb |= ray->get(square, occupied_squares);
-
-            return atk_bb;
-        }
-    };
-    */
 }
 
 namespace attacks {
-
-    
 
     class AttackMap {
     public:
@@ -487,11 +382,6 @@ namespace attacks {
             KingAttacks();
             Bitboard get(Square serialised_piece) override;
     };
-
-// Ray is a pure virtual class that serves as the base class for attack ray 
-// generation. Attack rays are used to generate attack maps for the sliding 
-// pieces (Bishop, Rook, and Queen).
-
 
 } // namespace attacks
 
