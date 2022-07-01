@@ -13,13 +13,11 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::NorthRay();
     Square serialised_piece = 16;
     Bitboard occupied_squares = 0;
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::NORTH>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -37,14 +35,12 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::NorthRay();
     Square serialised_piece = 16;
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 48;
-    Bitboard attack_ray;
-
+    
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::NORTH>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -63,14 +59,12 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::NorthRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 61; // Blocker on F8
-    Bitboard attack_ray;
-
+    
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::NORTH>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -81,14 +75,13 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
 TEST(NorthRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheEightRank) {
 
     // Assemble
-    auto ray = attacks::NorthRay();
     Square serialised_pieces[8] = {56, 57, 58, 59, 60, 61, 62, 63};
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
     // Act
     for (int i = 0; i < 8; i++) {
-        attack_ray[i] = ray.get(serialised_pieces[i], occupied_squares);
+        attack_ray[i] = faster::ray_map<Direction::NORTH>::value[serialised_pieces[i]];
     }
 
     // Assert
@@ -114,13 +107,11 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     // 1 . . . . . . .
 
     // Assemble
-    auto ray = attacks::SouthRay();
     Square serialised_piece = 40;
     Bitboard occupied_squares = 0;
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::SOUTH>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -138,14 +129,12 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::SouthRay();
     Square serialised_piece = 40;
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 8;
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::SOUTH>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -164,14 +153,12 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::SouthRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 45; // Blocker on F6
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::SOUTH>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -182,14 +169,13 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
 TEST(SouthRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheFirstRank) {
 
     // Assemble
-    auto ray = attacks::SouthRay();
     Square serialised_pieces[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
     // Act
     for (int i = 0; i < 8; i++) {
-        attack_ray[i] = ray.get(serialised_pieces[i], occupied_squares);
+        attack_ray[i] = faster::ray_map<Direction::SOUTH>::value[serialised_pieces[i]];
     }
 
     // Assert
@@ -215,13 +201,11 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::EastRay();
     Square serialised_piece = 40;
     Bitboard occupied_squares = 0;
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::EAST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -239,14 +223,12 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::EastRay();
     Square serialised_piece = 40; // Ray casting piece on A6
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 45; // Blocker on F6
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::EAST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -265,14 +247,12 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::EastRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 54; // Blocker on G7
-    Bitboard attack_ray;
-
+    
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::EAST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -283,14 +263,13 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
 TEST(EastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
 
     // Assemble
-    auto ray = attacks::EastRay();
     Square serialised_pieces[8] = {7, 15, 23, 31, 39, 47, 55, 63}; // H1, ..., H8
     Bitboard occupied_squares = 0;
     std::vector<Bitboard>attack_ray(8, 0);
 
     // Act
     for (int i = 0; i < 8; i++) {
-        attack_ray[i] = ray.get(serialised_pieces[i], occupied_squares);
+        attack_ray[i] = faster::ray_map<Direction::EAST>::value[serialised_pieces[i]];
     }
 
     // Assert
@@ -311,13 +290,11 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::WestRay();
     Square serialised_piece = 47; // Ray casting piece on H6
     Bitboard occupied_squares = 0; // No occupied squares
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::WEST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -335,14 +312,12 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::WestRay();
     Square serialised_piece = 47; // Ray casting piece on H6
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 42; // Blocker on C6
-    Bitboard attack_ray;
-
+    
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::WEST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -361,14 +336,12 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::WestRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 52; // Blocker on E7
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::WEST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -379,14 +352,13 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
 TEST(WestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
 
     // Assemble
-    auto ray = attacks::WestRay();
     Square serialised_pieces[8] = {0, 8, 16, 24, 32, 40, 48, 56}; // A1, ..., A8
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
     // Act
     for (int i = 0; i < 8; i++) {
-        attack_ray[i] = ray.get(serialised_pieces[i], occupied_squares);
+        attack_ray[i] = faster::ray_map<Direction::WEST>::value[serialised_pieces[i]];
     }
 
     // Assert
@@ -412,13 +384,11 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::NorthEastRay();
     Square serialised_piece = 26; // Ray casting piece on C4
     Bitboard occupied_squares = 0; // No occupied squares
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::NORTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -436,14 +406,12 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::NorthEastRay();
     Square serialised_piece = 26; // Ray casting piece on C4
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 53; // Blocker on F7
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::NORTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -462,14 +430,12 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::NorthEastRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 62; // Blocker on G8
-    Bitboard attack_ray;
-
+    
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::NORTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -480,14 +446,13 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
 TEST(NorthEastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
 
     // Assemble
-    auto ray = attacks::NorthEastRay();
     Square serialised_pieces[8] = {7, 15, 23, 31, 39, 47, 55, 63}; // H1, ..., H8
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
     // Act
     for (int i = 0; i < 8; i++) {
-        attack_ray[i] = ray.get(serialised_pieces[i], occupied_squares);
+        attack_ray[i] = faster::ray_map<Direction::NORTH_EAST>::value[serialised_pieces[i]];
     }
 
     // Assert
@@ -513,13 +478,11 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     // . . . . . 1 . .
 
     // Assemble
-    auto ray = attacks::SouthEastRay();
     Square serialised_piece = 26; // Ray casting piece on C4
     Bitboard occupied_squares = 0; // No occupied squares
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::SOUTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -537,14 +500,12 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::SouthEastRay();
     Square serialised_piece = 26; // Ray casting piece on C4
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 12; // Blocker on E2
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::SOUTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -563,14 +524,12 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::SouthEastRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 46; // Blocker on G6
-    Bitboard attack_ray;
-
+    
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::SOUTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -581,14 +540,13 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
 TEST(SouthEastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
 
     // Assemble
-    auto ray = attacks::SouthEastRay();
     Square serialised_pieces[8] = {7, 15, 23, 31, 39, 47, 55, 63}; // H1, ..., H8
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
     // Act
     for (int i = 0; i < 8; i++) {
-        attack_ray[i] = ray.get(serialised_pieces[i], occupied_squares);
+        attack_ray[i] = faster::ray_map<Direction::SOUTH_EAST>::value[serialised_pieces[i]];
     }
 
     // Assert
@@ -614,13 +572,11 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::NorthWestRay();
     Square serialised_piece = 21; // Ray casting piece on F3
     Bitboard occupied_squares = 0; // No occupied squares
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::NORTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -638,14 +594,12 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::NorthWestRay();
     Square serialised_piece = 21; // Ray casting piece on F3
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 42; // Blocker on C6
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::NORTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -664,14 +618,12 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::NorthWestRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 60; // Blocker on G8
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::NORTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -682,14 +634,14 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
 TEST(NorthWestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
 
     // Assemble
-    auto ray = attacks::NorthWestRay();
     Square serialised_pieces[8] = {0, 8, 16, 24, 32, 40, 48, 56}; // A1, ..., A8
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
     // Act
     for (int i = 0; i < 8; i++) {
-        attack_ray[i] = ray.get(serialised_pieces[i], occupied_squares);
+        attack_ray[i] = faster::ray_map<Direction::NORTH_WEST>::value[serialised_pieces[i]];
+        //attack_ray[i] = ray.get(serialised_pieces[i], occupied_squares);
     }
 
     // Assert
@@ -715,13 +667,11 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::SouthWestRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 0; // No occupied squares
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::SOUTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -739,14 +689,12 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::SouthWestRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 26; // Blocker on C4
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::SOUTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -765,14 +713,12 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     // . . . . . . . .
 
     // Assemble
-    auto ray = attacks::SouthWestRay();
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 44; // Blocker on E6
-    Bitboard attack_ray;
 
     // Act
-    attack_ray = ray.get(serialised_piece, occupied_squares);
+    Bitboard attack_ray = faster::blocked_ray<Direction::SOUTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
     std::vector<Square> serialised_ray = bitboard::scan_forward(attack_ray);
@@ -783,14 +729,13 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
 TEST(SouthWestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
 
     // Assemble
-    auto ray = attacks::SouthWestRay();
     Square serialised_pieces[8] = {0, 8, 16, 24, 32, 40, 48, 56}; // A1, ..., A8
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
     // Act
     for (int i = 0; i < 8; i++) {
-        attack_ray[i] = ray.get(serialised_pieces[i], occupied_squares);
+        attack_ray[i] = faster::ray_map<Direction::SOUTH_WEST>::value[serialised_pieces[i]]; // ray.get(serialised_pieces[i], occupied_squares);
     }
 
     // Assert
