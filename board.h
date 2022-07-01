@@ -280,7 +280,7 @@ void Board::process_move(const faster::Move& move, bool undo) {
 	else if (move.castle == PieceType::QUEEN)
 		return process_castle<PieceType::QUEEN, C>(move);
 
-	if (move.en_passant) process_ep<C>(move);
+	if (move.en_passant) return process_ep<C>(move);
 
 	// Bitboards that will be used to update the board representation
 	Bitboard to_bitboard = bitboard::to_bitboard(move.to);
