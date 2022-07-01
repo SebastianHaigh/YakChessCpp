@@ -58,10 +58,6 @@ void Board::parse_fen(const std::string& fen) {
 		}
 	}
 	current_state = GameState(fen.substr(end_of_piece_placement + 1));
-	/*
-	
-	
-	*/
 }
 
 PieceType Board::get_piece_type_on(Square square) {

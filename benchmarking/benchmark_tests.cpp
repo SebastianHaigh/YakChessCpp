@@ -65,8 +65,6 @@ void ROOK_MOVE_GENERATION() {
 		Bitboard friendly = bitboard::RANK_1 | bitboard::RANK_2;
 		Bitboard occupied = friendly;
 		Bitboard empty = ~occupied;
-		//attacks::KnightAttacks knight_atks;
-		//attacks::KingAttacks king_atks;
 		int move_counter = 0;
 
 		faster::RookMap rook_atks;
