@@ -11,8 +11,7 @@ TEST(MoveTest, DoublePawnPushCreatesEpTargetSquare) {
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
 	std::string expected{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1" };
 	Board board(fen);
-	Move move = Move(8, 24, PieceType::PAWN);
-	move.set_double_push();
+	faster::Move move = faster::make_double_push(8, 24);
 
 	// Act
 	board.make_move(move);
@@ -27,9 +26,9 @@ TEST(MoveTest, CanMakeEpCapture) {
 	std::string fen{ "8/8/8/8/Pp6/1P6/8/8 b KQkq a3 0 1" };
 	std::string expected{ "8/8/8/8/8/pP6/8/8 w KQkq - 0 2" };
 	auto board = Board(fen);
-	Move move(Square(25), Square(16), PieceType::PAWN);
-	move.set_en_passant(bitboard::to_bitboard(Square(24)));
-
+	faster::Move move = faster::make_ep_capture(25, 16);
+	//move.set_en_passant(bitboard::to_bitboard(Square(24)));
+	
 	// Act
 	board.make_move(move);
 
@@ -38,7 +37,7 @@ TEST(MoveTest, CanMakeEpCapture) {
 	EXPECT_EQ(board.to_fen(), expected);
 }
 
-
+/*
 TEST(MoveTest, CanConvertPawnMoveToAlgebraic) {
 	// Arrange
 	Move move(Square(25), Square(16), PieceType::PAWN);
@@ -50,16 +49,16 @@ TEST(MoveTest, CanConvertPawnMoveToAlgebraic) {
 	// Assert
 	EXPECT_EQ(actual, expected);
 }
-
+*/
 TEST(MoveFactoryTest, CanCreatePawnPushMove) {
 	// Arrange
-	MoveFactory mf = MoveFactory();
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
 	std::string expected{ "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1" };
 	Board board = Board(fen);
 
 	// Act
-	Move pawn_push = mf.create_pawn_push(8, 16);
+	faster::Move pawn_push = faster::make_quiet(8, 16);
+	//Move pawn_push = mf.create_pawn_push(8, 16);
 
 	// Assert
 	board.make_move(pawn_push);
@@ -68,13 +67,12 @@ TEST(MoveFactoryTest, CanCreatePawnPushMove) {
 
 TEST(MoveFactoryTest, CanCreatePawnDoublePushMove) {
 	// Arrange
-	MoveFactory mf = MoveFactory();
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
 	std::string expected{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1" };
 	Board board = Board(fen);
 
 	// Act
-	Move pawn_push = mf.create_pawn_push(8, 24);
+	faster::Move pawn_push = faster::make_double_push(8, 24);
 
 	// Assert
 	board.make_move(pawn_push);
@@ -396,8 +394,8 @@ TEST(BoardTest, CastlingRightsChangeWhenRookIsCaptured) {
 	std::string expected{ "rnbqkbn1/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNr w Qq - 0 2" };
 	Board board(fen);
 
-	Move move(63, 7, PieceType::ROOK);
-	move.set_capture(PieceType::ROOK);
+	faster::Move move = faster::make_capture(63, 7);
+	//move.set_capture(PieceType::ROOK);
 
 	board.make_move(move);
 
@@ -411,8 +409,10 @@ TEST(BoardTest, UndoingMoveRestoresState) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
 	Board board(fen);
-	Move move(bitboard::square_index("e2"), bitboard::square_index("e4"), PieceType::PAWN);
+	faster::Move move = faster::make_quiet(bitboard::square_index("e2"), bitboard::square_index("e4"));
 	board.make_move(move);
+
+	//std::cout << board.to_fen() << std::endl;
 
 	// Act
 	board.undo_move();
@@ -522,7 +522,7 @@ TEST(BoardMoveGenerationTests, DetectsLegalCapturesWithWhitePawns) {
 	Board board = Board(fen);
 
 	// Act
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 3);
@@ -546,7 +546,7 @@ TEST(BoardMoveGenerationTests, DetectsLegalCapturesWithBlackPawns) {
 	Board board = Board(fen);
 
 	// Act
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 3);
@@ -558,12 +558,12 @@ TEST(BoardMoveGenerationTests, Kiwipete) {
 	Board board = Board(fen);
 
 	// Act
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 48);
 }
-
+/*
 TEST(BoardMoveGenerationTests, KiwipeteFast) {
 	// Arrange
 	std::string fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
@@ -587,18 +587,29 @@ TEST(BoardMoveGenerationTests, KiwipeteFast) {
 	// Assert
 	EXPECT_EQ(move_counter, 13);
 }
-
+*/
 TEST(BoardMoveGenerationTests, CanGenerateAndMakeEpCapture) {
+
+	//  Before Capture     After Capture
+	// . . . . . . . .    . . . . . . . . 
+	// . . . . . . . .    . . . . . . . .
+	// . . . . . . . .    . . . . . . . .
+	// . . . . . . . .    . . . . . . . .
+	// P p . . . . . .    . . . . . . . .
+	// . P . . . . . .    p P . . . . . .
+	// . . . . . . . .    . . . . . . . .
+	// . . . . . . . .    . . . . . . . .
+	
 	// Arrange
 	std::string fen{ "8/8/8/8/Pp6/1P6/8/8 b - a3 0 1" };
 	std::string expected{ "8/8/8/8/8/pP6/8/8 w - - 0 2" };
 	Board board = Board(fen);
 
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Act
-	for (Move move : moves) {
-		if (move.is_en_passant()) {
+	for (auto move : moves) {
+		if (move.en_passant) {
 			board.make_move(move);
 			break;
 		}
@@ -609,17 +620,39 @@ TEST(BoardMoveGenerationTests, CanGenerateAndMakeEpCapture) {
 	EXPECT_EQ(board.to_fen(), expected);
 }
 
+TEST(BoardMoveGenerationTests, CanCastleKingSideWhiteOnlyKingAndRook) {
+	// Arrange
+	std::string fen{ "8/8/8/8/8/8/8/4K2R w K - 0 1" };
+	std::string expected{ "8/8/8/8/8/8/8/5RK1 b - - 0 1" };
+	Board board = Board(fen);
+
+	std::vector<faster::Move> moves = board.generate_moves();
+
+	// Act
+	for (auto move : moves) {
+		if (move.castle != PieceType::NULL_PIECE) {
+			board.make_move(move);
+			break;
+		}
+
+	}
+
+	// Assert
+	EXPECT_EQ(board.to_fen(), expected);
+}
+
+
 TEST(BoardMoveGenerationTests, CanCastleKingSideWhite) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1" };
 	std::string expected{ "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 0 1" };
 	Board board = Board(fen);
 
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Act
-	for (Move move : moves) {
-		if (move.is_castle()) {
+	for (auto move : moves) {
+		if (move.castle != PieceType::NULL_PIECE) {
 			board.make_move(move);
 			break;
 		}
@@ -636,11 +669,11 @@ TEST(BoardMoveGenerationTests, CanCastleKingSideBlack) {
 	std::string expected{ "rnbq1rk1/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 w - - 0 2" };
 	Board board = Board(fen);
 
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Act
-	for (Move move : moves) {
-		if (move.is_castle()) {
+	for (auto move : moves) {
+		if (move.castle != PieceType::NULL_PIECE) {
 			board.make_move(move);
 			break;
 		}
@@ -657,11 +690,11 @@ TEST(BoardMoveGenerationTests, CanCastleQueenSideWhite) {
 	std::string expected{ "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/2KR2NR b kq - 0 1" };
 	Board board = Board(fen);
 
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Act
-	for (Move move : moves) {
-		if (move.is_castle()) {
+	for (auto move : moves) {
+		if (move.castle != PieceType::NULL_PIECE) {
 			board.make_move(move);
 			break;
 		}
@@ -678,11 +711,11 @@ TEST(BoardMoveGenerationTests, CanCastleQueenSideBlack) {
 	std::string expected{ "2kr1bnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR w KQ - 0 2" };
 	Board board = Board(fen);
 
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Act
-	for (Move move : moves) {
-		if (move.is_castle()) {
+	for (auto move : moves) {
+		if (move.castle != PieceType::NULL_PIECE) {
 			board.make_move(move);
 			break;
 		}
@@ -698,7 +731,7 @@ TEST(BoardMoveGenerationTests, PawnCanPromote) {
 	std::string fen{ "8/P7/8/8/8/8/8/8 w - - 0 1" };
 	Board board = Board(fen);
 
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Act & Assert
 	
@@ -725,22 +758,22 @@ TEST(MoveTest, FirstMoveOfTheGameHas20LegalMoves) {
 	Board board = Board(fen);
 
 	// Act
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 20);
 }
 TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition) {
 
-	//   Test Board       W Pawn Targets           Targets
-	// r n b q k b n r    . . . . . . . .    . . . . . . . . 
-	// p p p . . p p p    . . . . . . . .    . . . . . . . . 
-	// . . . p . . . .    . 1 1 . . . . .    1 1 . 1 1 1 1 1 
-	// . . . . p . . .    . 1 . . . . . .    . . . . . . . . 
-	// . . . . P . . .    . . . . . . . .    . . . . . . . . 
-	// . . . . . N . .    . . . . . . . .    . . . . . . . . 
-	// P P P P . P P P    . . . . . . . .    . . . . . . . . 
-	// R N B Q K B . R    . . . . . . . .    . . . . . . . . 
+	//   Test Board    
+	// r n b q k b n r  
+	// p p p . . p p p  
+	// . . . p . . . .   
+	// . . . . p . . .   
+	// . . . . P . . .  
+	// . . . . . N . . 
+	// P P P P . P P P 
+	// R N B Q K B . R 
 
 
 	// Arrange
@@ -748,13 +781,7 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition) {
 	Board board = Board(fen);
 
 	// Act
-	std::vector<Move> moves = board.generate_moves();
-	std::string move_list = "";
-	for (auto move : moves) {
-		move_list += move.to_algebraic() + ", ";
-		std::cout << move.to_algebraic() + ", ";
-	}
-
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 27);
@@ -763,15 +790,15 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition) {
 
 TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition2) {
 
-	//   Test Board       W Pawn Targets           Targets
-	// r n b q k b n r    . . . . . . . .    . . . . . . . . 
-	// p p p . . . p p    . . . . . . . .    . . . . . . . . 
-	// . . . p . p . .    . 1 1 . . . . .    1 1 . 1 1 1 1 1 
-	// . . . . p . . .    . 1 . . . . . .    . . . . . . . . 
-	// . . . P P . . .    . . . . . . . .    . . . . . . . . 
-	// . . . . . N . .    . . . . . . . .    . . . . . . . . 
-	// P P P . . P P P    . . . . . . . .    . . . . . . . . 
-	// R N B Q K B . R    . . . . . . . .    . . . . . . . . 
+	//   Test Board       
+	// r n b q k b n r 
+	// p p p . . . p p 
+	// . . . p . p . . 
+	// . . . . p . . . 
+	// . . . P P . . . 
+	// . . . . . N . . 
+	// P P P . . P P P 
+	// R N B Q K B . R
 
 
 	// Arrange
@@ -779,7 +806,7 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition2) {
 	Board board = Board(fen);
 
 	// Act
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 36);
@@ -788,15 +815,15 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition2) {
 
 TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition3) {
 
-	//   Test Board       W Pawn Targets           Targets
-	// r n b q k b n r    . . . . . . . .    . . . . . . . . 
-	// p p . . . . p p    . . . . . . . .    . . . . . . . . 
-	// . . p p . p . .    . 1 1 . . . . .    1 1 . 1 1 1 1 1 
-	// . B . . p . . .    . 1 . . . . . .    . . . . . . . . 
-	// . . . P P . . .    . . . . . . . .    . . . . . . . . 
-	// . . . . . N . .    . . . . . . . .    . . . . . . . . 
-	// P P P . . P P P    . . . . . . . .    . . . . . . . . 
-	// R N B Q K . . R    . . . . . . . .    . . . . . . . . 
+	//   Test Board    
+	// r n b q k b n r
+	// p p . . . . p p 
+	// . . p p . p . .
+	// . B . . p . . .
+	// . . . P P . . .
+	// . . . . . N . .
+	// P P P . . P P P
+	// R N B Q K . . R 
 
 
 	// Arrange
@@ -804,7 +831,7 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition3) {
 	Board board = Board(fen);
 
 	// Act
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 41);
@@ -813,15 +840,15 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition3) {
 
 TEST(BoardMoveGenerationTests, DetectsLegalMovesWhenInCheck) {
 
-	//   Test Board       W Pawn Targets           Targets
-	// r n b q k b n r    . . . . . . . .    . . . . . . . . 
-	// p p p . . p p p    . . . . . . . .    . . . . . . . . 
-	// . . . p . . . .    . 1 1 . . . . .    1 1 . 1 1 1 1 1 
-	// . B . . p . . .    . 1 . . . . . .    . . . . . . . . 
-	// . . . . P . . .    . . . . . . . .    . . . . . . . . 
-	// . . . . . N . .    . . . . . . . .    . . . . . . . . 
-	// P P P P . P P P    . . . . . . . .    . . . . . . . . 
-	// R N B Q K . . R    . . . . . . . .    . . . . . . . . 
+	//   Test Board    
+	// r n b q k b n r 
+	// p p p . . p p p
+	// . . . p . . . . 
+	// . B . . p . . . 
+	// . . . . P . . . 
+	// . . . . . N . . 
+	// P P P P . P P P
+	// R N B Q K . . R  
 
 
 	// Arrange
@@ -829,7 +856,10 @@ TEST(BoardMoveGenerationTests, DetectsLegalMovesWhenInCheck) {
 	Board board = Board(fen);
 
 	// Act
-	std::vector<Move> moves = board.generate_moves();
+	std::vector<faster::Move> moves = board.generate_moves();
+
+	for (auto move : moves)
+		std::cout << move.to_algebraic() << std::endl;
 
 	// Assert
 	EXPECT_EQ(moves.size(), 6); // The only legal moves are the six that remove the check: c6, Nc6, Nd7, Bd7, Qc7, Ke7
@@ -868,7 +898,7 @@ TEST(BoardMoveGenerationTests, DetectsASituationThatIsCheckmate) {
 	// p p p . . . p p  
 	// . . n . B . . .  
 	// . . . . p . . .  
-	// . . . . P . . .  
+	// . . . . . . . .  
 	// . . . . . Q . . 
 	// P P P P . P P P  
 	// R N B   K . . R 
@@ -883,6 +913,24 @@ TEST(BoardMoveGenerationTests, DetectsASituationThatIsCheckmate) {
 
 	// Assert
 	EXPECT_TRUE(actual);
+
+}
+
+TEST(BoardMoveGenerationTests, CannotCastleOutOfCheck) {
+
+	//   Test Board    
+	// r . . q . b k r   
+	// p p p . . . p p  
+	// . . n . B . . .  
+	// . . . . p . . .  
+	// . . . . . . . .  
+	// . . . . . Q . . 
+	// P P P P . P P P  
+	// R N B   K . . R 
+
+
+	// Assert
+	EXPECT_TRUE(false);
 
 }
 TEST(CastlingRightsTests, CanBeCreatedFromFenAll) {
@@ -961,7 +1009,7 @@ TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForWhite) {
 	// Arrange
 	std::string fen = "KQkq";
 	CastlingRights castling_rights(fen);
-	Move move(bitboard::square_index("e1"), bitboard::square_index("e1"), PieceType::KING);
+	faster::Move move = faster::make_quiet(bitboard::square_index("e1"), bitboard::square_index("e1"));
 
 	// Act
 	castling_rights.update(move, PieceColour::WHITE);
@@ -974,7 +1022,7 @@ TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForBlack) {
 	// Arrange
 	std::string fen = "KQkq";
 	CastlingRights castling_rights(fen);
-	Move move(bitboard::square_index("e8"), bitboard::square_index("e1"), PieceType::KING);
+	faster::Move move = faster::make_quiet(bitboard::square_index("e8"), bitboard::square_index("e1"));
 
 	// Act
 	castling_rights.update(move, PieceColour::BLACK);
@@ -987,7 +1035,7 @@ TEST(CastlingRightsTests, H1RookMoveRemovesRightToCastleForWhite) {
 	// Arrange
 	std::string fen = "KQkq";
 	CastlingRights castling_rights(fen);
-	Move move(bitboard::square_index("h1"), bitboard::square_index("e1"), PieceType::ROOK);
+	faster::Move move = faster::make_quiet(bitboard::square_index("h1"), bitboard::square_index("e1"));
 
 	// Act
 	castling_rights.update(move, PieceColour::WHITE);
@@ -1000,7 +1048,7 @@ TEST(CastlingRightsTests, A8RookMoveRemovesRightToCastleForBlack) {
 	// Arrange
 	std::string fen = "KQkq";
 	CastlingRights castling_rights(fen);
-	Move move(bitboard::square_index("a8"), bitboard::square_index("e1"), PieceType::ROOK);
+	faster::Move move = faster::make_quiet(bitboard::square_index("a8"), bitboard::square_index("e1"));
 
 	// Act
 	castling_rights.update(move, PieceColour::BLACK);

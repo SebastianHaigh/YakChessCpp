@@ -1,5 +1,6 @@
 #include "board.h"
 
+/*
 std::string Move::to_algebraic() {
 	if(piece_to_move == PieceType::PAWN) {
 		std::string output = "";
@@ -31,6 +32,7 @@ std::string Move::to_algebraic() {
 		return "XX";
 	}
 }
+*/
 
 void Board::parse_fen(const std::string& fen) {
 	auto end_of_piece_placement = fen.find_first_of(" ");
@@ -90,137 +92,79 @@ Bitboard Board::empty_squares() {
 	return ~occupied_squares();
 }
 
-std::vector<Move> Board::generate_moves() {
+std::vector<faster::Move> Board::generate_moves() {
+	faster::Move psuedo_legal_move_list[330];
+	faster::Move en_passant_move;
+	int move_counter{ 0 };
+
+	PieceColour this_side = current_state.side_to_move();
+	PieceColour other_side = current_state.side_not_to_move();
+
+	if (this_side == PieceColour::WHITE) {
+		faster::generate_pawn_moves<PieceColour::WHITE>(&psuedo_legal_move_list[move_counter], move_counter,
+			get_position(this_side, PieceType::PAWN), empty_squares(), get_position(other_side));
+
+		faster::generate_ep_captures<PieceColour::WHITE>(&en_passant_move, move_counter,
+			get_position(this_side, PieceType::PAWN), ep_target());
+	}
+	else {
+		faster::generate_pawn_moves<PieceColour::BLACK>(&psuedo_legal_move_list[move_counter], move_counter,
+			get_position(this_side, PieceType::PAWN), empty_squares(), get_position(other_side));
+
+		faster::generate_ep_captures<PieceColour::BLACK>(&psuedo_legal_move_list[move_counter], move_counter,
+			get_position(this_side, PieceType::PAWN), ep_target());
+	}
+
+	faster::jumping_piece_moves(&knight_atks, &psuedo_legal_move_list[move_counter], move_counter,
+		get_position(this_side, PieceType::KNIGHT), empty_squares(), get_position(other_side));
+
+	faster::jumping_piece_moves(&king_atks, &psuedo_legal_move_list[move_counter], move_counter,
+		get_position(this_side, PieceType::KING), empty_squares(), get_position(other_side));
+
+	faster::generate_sliding_piece_moves(bishop_atks, &psuedo_legal_move_list[move_counter], move_counter,
+		get_position(this_side, PieceType::BISHOP), empty_squares(), get_position(other_side));
+
+	faster::generate_sliding_piece_moves(rook_atks, &psuedo_legal_move_list[move_counter], move_counter,
+		get_position(this_side, PieceType::ROOK), empty_squares(), get_position(other_side));
+
+	faster::generate_sliding_piece_moves(queen_atks, &psuedo_legal_move_list[move_counter], move_counter,
+		get_position(this_side, PieceType::QUEEN), empty_squares(), get_position(other_side));
+
 	
-	std::vector<Move> moves = generate_pawn_moves_and_captures();
-	moves = generate_piece_moves_and_captures(PieceType::KNIGHT, moves);
-	moves = generate_piece_moves_and_captures(PieceType::BISHOP, moves);
-	moves = generate_piece_moves_and_captures(PieceType::ROOK, moves);
-	moves = generate_piece_moves_and_captures(PieceType::QUEEN, moves);
-	moves = generate_piece_moves_and_captures(PieceType::KING, moves);
-	moves = generate_castling_moves(moves);
-	move_list.clear();
-	for (Move move : moves) {
-
-		// Castles have alredy been checked for legality
-		if (!move.is_castle()) {
-			make_move(move);
-			if (!is_check(previous_state.side_to_move())) {
-				move_list.push_back(move);
-			}
-			undo_move();
-		}
-		else {
-			move_list.push_back(move);
-		}
-	}
-
-	return move_list;
-}
-
-std::vector<Move> Board::generate_pawn_moves_and_captures() {
-	
-	std::unique_ptr<pieces::Pawns> pawns = factory.make_pawns(current_state.side_to_move());
-	Bitboard pawns_bitboard = get_position(current_state.side_to_move(), PieceType::PAWN);
-
-	std::vector<std::pair<Square, Square>> quiet_moves = pawns->quiet_moves(pawns_bitboard, empty_squares());
-	std::vector<std::pair<Square, Square>> captures = pawns->captures(pawns_bitboard, get_position(current_state.side_not_to_move()));
-	std::vector<std::pair<Square, Square>> ep_captures = pawns->captures(pawns_bitboard, ep_target());
-
-	std::vector<Move> moves;
-	for (auto move : quiet_moves) {
-		if (target_is_promotion(move.second)) {
-			Move this_move = Move(move.first, move.second, get_piece_type_on(move.first));
-			this_move.set_promotion(PieceType::KNIGHT);
-			moves.push_back(this_move);
-
-			this_move.set_promotion(PieceType::BISHOP);
-			moves.push_back(this_move);
-
-			this_move.set_promotion(PieceType::ROOK);
-			moves.push_back(this_move);
-
-			this_move.set_promotion(PieceType::QUEEN);
-			moves.push_back(this_move);
-		}
-		else {
-			Move this_move = Move(move.first, move.second, get_piece_type_on(move.first));
-			moves.push_back(this_move);
-		}
-	}
-
-	for (auto capture : captures) {
-		if (target_is_promotion(capture.second)) {
-			Move this_move = Move(capture.first, capture.second, get_piece_type_on(capture.first));
-			this_move.set_promotion(PieceType::KNIGHT);
-			moves.push_back(this_move);
-
-			this_move.set_promotion(PieceType::BISHOP);
-			moves.push_back(this_move);
-
-			this_move.set_promotion(PieceType::ROOK);
-			moves.push_back(this_move);
-
-			this_move.set_promotion(PieceType::QUEEN);
-			moves.push_back(this_move);
-		}
-		else {
-			Move this_move = Move(capture.first, capture.second, get_piece_type_on(capture.second));
-			moves.push_back(this_move);
-		}
-	}
-
-	for (auto capture : ep_captures) {
-		Move this_move = Move(capture.first, capture.second, get_piece_type_on(capture.first));
-		if (current_state.side_to_move() == PieceColour::BLACK) {
-			// Black captures white
-			this_move.set_en_passant(bitboard::north_one(ep_target()));
-		}
-		else {
-			// White captures black
-			this_move.set_en_passant(bitboard::south_one(ep_target()));
-		}
+	std::vector<faster::Move> legal_moves;
+	for (int i = 0; i < move_counter; i++) {
 		
-		moves.push_back(this_move);
+		make_move(psuedo_legal_move_list[i]);
+		if (!is_check(previous_state.side_to_move())) {
+			legal_moves.push_back(psuedo_legal_move_list[i]);
+		}
+		undo_move();
 	}
 
-	return moves;
+	legal_moves = generate_castling_moves(legal_moves);
+
+	return legal_moves;
 }
 
-std::vector<Move> Board::generate_piece_moves_and_captures(PieceType type, std::vector<Move> moves) {
-	std::unique_ptr<pieces::Piece> piece = factory.make_piece(type);
-
-	std::vector<std::pair<Square, Square>> quiet_moves = piece->quiet_moves(get_position(current_state.side_to_move(), type), empty_squares());
-	std::vector<std::pair<Square, Square>> captures = piece->captures(get_position(current_state.side_to_move(), type), occupied_squares(), get_position(current_state.side_not_to_move()));
-
-	for (auto move : quiet_moves) {
-		moves.push_back(Move(move.first, move.second, get_piece_type_on(move.first)));
-	}
-
-	for (auto capture : captures) {
-		Move this_capture = Move(capture.first, capture.second, get_piece_type_on(capture.first));
-		this_capture.set_capture(get_piece_type_on(capture.second));
-
-		moves.push_back(this_capture);
-	}
-	return moves;
-
-}
-
-std::vector<Move> Board::generate_castling_moves(std::vector<Move> moves) {
+std::vector<faster::Move> Board::generate_castling_moves(std::vector<faster::Move> moves) {
+	
 	Bitboard squares_attacked_by_enemy = attacked_by(current_state.side_not_to_move());
+
 	Bitboard king = get_position(current_state.side_to_move(), PieceType::KING);
+	
 	if (current_state.can_king_side_castle()) {
 		Bitboard king_path = bitboard::east_one(king) | bitboard::east_one(bitboard::east_one(king));
 		if ((king_path & occupied_squares()) == 0 && (king_path & squares_attacked_by_enemy) == 0) {
-			moves.push_back(Move(PieceType::KING));
+			moves.push_back(faster::make_kingside_castle());
+			
 		}
 	} 
+	
 	if (current_state.can_queen_side_castle()) {
 		Bitboard king_path = bitboard::west_one(king) | bitboard::west_one(bitboard::west_one(king));
 		Bitboard rook_path = king_path | bitboard::west_one(king_path);
 		if ((rook_path & occupied_squares()) == 0 && (king_path & squares_attacked_by_enemy) == 0) {
-			moves.push_back(Move(PieceType::QUEEN));
+			moves.push_back(faster::make_queenside_castle());
 		}
 
 	}
@@ -233,6 +177,7 @@ void Board::make_move(PieceType type, PieceColour colour, Square from, Square to
 	colour_bitboard[static_cast<int>(colour)] ^= from_to_bitboard;
 }
 
+/*
 void Board::make_move(Move move) {
 	process_move(move);
 	
@@ -242,11 +187,26 @@ void Board::make_move(Move move) {
 	previous_move = move;
 
 }
+*/
+void Board::make_move(const faster::Move& move) {
+	if (current_state.side_to_move() == PieceColour::WHITE) 
+		process_move<PieceColour::WHITE>(move, false);
+	else
+		process_move<PieceColour::BLACK>(move, false);
+	
+	previous_state = current_state;
+	current_state.update(move);
+	current_state.toggle_side_to_move();
+	previous_move_f = move;
+}
 
 void Board::undo_move() {
-	if (previous_move.get_moved_piece() != PieceType::NULL_PIECE) {
+	if (previous_move_f.from != previous_move_f.to) {
 		current_state.toggle_side_to_move();
-		process_move(previous_move);
+		if (current_state.side_to_move() == PieceColour::WHITE)
+			process_move<PieceColour::WHITE>(previous_move_f, true);
+		else
+			process_move<PieceColour::BLACK>(previous_move_f, true);
 		current_state = previous_state;
 	}
 }
@@ -265,7 +225,7 @@ bool Board::is_check(PieceColour colour) {
 
 bool Board::is_checkmate() {
 	if (is_check()) {
-		std::vector<Move> moves = generate_moves();
+		std::vector<faster::Move> moves = generate_moves();
 		if (moves.empty()) {
 			return true;
 		}
@@ -276,6 +236,7 @@ bool Board::is_checkmate() {
 	return false;
 }
 
+/*
 void Board::process_move(Move move) {
 	// Process capture or quiet move
 	if (move.is_capture() && move.is_en_passant()) {
@@ -340,6 +301,7 @@ void Board::process_move(Move move) {
 
 	}
 }
+*/
 
 //void Board::set_ep_target(Square square) {
 //	ep_square = square;
@@ -368,6 +330,8 @@ bool Board::can_queen_side_castle(PieceColour colour) {
 	return current_state.can_queen_side_castle(colour);
 }
 
+
+
 std::string Board::rank_to_fen(Rank rank) {
 	std::string fen{ "" };
 	int empty_sum = 0;
@@ -393,36 +357,39 @@ std::string Board::rank_to_fen(Rank rank) {
 }
 
 Bitboard Board::pawn_attacks(PieceColour colour) {
-	std::unique_ptr<pieces::Pawns> pawns = factory.make_pawns(colour);
+	//std::unique_ptr<pieces::Pawns> pawns = factory.make_pawns(colour);
 	Bitboard pawns_bitboard = get_position(colour, PieceType::PAWN);
 
-	return pawns->all_attacked_squares(pawns_bitboard);
+	return (colour == PieceColour::BLACK) ? faster::pawn_attacks<PieceColour::BLACK>(pawns_bitboard) : faster::pawn_attacks<PieceColour::WHITE>(pawns_bitboard);
 }
 
+
 Bitboard Board::piece_attacks(PieceType type, PieceColour colour) {
-	std::unique_ptr<pieces::Piece> piece = factory.make_piece(type);
-	Bitboard piece_bitboard = get_position(colour, type);
-	return piece->attacks(piece_bitboard, occupied_squares(), get_position(pieces::other_colour(colour)));
+	//std::unique_ptr<pieces::Piece> piece = factory.make_piece(type);
+	//Bitboard piece_bitboard = get_position(colour, type);
+	switch (type) {
+		case PieceType::PAWN: return pawn_attacks(colour);
+		case PieceType::KNIGHT: return faster::piece_attacks<PieceType::KNIGHT>(get_position(colour, type), occupied_squares());
+		case PieceType::BISHOP: return faster::piece_attacks<PieceType::BISHOP>(get_position(colour, type), occupied_squares());
+		case PieceType::ROOK: return faster::piece_attacks<PieceType::ROOK>(get_position(colour, type), occupied_squares());
+		case PieceType::QUEEN: return faster::piece_attacks<PieceType::QUEEN>(get_position(colour, type), occupied_squares());
+		case PieceType::KING: return faster::piece_attacks<PieceType::KING>(get_position(colour, type), occupied_squares());
+		default: return Bitboard{ 0 };
+	}
 }
 
 Bitboard Board::all_attacks(PieceColour colour) {
 	Bitboard attacked_squares{ 0 };
-	attacked_squares |= (pawn_attacks(colour) & ~get_position(colour));
-	attacked_squares |= piece_attacks(PieceType::KNIGHT, colour);
-	attacked_squares |= piece_attacks(PieceType::BISHOP, colour);
-	attacked_squares |= piece_attacks(PieceType::ROOK, colour);
-	attacked_squares |= piece_attacks(PieceType::QUEEN, colour);
-	attacked_squares |= piece_attacks(PieceType::KING, colour);
+	Bitboard friendly_pieces = get_position(colour);
+	attacked_squares |= (pawn_attacks(colour) & ~friendly_pieces);
+	attacked_squares |= (piece_attacks(PieceType::KNIGHT, colour) & ~friendly_pieces);
+	attacked_squares |= (piece_attacks(PieceType::BISHOP, colour) & ~friendly_pieces);
+	attacked_squares |= (piece_attacks(PieceType::ROOK, colour) & ~friendly_pieces);
+	attacked_squares |= (piece_attacks(PieceType::QUEEN, colour) & ~friendly_pieces);
+	attacked_squares |= (piece_attacks(PieceType::KING, colour) & ~friendly_pieces);
 	return attacked_squares;
 }
 
-Move MoveFactory::create_pawn_push(Square from, Square to) {
-	Move move = Move(from, to, PieceType::PAWN);
-	if (abs(static_cast<int>(to) - static_cast<int>(from)) == 16) {
-		move.set_double_push();
-	} 
-	return move;
-}
 
 CastlingRights::CastlingRights(std::string fen) {
 	if (fen.empty() || (fen.size() == 1 && fen[0] == '-')) {
@@ -466,7 +433,7 @@ bool CastlingRights::queen_side(PieceColour colour) {
 		return white[1];
 	}
 }
-
+/*
 void CastlingRights::update(Move move, PieceColour side) {
 	white[0] = !(move.from_square() == 7 || move.to_square() == 7 || move.from_square() == 4) && white[0];
 	white[1] = !(move.from_square() == 0 || move.to_square() == 0 || move.from_square() == 4) && white[1];
@@ -476,6 +443,23 @@ void CastlingRights::update(Move move, PieceColour side) {
 		if (side == PieceColour::WHITE) {
 			white[0] = false;
 			white[1] = false;
+		}
+		else {
+			black[0] = false;
+			black[1] = false;
+		}
+	}
+}
+*/
+void CastlingRights::update(const faster::Move& move, PieceColour side) {
+	white[0] = !(move.from == 7 || move.to == 7 || move.from == 4) && white[0];
+	white[1] = !(move.from == 0 || move.to == 0 || move.from == 4) && white[1];
+	black[0] = !(move.from == 63 || move.to == 63 || move.from == 60) && black[0];
+	black[1] = !(move.from == 56 || move.to == 56 || move.from == 60) && black[1];
+	if (move.castle != PieceType::NULL_PIECE) { 
+		if (side == PieceColour::WHITE) {
+			white[0] = false;
+			white[1] = false; 
 		}
 		else {
 			black[0] = false;
@@ -536,7 +520,7 @@ std::string GameState::to_fen() {
 	fen += std::to_string(move_clock);
 	return fen;
 }
-
+/*
 void GameState::update(Move move) {
 	if (move.is_double_push()) {
 		has_ep_target = true;
@@ -545,6 +529,27 @@ void GameState::update(Move move) {
 		}
 		else {
 			ep_square = move.to_square() + 8;
+		}
+	}
+	else {
+		has_ep_target = false;
+	}
+
+	castling_rights.update(move, side);
+	if (side == PieceColour::BLACK) {
+		move_clock++;
+	}
+}
+*/
+
+void GameState::update(const faster::Move& move) {
+	if (move.double_push) {
+		has_ep_target = true;
+		if (side == PieceColour::WHITE) {
+			ep_square = move.to - 8;
+		}
+		else {
+			ep_square = move.to + 8;
 		}
 	}
 	else {
