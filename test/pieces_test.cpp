@@ -10,16 +10,14 @@
 
 TEST(BlackPawnsTest, CanGenerateSinglePushesFromUnobstructedStartingPosition) {
     // Assemble
-    auto pawn_bitboard = bitboard::RANK_7;
-    auto empty_squares = ~pawn_bitboard;
-    auto pawns = pieces::BlackPawns();
+    Bitboard pawn_bitboard = bitboard::RANK_7;
+    Bitboard empty_squares = ~pawn_bitboard;
 
     // Act
-    auto single_push_moves = pawns.single_push(pawn_bitboard, empty_squares);
 
     // Assert
 
-    EXPECT_EQ(single_push_moves.size(), 8);
+    //EXPECT_EQ(single_push_moves.size(), 8);
 }
 
 TEST(BlackPawnsTest, DoublePushOnlyAllowedFromRank7) {
@@ -206,37 +204,43 @@ TEST(WhitePawnTests, OpponentPieceCanBeCaptured) {
 TEST(KnightTests, KnightOnA1AttacksTheCorrectSquares) {
     // Arrange
     attacks::KnightAttacks knight_attacks;
-    pieces::JumpingPiece knight(&knight_attacks);
     Square starting_square{0};
+    faster::Move move_list[50];
+    int move_counter{ 0 };
+    Bitboard empty_squares = bitboard::UNIVERSAL;
+    Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    std::vector<std::pair<Square, Square>> moves = knight.quiet_moves(bitboard::to_bitboard(starting_square), bitboard::UNIVERSAL);
+    faster::jumping_piece_moves(&knight_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
   
     // Assert
-    EXPECT_EQ(moves.size(), 2);
-    EXPECT_EQ(moves[0].second, bitboard::square_index("c2"));
-    EXPECT_EQ(moves[1].second, bitboard::square_index("b3"));
+    EXPECT_EQ(move_counter, 2);
+    EXPECT_EQ(move_list[0].to, bitboard::square_index("c2"));
+    EXPECT_EQ(move_list[1].to, bitboard::square_index("b3"));
 }
 
 TEST(KnightTests, KnightOnD4AttacksTheCorrectSquares) {
     // Arrange
     attacks::KnightAttacks knight_attacks;
-    pieces::JumpingPiece knight(&knight_attacks);
     Square starting_square = bitboard::square_index("d4");
+    faster::Move move_list[50];
+    int move_counter{ 0 };
+    Bitboard empty_squares = bitboard::UNIVERSAL;
+    Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    std::vector<std::pair<Square, Square>> moves = knight.quiet_moves(bitboard::to_bitboard(starting_square), bitboard::UNIVERSAL);
+    faster::jumping_piece_moves(&knight_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
 
     // Assert
-    EXPECT_EQ(moves.size(), 8);
-    EXPECT_EQ(moves[0].second, bitboard::square_index("c2"));
-    EXPECT_EQ(moves[1].second, bitboard::square_index("e2"));
-    EXPECT_EQ(moves[2].second, bitboard::square_index("b3"));
-    EXPECT_EQ(moves[3].second, bitboard::square_index("f3"));
-    EXPECT_EQ(moves[4].second, bitboard::square_index("b5"));
-    EXPECT_EQ(moves[5].second, bitboard::square_index("f5"));
-    EXPECT_EQ(moves[6].second, bitboard::square_index("c6"));
-    EXPECT_EQ(moves[7].second, bitboard::square_index("e6"));
+    EXPECT_EQ(move_counter, 8);
+    EXPECT_EQ(move_list[0].to, bitboard::square_index("c2"));
+    EXPECT_EQ(move_list[1].to, bitboard::square_index("e2"));
+    EXPECT_EQ(move_list[2].to, bitboard::square_index("b3"));
+    EXPECT_EQ(move_list[3].to, bitboard::square_index("f3"));
+    EXPECT_EQ(move_list[4].to, bitboard::square_index("b5"));
+    EXPECT_EQ(move_list[5].to, bitboard::square_index("f5"));
+    EXPECT_EQ(move_list[6].to, bitboard::square_index("c6"));
+    EXPECT_EQ(move_list[7].to, bitboard::square_index("e6"));
 }
 
 
@@ -244,68 +248,74 @@ TEST(KnightTests, KnightOnD4AttacksTheCorrectSquares) {
 TEST(KingTests, KnightOnA1AttacksTheCorrectSquares) {
     // Arrange
     attacks::KingAttacks king_attacks;
-    pieces::JumpingPiece king(&king_attacks);
     Square starting_square{ 0 };
+    faster::Move move_list[50];
+    int move_counter{ 0 };
+    Bitboard empty_squares = bitboard::UNIVERSAL;
+    Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    std::vector<std::pair<Square, Square>> moves = king.quiet_moves(bitboard::to_bitboard(starting_square), bitboard::UNIVERSAL);
+    faster::jumping_piece_moves(&king_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
 
     // Assert
-    EXPECT_EQ(moves.size(), 3);
-    EXPECT_EQ(moves[0].second, bitboard::square_index("b1"));
-    EXPECT_EQ(moves[1].second, bitboard::square_index("a2"));
-    EXPECT_EQ(moves[2].second, bitboard::square_index("b2"));
+    EXPECT_EQ(move_counter, 3);
+    EXPECT_EQ(move_list[0].to, bitboard::square_index("b1"));
+    EXPECT_EQ(move_list[1].to, bitboard::square_index("a2"));
+    EXPECT_EQ(move_list[2].to, bitboard::square_index("b2"));
 }
 
 TEST(KingTests, KnightOnD4AttacksTheCorrectSquares) {
     // Arrange
     attacks::KingAttacks king_attacks;
-    pieces::JumpingPiece king(&king_attacks);
     Square starting_square = bitboard::square_index("d4");
+    faster::Move move_list[50];
+    int move_counter{ 0 };
+    Bitboard empty_squares = bitboard::UNIVERSAL;
+    Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    std::vector<std::pair<Square, Square>> moves = king.quiet_moves(bitboard::to_bitboard(starting_square), bitboard::UNIVERSAL);
+    faster::jumping_piece_moves(&king_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
 
     // Assert
-    EXPECT_EQ(moves.size(), 8);
-    EXPECT_EQ(moves[0].second, bitboard::square_index("c3"));
-    EXPECT_EQ(moves[1].second, bitboard::square_index("d3"));
-    EXPECT_EQ(moves[2].second, bitboard::square_index("e3"));
-    EXPECT_EQ(moves[3].second, bitboard::square_index("c4"));
-    EXPECT_EQ(moves[4].second, bitboard::square_index("e4"));
-    EXPECT_EQ(moves[5].second, bitboard::square_index("c5"));
-    EXPECT_EQ(moves[6].second, bitboard::square_index("d5"));
-    EXPECT_EQ(moves[7].second, bitboard::square_index("e5"));
+    EXPECT_EQ(move_counter, 8);
+    EXPECT_EQ(move_list[0].to, bitboard::square_index("c3"));
+    EXPECT_EQ(move_list[1].to, bitboard::square_index("d3"));
+    EXPECT_EQ(move_list[2].to, bitboard::square_index("e3"));
+    EXPECT_EQ(move_list[3].to, bitboard::square_index("c4"));
+    EXPECT_EQ(move_list[4].to, bitboard::square_index("e4"));
+    EXPECT_EQ(move_list[5].to, bitboard::square_index("c5"));
+    EXPECT_EQ(move_list[6].to, bitboard::square_index("d5"));
+    EXPECT_EQ(move_list[7].to, bitboard::square_index("e5"));
 }
 
 TEST(RookTests, RookAttacksProperly) {
     // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-    std::unique_ptr<pieces::Piece> rooks = factory.make_piece(PieceType::ROOK);
+    faster::RookMap atk_map;
+    faster::Move list[100];
+    int move_counter{ 0 };
     Bitboard rook_bb = Bitboard{ 1 };
     Bitboard obstruction = bitboard::to_bitboard(bitboard::square_index("a5"));
 
     // Act
-    std::vector<std::pair<Square, Square>> quiet_moves = rooks->quiet_moves(rook_bb, ~obstruction);
-    std::vector<std::pair<Square, Square>> captures = rooks->captures(rook_bb, obstruction, obstruction);
+    faster::generate_sliding_piece_moves(atk_map, &list[0], move_counter, rook_bb, ~obstruction, obstruction);
 
     // Assert
-    EXPECT_EQ(quiet_moves.size(), 10);
-    EXPECT_EQ(captures.size(), 1);
+    EXPECT_EQ(move_counter, 11);
 }
 
 TEST(QueenTests, CanCalculateQueenAttackBitboard) {
     // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-    std::unique_ptr<pieces::Piece> queens = factory.make_piece(PieceType::QUEEN);
+    faster::RookMap atk_map;
+    faster::Move list[100];
+    int move_counter{ 0 };
     Bitboard queen_bb = Bitboard{ 1 };
     Bitboard opponent_pieces = bitboard::to_bitboard(bitboard::square_index("a8"));
     Bitboard friendly_pieces = queen_bb | bitboard::to_bitboard(bitboard::square_index("h8"));
     Bitboard occupied = opponent_pieces | friendly_pieces;
-    Bitboard expected = (bitboard::FILE_A | bitboard::RANK_1 | bitboard::DIAG_A1_H8) & ~friendly_pieces;
+    Bitboard expected = (bitboard::FILE_A | bitboard::RANK_1 | bitboard::DIAG_A1_H8) & ~queen_bb;
 
     // Act
-    Bitboard actual = queens->attacks(queen_bb, occupied, opponent_pieces);
+    Bitboard actual = faster::piece_attacks<PieceType::QUEEN>(queen_bb, occupied);
 
     // Assert
     EXPECT_EQ(actual, expected);
@@ -313,103 +323,20 @@ TEST(QueenTests, CanCalculateQueenAttackBitboard) {
 
 TEST(BishopTests, CanCalculateBishopAttackBitboardWithTwoBishops) {
     // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-    std::unique_ptr<pieces::Piece> bishops = factory.make_piece(PieceType::BISHOP);
     Bitboard bishop_bb = bitboard::to_bitboard("a1") | bitboard::to_bitboard("a8");
     Bitboard opponent_pieces = bitboard::to_bitboard("a8");
     Bitboard friendly_pieces = bishop_bb | bitboard::to_bitboard("h8");
     Bitboard occupied = opponent_pieces | friendly_pieces;
-    Bitboard expected = (bitboard::DIAG_A8_H1 | bitboard::DIAG_A1_H8) & ~friendly_pieces;
+    Bitboard expected = (bitboard::DIAG_A8_H1 | bitboard::DIAG_A1_H8) & bitboard::NOT_FILE_A;
 
     // Act
-    Bitboard actual = bishops->attacks(bishop_bb, occupied, opponent_pieces);
+    Bitboard actual = faster::piece_attacks<PieceType::BISHOP>(bishop_bb, occupied);
 
     // Assert
     EXPECT_EQ(actual, expected);
 }
 
 
-TEST(FactoryTests, FactoryCanCreateWhitePawns) {
-    // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-
-    // Act
-    std::unique_ptr<pieces::Pawns> pawns = factory.make_pawns(PieceColour::WHITE);
-
-    // Assert
-    EXPECT_EQ(pawns->double_push_target(), bitboard::RANK_4);
-}
-
-TEST(FactoryTests, FactoryCanCreateBlackPawns) {
-    // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-
-    // Act
-    std::unique_ptr<pieces::Pawns> pawns = factory.make_pawns(PieceColour::BLACK);
-
-    // Assert
-    EXPECT_EQ(pawns->double_push_target(), bitboard::RANK_5);
-}
-
-TEST(FactoryTests, FactoryCanCreateKnights) {
-    // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-
-    // Act
-    std::unique_ptr<pieces::Piece> knights = factory.make_piece(PieceType::KNIGHT);
-
-    // Assert
-    auto knight_moves = knights->quiet_moves(Bitboard{1}, bitboard::UNIVERSAL);
-    EXPECT_EQ(knight_moves.size(), 2);
-}
-
-TEST(FactoryTests, FactoryCanCreateRook) {
-    // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-
-    // Act
-    std::unique_ptr<pieces::Piece> rooks = factory.make_piece(PieceType::ROOK);
-
-    // Assert
-    auto rook_moves = rooks->quiet_moves(Bitboard{ 1 }, bitboard::UNIVERSAL);
-    EXPECT_EQ(rook_moves.size(), 14);
-}
-
-TEST(FactoryTests, FactoryCanCreateBishop) {
-    // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-
-    // Act
-    std::unique_ptr<pieces::Piece> rooks = factory.make_piece(PieceType::BISHOP);
-
-    // Assert
-    auto rook_moves = rooks->quiet_moves(Bitboard{ 1 }, bitboard::UNIVERSAL);
-    EXPECT_EQ(rook_moves.size(), 7);
-}
-
-TEST(FactoryTests, FactoryCanCreateQueen) {
-    // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-
-    // Act
-    std::unique_ptr<pieces::Piece> queen = factory.make_piece(PieceType::QUEEN);
-
-    // Assert
-    auto queen_moves = queen->quiet_moves(Bitboard{ 1 }, bitboard::UNIVERSAL);
-    EXPECT_EQ(queen_moves.size(), 21);
-}
-
-TEST(FactoryTests, FactoryCanCreateKing) {
-    // Arrange
-    pieces::StandardPieceFactory factory = pieces::StandardPieceFactory();
-
-    // Act
-    std::unique_ptr<pieces::Piece> king = factory.make_piece(PieceType::KING);
-
-    // Assert
-    auto king_moves = king->quiet_moves(Bitboard{ 1 }, bitboard::UNIVERSAL);
-    EXPECT_EQ(king_moves.size(), 3);
-}
 
 TEST(FunctionTests, FenCharToPieceTypeTestForBlackPieces) {
     // Arrange

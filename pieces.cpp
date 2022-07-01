@@ -13,7 +13,7 @@ namespace faster {
         Bitboard targets = colour == PieceColour::BLACK ? bitboard::south_one(sources) : bitboard::north_one(sources);
         while (sources)
         {
-            *move_list++ = make_quiet(pop_first(sources), pop_first(targets));
+            *move_list++ = make_quiet(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
             move_counter++;
         }
 
@@ -22,7 +22,7 @@ namespace faster {
         sources = (colour == PieceColour::BLACK) ? bitboard::north_one(sources) : bitboard::south_one(sources) & not_promotable;
         while (sources)
         {
-            *move_list++ = make_capture(pop_first(sources), pop_first(targets));
+            *move_list++ = make_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
             move_counter++;
         }
 
@@ -30,7 +30,7 @@ namespace faster {
         targets = colour == PieceColour::BLACK ? bitboard::south_east_one(sources) : bitboard::north_east_one(sources);
         while (sources)
         {
-            *move_list++ = make_capture(pop_first(sources), pop_first(targets));
+            *move_list++ = make_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
             move_counter++;
         }
 
@@ -38,7 +38,7 @@ namespace faster {
         targets = colour == PieceColour::BLACK ? bitboard::south_west_one(sources) : bitboard::north_west_one(sources);
         while (sources)
         {
-            *move_list++ = make_capture(pop_first(sources), pop_first(targets));
+            *move_list++ = make_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
             move_counter++;
         }
             
@@ -46,8 +46,8 @@ namespace faster {
         sources = (colour == PieceColour::BLACK ? bitboard::north_one(empty_squares) : bitboard::south_one(empty_squares)) & promotable;
         targets = colour == PieceColour::BLACK ? bitboard::south_one(sources) : bitboard::north_one(sources);
         while (sources) {
-            Square from = pop_first(sources);
-            Square to = pop_first(targets);
+            Square from = bitboard::pop_LS1B(sources);
+            Square to = bitboard::pop_LS1B(targets);
             *move_list++ = make_quiet_promotion(from, to, PieceType::KNIGHT);
             *move_list++ = make_quiet_promotion(from, to, PieceType::BISHOP);
             *move_list++ = make_quiet_promotion(from, to, PieceType::ROOK);
@@ -58,8 +58,8 @@ namespace faster {
         sources = (colour == PieceColour::BLACK ? bitboard::north_west_one(opponent_pieces) : bitboard::south_west_one(opponent_pieces)) & promotable;
         targets = colour == PieceColour::BLACK ? bitboard::south_east_one(sources) : bitboard::north_east_one(sources);
         while (sources) {
-            Square from = pop_first(sources);
-            Square to = pop_first(targets);
+            Square from = bitboard::pop_LS1B(sources);
+            Square to = bitboard::pop_LS1B(targets);
             *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
             *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
             *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
@@ -70,8 +70,8 @@ namespace faster {
         sources = (colour == PieceColour::BLACK ? bitboard::north_east_one(empty_squares) : bitboard::south_east_one(empty_squares)) & promotable;
         targets = colour == PieceColour::BLACK ? bitboard::south_west_one(sources) : bitboard::north_west_one(sources);
         while (sources) {
-            Square from = pop_first(sources);
-            Square to = pop_first(targets);
+            Square from = bitboard::pop_LS1B(sources);
+            Square to = bitboard::pop_LS1B(targets);
             *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
             *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
             *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
@@ -87,7 +87,7 @@ namespace faster {
             Bitboard quiet = atk_map->get(from) & empty_squares;
             while (quiet)
             {
-                *move_list++ = make_quiet(from, pop_first(quiet));
+                *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
                 move_counter++;
             }
                 
@@ -95,7 +95,7 @@ namespace faster {
             Bitboard capture = atk_map->get(from) & opponent_pieces;
             while (capture)
             {
-                *move_list++ = make_capture(from, pop_first(capture));
+                *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
                 move_counter++;
             }
                 
@@ -110,7 +110,7 @@ namespace faster {
                 Bitboard quiet = map->get(from, ~empty_squares) & empty_squares;
                 while (quiet)
                 {
-                    *move_list++ = make_quiet(from, pop_first(quiet));
+                    *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
                     move_counter++;
                 }
                     
@@ -118,7 +118,7 @@ namespace faster {
                 Bitboard capture = map->get(from, ~empty_squares) & opponent_pieces;
                 while (capture)
                 {
-                    *move_list++ = make_capture(from, pop_first(capture));
+                    *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
                     move_counter++;
                 }
                     
@@ -127,27 +127,67 @@ namespace faster {
 
     }
 
-    void generate_sliding_piece_moves(const faster::SlidingPieceAttackMap* atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
-
+    void generate_sliding_piece_moves(const RookMap& atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
         while (piece_positions) {
             Square from = pop_first(piece_positions);
-            Bitboard atk_bb = atk_map->attacks(from, ~empty_squares);
-            
+            Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
+
             Bitboard quiet = atk_bb & empty_squares;
             while (quiet)
             {
-                *move_list++ = make_quiet(from, pop_first(quiet));
+                *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
                 move_counter++;
             }
 
             Bitboard capture = atk_bb & opponent_pieces;
             while (capture)
             {
-                *move_list++ = make_capture(from, pop_first(capture));
+                *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
                 move_counter++;
             }
         }
+    }
 
+    void generate_sliding_piece_moves(const BishopMap& atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
+        while (piece_positions) {
+            Square from = pop_first(piece_positions);
+            Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
+
+            Bitboard quiet = atk_bb & empty_squares;
+            while (quiet)
+            {
+                *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
+                move_counter++;
+            }
+
+            Bitboard capture = atk_bb & opponent_pieces;
+            while (capture)
+            {
+                *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
+                move_counter++;
+            }
+        }
+    }
+
+    void generate_sliding_piece_moves(const QueenMap& atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
+        while (piece_positions) {
+            Square from = pop_first(piece_positions);
+            Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
+
+            Bitboard quiet = atk_bb & empty_squares;
+            while (quiet)
+            {
+                *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
+                move_counter++;
+            }
+
+            Bitboard capture = atk_bb & opponent_pieces;
+            while (capture)
+            {
+                *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
+                move_counter++;
+            }
+        }
     }
 
 
@@ -270,62 +310,6 @@ namespace pieces {
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// Implementation of Pawns
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// Implementation of Sliding Pieces
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-// SlidingPieces::SlidingPieces(std::shared_ptr <Bitboard> board_ptr, std::shared_ptr <Bitboard> empty_squares_ptr) {
-//     board = board_ptr;
-//     empty_squares = empty_squares_ptr;
-// }
-
-// std::stack <Move> SlidingPieces::quite_moves() {
-//     // Calculating the quiet move (i.e., not capture moves);
-
-//     Bitboard quiet_targets;
-//     std::stack <Move> quite_moves;
-
-//     std::stack <Move> potential_targets = targets();
-    
-//     while (!potential_targets.empty()) {
-//         Move target = potential_targets.top();
-//         // bit-wise AND with target and empty_squares results in the bitboard of 
-//         // empty squares that this sliding piece can move to.
-//         quiet_targets = target.get_target() & *empty_squares;
-//         quite_moves.push(SerialMove(target.get_source(), quiet_targets));
-//         potential_targets.pop();
-//     }
-
-//     return quite_moves;
-// }
-
-// std::stack <Move> SlidingPieces::targets() {
-
-//     Bitboard targets = 0;
-//     std::stack <Square> serialised_pieces = bitboard::scan_forward(*board);
-//     std::stack <Move> moves;
-
-//     while (!serialised_pieces.empty()) {
-//         for (size_t i = 0; i < rays.size(); i++)
-//         {
-//             targets |= rays[i]->get(serialised_pieces.top(), ~*empty_squares);
-//         }
-//         moves.push(Move(serialised_pieces.top(), targets));
-//         serialised_pieces.pop();
-//     }
-//     return moves;
-// }
-
 std::vector<std::pair<Square, Square>> Pawns::quiet_moves(Bitboard pawn_positions, Bitboard empty_squares) {
     std::vector<std::pair<Square, Square>> moves;
     if (pawn_positions == 0) {
@@ -437,7 +421,7 @@ Bitboard BlackPawns::west_attack_sources(Bitboard opponent_pieces) {
     return bitboard::north_east_one(opponent_pieces);
 };
 
-
+/*
 std::vector<std::pair<Square, Square>> JumpingPiece::quiet_moves(Bitboard piece_positions, Bitboard empty_squares) {
     std::vector<std::pair<Square, Square>> moves;
     if (piece_positions == 0) {
@@ -542,8 +526,8 @@ Bitboard SlidingPiece::attacks(Bitboard piece_positions, Bitboard occupied_squar
     }
     return targets;
 }
-
-
+*/
+/*
 std::unique_ptr<Pawns> StandardPieceFactory::make_pawns(PieceColour colour) { 
     if (colour == PieceColour::BLACK) {
         return std::make_unique<BlackPawns>();
@@ -563,14 +547,15 @@ std::unique_ptr<Piece> StandardPieceFactory::make_piece(PieceType type) {
     case PieceType::ROOK:
         return std::make_unique<SlidingPiece>(std::vector<attacks::Ray*>{ &north_ray, & east_ray, & south_ray, & west_ray });
     case PieceType::BISHOP:
-        return std::make_unique<SlidingPiece>(std::vector<attacks::Ray*>{ &north_east_ray, & south_east_ray, & south_west_ray, & north_west_ray });
+        return std::make_unique<SlidingPiece>(std::vector<attacks::Ray*>{ &north_east_ray, & south_east_ray, & north_west_ray });
     case PieceType::QUEEN:
-        return std::make_unique<SlidingPiece>(std::vector<attacks::Ray*>{ &north_ray, & east_ray, & south_ray, & west_ray, &north_east_ray, & south_east_ray, & south_west_ray, & north_west_ray });
+        return std::make_unique<SlidingPiece>(std::vector<attacks::Ray*>{ &north_ray, & east_ray, & south_ray, & west_ray, &north_east_ray, & south_east_ray, & north_west_ray });
     default:
         return std::make_unique<NullPiece>();
     }
     
 
 };
+*/
 
 } // namespace pieces
