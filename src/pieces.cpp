@@ -82,7 +82,7 @@ namespace faster {
 
     void generate_sliding_piece_moves(const RookMap& atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
         while (piece_positions) {
-            Square from = pop_first(piece_positions);
+            Square from = bitboard::pop_LS1B(piece_positions);
             Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
 
             Bitboard quiet = atk_bb & empty_squares;
@@ -103,7 +103,7 @@ namespace faster {
 
     void generate_sliding_piece_moves(const BishopMap& atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
         while (piece_positions) {
-            Square from = pop_first(piece_positions);
+            Square from = bitboard::pop_LS1B(piece_positions);
             Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
 
             Bitboard quiet = atk_bb & empty_squares;
@@ -124,7 +124,7 @@ namespace faster {
 
     void generate_sliding_piece_moves(const QueenMap& atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
         while (piece_positions) {
-            Square from = pop_first(piece_positions);
+            Square from = bitboard::pop_LS1B(piece_positions);
             Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
 
             Bitboard quiet = atk_bb & empty_squares;

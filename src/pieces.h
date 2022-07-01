@@ -5,7 +5,6 @@
 #include "attackmaps.h"
 
 #include <iostream>
-#include <intrin.h>
 #include <vector>
 #include <memory>
 #include <stack>
@@ -461,15 +460,6 @@ namespace faster {
         move.castle = PieceType::QUEEN;
         return move;
     };
-
-    inline Square pop_first(Bitboard& bb) {
-        unsigned long idx;
-        _BitScanForward64(&idx, bb);
-        bb &= bb - 1;
-        return idx;
-    }
-
-    int pop_1st_bit(Bitboard* bb);
 
 }
 

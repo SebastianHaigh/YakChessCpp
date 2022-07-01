@@ -59,7 +59,7 @@ uint64 index_to_uint64(int index, int bits, uint64 m) {
     int i, j;
     uint64 result = 0ULL;
     for (i = 0; i < bits; i++) {
-        j = faster::pop_first(m); // pop_1st_bit(&m); // get index of LSB square 0 - 63
+        j = bitboard::pop_LS1B(m); // pop_1st_bit(&m); // get index of LSB square 0 - 63
         if (index & (1 << i)) result |= (1ULL << j);
     }
     return result;
