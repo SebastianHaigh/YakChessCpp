@@ -288,6 +288,8 @@ namespace pieces {
                 return 'q';
             case PieceType::KING:
                 return 'k';
+            default:
+                return 'x'; // ERROR CASE, should never run
         }
     }
 
@@ -305,6 +307,8 @@ namespace pieces {
                 return 'Q';
             case PieceType::KING:
                 return 'K';
+            default:
+                return 'X'; // ERROR CASE, should never run
         }
     }
 
