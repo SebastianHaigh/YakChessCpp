@@ -178,6 +178,95 @@ namespace faster {
         }
     };
 
+    /**
+     * \brief Constructs a quiet Move.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \return The constructed quiet move.
+     */
+    inline Move make_quiet(Square from, Square to) {
+        Move move;
+        move.from = from; move.to = to;
+        return move;
+    }
+
+    /**
+     * \brief Constructs a double pawn push.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \return The constructed double push move.
+     *
+     * \note Use this when constructing double push moves to ensure
+     * that the en passant target is properly set after making the move.
+     */
+    inline Move make_double_push(Square from, Square to) {
+        Move move;
+        move.from = from; move.to = to; move.double_push = true;
+        return move;
+    }
+
+    /**
+     * \brief Constructs a move with capture.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \return The constructed capture move.
+     */
+    inline Move make_capture(Square from, Square to) {
+        Move move;
+        move.from = from; move.to = to; move.capture = true;
+        return move;
+    };
+
+    /**
+     * \brief Constructs an en passant capture.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \return The constructed en passant capture.
+     */
+    inline Move make_ep_capture(Square from, Square to) {
+        Move move;
+        move.from = from; move.to = to; move.capture = true; move.en_passant = true;
+        return move;
+    };
+
+    /**
+     * \brief Constructs a quiet move with promotion.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \param[in] type - The type of piece to promote to.
+     * \return The constructed quiet promotion.
+     */
+    inline Move make_quiet_promotion(Square from, Square to, PieceType type) {
+        Move move;
+        move.from = from; move.to = to; move.promotion = type;
+        return move;
+    };
+
+    /**
+     * \brief Constructs a capture with promotion.
+     * \param[in] from - The square from which to move.
+     * \param[in] to - The square to move to.
+     * \param[in] type - The type of piece to promote to.
+     * \return The constructed capture promotion.
+     */
+    inline Move make_capture_promotion(Square from, Square to, PieceType type) {
+        Move move;
+        move.from = from; move.to = to; move.capture = true; move.promotion = type;
+        return move;
+    };
+
+    inline Move make_kingside_castle() {
+        Move move;
+        move.castle = PieceType::KING;
+        return move;
+    };
+
+    inline Move make_queenside_castle() {
+        Move move;
+        move.castle = PieceType::QUEEN;
+        return move;
+    };
+
     template<PieceColour C, bool PROMOTIONS>
     inline void generate_pawn_single_pushes(Move* move_list, int& move_counter, Bitboard pawn_positions, Bitboard empty_squares)
     {
@@ -372,94 +461,7 @@ namespace faster {
         return atk_bb;
     }
 
-    /**
-     * \brief Constructs a quiet Move.
-     * \param[in] from - The square from which to move.
-     * \param[in] to - The square to move to.
-     * \return The constructed quiet move.
-     */
-    inline Move make_quiet(Square from, Square to) {
-        Move move;
-        move.from = from; move.to = to;
-        return move;
-    }
-
-    /**
-     * \brief Constructs a double pawn push.
-     * \param[in] from - The square from which to move.
-     * \param[in] to - The square to move to.
-     * \return The constructed double push move.
-     * 
-     * \note Use this when constructing double push moves to ensure
-     * that the en passant target is properly set after making the move.
-     */
-    inline Move make_double_push(Square from, Square to) {
-        Move move;
-        move.from = from; move.to = to; move.double_push = true;
-        return move;
-    }
-
-    /**
-     * \brief Constructs a move with capture.
-     * \param[in] from - The square from which to move.
-     * \param[in] to - The square to move to.
-     * \return The constructed capture move.
-     */
-    inline Move make_capture(Square from, Square to) {
-        Move move;
-        move.from = from; move.to = to; move.capture = true;
-        return move;
-    };
-
-    /**
-     * \brief Constructs an en passant capture.
-     * \param[in] from - The square from which to move.
-     * \param[in] to - The square to move to.
-     * \return The constructed en passant capture.
-     */
-    inline Move make_ep_capture(Square from, Square to) {
-        Move move;
-        move.from = from; move.to = to; move.capture = true; move.en_passant = true;
-        return move;
-    };
-
-    /**
-     * \brief Constructs a quiet move with promotion.
-     * \param[in] from - The square from which to move.
-     * \param[in] to - The square to move to.
-     * \param[in] type - The type of piece to promote to.
-     * \return The constructed quiet promotion.
-     */
-    inline Move make_quiet_promotion(Square from, Square to, PieceType type) {
-        Move move;
-        move.from = from; move.to = to; move.promotion = type;
-        return move;
-    };
-
-    /**
-     * \brief Constructs a capture with promotion.
-     * \param[in] from - The square from which to move.
-     * \param[in] to - The square to move to.
-     * \param[in] type - The type of piece to promote to.
-     * \return The constructed capture promotion.
-     */
-    inline Move make_capture_promotion(Square from, Square to, PieceType type) {
-        Move move;
-        move.from = from; move.to = to; move.capture = true; move.promotion = type;
-        return move;
-    };
-
-    inline Move make_kingside_castle() {
-        Move move;
-        move.castle = PieceType::KING;
-        return move;
-    };
-
-    inline Move make_queenside_castle() {
-        Move move;
-        move.castle = PieceType::QUEEN;
-        return move;
-    };
+    
 
 }
 
