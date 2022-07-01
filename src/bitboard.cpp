@@ -38,11 +38,8 @@ std::vector<Square> scan_backward(Bitboard board) {
 
 std::vector<Square> scan_forward(Bitboard board) {
     std::vector<Square> serialised_board;
-    unsigned long idx;
     while (board) {
-        _BitScanForward64(&idx, board);
-        board &= board - 1;
-        serialised_board.push_back(idx);
+        serialised_board.push_back(pop_LS1B(board));
     }
     return serialised_board;
 }
