@@ -152,14 +152,15 @@ inline Bitboard south_west_one(Bitboard board) { return (board >> 9) & NOT_FILE_
  */
 template<Direction D>
 Bitboard shift(Bitboard board) {
-    if (dir == Direction::NORTH) return north_one(board);
-    if (dir == Direction::SOUTH) return south_one(board);
-    if (dir == Direction::EAST) return east_one(board);
-    if (dir == Direction::WEST) return west_one(board);
-    if (dir == Direction::NORTH_EAST) return north_east_one(board);
-    if (dir == Direction::NORTH_WEST) return north_west_one(board);
-    if (dir == Direction::SOUTH_EAST) return south_east_one(board);
-    if (dir == Direction::SOUTH_WEST) return south_west_one(board);
+    if (D == Direction::NORTH) return north_one(board);
+    if (D == Direction::SOUTH) return south_one(board);
+    if (D == Direction::EAST) return east_one(board);
+    if (D == Direction::WEST) return west_one(board);
+    if (D == Direction::NORTH_EAST) return north_east_one(board);
+    if (D == Direction::NORTH_WEST) return north_west_one(board);
+    if (D == Direction::SOUTH_EAST) return south_east_one(board);
+    if (D == Direction::SOUTH_WEST) return south_west_one(board);
+    return board;
 }
 
 /**

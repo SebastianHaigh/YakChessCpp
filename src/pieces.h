@@ -441,50 +441,7 @@ class PawnTargets {
         const Bitboard get_source() { return source; };
 };
 
-class Pawns {
-    private:
-        std::vector<std::pair<Square, Square>> zip_moves(const Bitboard& sources, const Bitboard& targets);
-    public:
-        Pawns() {}
-        virtual Bitboard push_targets(Bitboard sources) = 0;
-        virtual Bitboard push_sources(Bitboard targets) = 0;
-        virtual Bitboard east_attack_targets(Bitboard sources) = 0;
-        virtual Bitboard east_attack_sources(Bitboard opponent_pieces) = 0;
-        virtual Bitboard west_attack_targets(Bitboard sources) = 0;
-        virtual Bitboard west_attack_sources(Bitboard opponent_pieces) = 0;
-        virtual Bitboard double_push_target() = 0;
-        std::vector<std::pair<Square, Square>> quiet_moves(Bitboard pawn_positions, Bitboard empty_squares);
-        std::vector<std::pair<Square, Square>> captures(Bitboard pawn_positions, Bitboard opponent_pieces);
-        std::vector<std::pair<Square, Square>> single_push(Bitboard pawn_positions, Bitboard empty_squares);
-        std::vector<std::pair<Square, Square>> double_push(Bitboard pawn_positions, Bitboard empty_squares);
-        std::vector<std::pair<Square, Square>> west_captures(Bitboard pawn_positions, Bitboard opponent_pieces);
-        std::vector<std::pair<Square, Square>> east_captures(Bitboard pawn_positions, Bitboard opponent_pieces);
-        Bitboard all_attacked_squares(Bitboard pawn_positions);
-};
 
-class WhitePawns : public Pawns {
-    public:
-        WhitePawns() {}
-        Bitboard push_targets(Bitboard sources) override;
-        Bitboard push_sources(Bitboard targets) override;
-        Bitboard east_attack_targets(Bitboard sources) override;
-        Bitboard east_attack_sources(Bitboard opponent_pieces) override;
-        Bitboard west_attack_targets(Bitboard sources) override;
-        Bitboard west_attack_sources(Bitboard opponent_pieces) override;
-        Bitboard double_push_target() override { return bitboard::RANK_4; };
-};
-
-class BlackPawns : public Pawns {
-    public:
-        BlackPawns() {}
-        Bitboard push_targets(Bitboard sources) override;
-        Bitboard push_sources(Bitboard targets) override;
-        Bitboard east_attack_targets(Bitboard sources) override;
-        Bitboard east_attack_sources(Bitboard opponent_pieces) override;
-        Bitboard west_attack_targets(Bitboard sources) override;
-        Bitboard west_attack_sources(Bitboard opponent_pieces) override;
-        Bitboard double_push_target() override { return bitboard::RANK_5; };
-};
 
 } // namespace name
 

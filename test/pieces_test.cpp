@@ -10,36 +10,58 @@
 
 TEST(BlackPawnsTest, CanGenerateSinglePushesFromUnobstructedStartingPosition) {
     // Assemble
-    Bitboard pawn_bitboard = bitboard::RANK_7;
-    Bitboard empty_squares = ~pawn_bitboard;
+    Bitboard pawns = bitboard::RANK_7;
+    faster::Move move_list[20];
+    int move_counter{ 0 };
 
     // Act
+    faster::generate_pawn_single_pushes<PieceColour::BLACK, false>(&move_list[move_counter], move_counter, pawns, ~pawns);
 
     // Assert
 
-    //EXPECT_EQ(single_push_moves.size(), 8);
+    EXPECT_EQ(move_counter, 8);
 }
+
+TEST(BlackPawnsTest, DoublePushTargetIsRank5) {
+    // Assemble
+    Bitboard expected = bitboard::RANK_5;
+
+    // Act
+    Bitboard actual = faster::pawn_double_push_target<PieceColour::BLACK>();
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
 
 TEST(BlackPawnsTest, DoublePushOnlyAllowedFromRank7) {
     // Assemble
-    auto pawn_bitboard = bitboard::RANK_7;
-    auto empty_squares = ~pawn_bitboard;
-    auto pawns = pieces::BlackPawns();
-
+    Bitboard pawns = bitboard::RANK_1;
+    faster::Move move_list[20];
+    int move_counter{ 0 };
+    int actual[8]{ 0 };
 
     // Act
-    auto moves = pawns.double_push(pawn_bitboard, empty_squares);
-
+    for (int i = 0; i < 8; i++)
+    {
+        move_counter = 0;
+        faster::generate_pawn_double_pushes<PieceColour::BLACK, false>(&move_list[move_counter], move_counter, pawns, ~pawns);
+        actual[i] = move_counter;
+        pawns = bitboard::shift<Direction::NORTH>(pawns);
+    }
+    
 
     // Assert
-    EXPECT_EQ(bitboard::rank_index(moves[0].first), 6); // If the source square has rank index of 6 it means that square is on the 7th rank.
-    EXPECT_EQ(bitboard::rank_index(moves[1].first), 6);
-    EXPECT_EQ(bitboard::rank_index(moves[2].first), 6);
-    EXPECT_EQ(bitboard::rank_index(moves[3].first), 6);
-    EXPECT_EQ(bitboard::rank_index(moves[4].first), 6);
-    EXPECT_EQ(bitboard::rank_index(moves[5].first), 6);
-    EXPECT_EQ(bitboard::rank_index(moves[6].first), 6);
+    EXPECT_EQ(actual[0], 0); // RANK 1, No moves
+    EXPECT_EQ(actual[1], 0); // RANK 2, No moves
+    EXPECT_EQ(actual[2], 0); // RANK 3, No moves
+    EXPECT_EQ(actual[3], 0); // RANK 4, No moves
+    EXPECT_EQ(actual[4], 0); // RANK 5, No moves
+    EXPECT_EQ(actual[5], 0); // RANK 6, No moves
+    EXPECT_EQ(actual[6], 8); // RANK 7, Eight moves
+    EXPECT_EQ(actual[7], 0); // RANK 8, No moves
 }
+
 TEST(BlackPawnsTest, FriendlyPieceBlocksPawnPushes) {
     // Tests if an friendly piece can block pawn pushes.
 
@@ -55,22 +77,23 @@ TEST(BlackPawnsTest, FriendlyPieceBlocksPawnPushes) {
 
     // Assemble
     auto pawn_bitboard = bitboard::RANK_7;
-    auto extra_piece = bitboard::RANK_6 & bitboard::FILE_C;
+    auto extra_piece = bitboard::static_bitboard<C6>::value;
     auto empty_squares = ~(pawn_bitboard ^ extra_piece);
-    auto pawns = pieces::BlackPawns();
+    faster::Move move_list[20];
+    int move_counter{ 0 };
 
     // Act
-    auto moves = pawns.single_push(pawn_bitboard, empty_squares);
+    faster::generate_pawn_single_pushes<PieceColour::BLACK, false>(&move_list[move_counter], move_counter, pawn_bitboard, empty_squares);
 
     // Assert
-    EXPECT_EQ(moves.size(), 7);
+    EXPECT_EQ(move_counter, 7);
 }
 
 TEST(BlackPawnsTest, WestAttackSources)
 {
     // Arrange
-    Bitboard target = bitboard::to_bitboard("c6");
-    Bitboard expected = bitboard::to_bitboard("d7");
+    Bitboard target = bitboard::static_bitboard<C6>::value;
+    Bitboard expected = bitboard::static_bitboard<D7>::value;
 
     // Act
     Bitboard actual = faster::pawn_west_attack_source<PieceColour::BLACK>(target);
@@ -200,28 +223,30 @@ TEST(BlackPawnsTest, OpponentPieceCanBeCaptured) {
 
 TEST(WhitePawnTests, CanGenerateSinglePushesFromUnobstructedStartingPosition) {
     // Assemble
-    pieces::WhitePawns pawns = pieces::WhitePawns();
-    Bitboard pawn_bitboard = bitboard::RANK_2;
-    Bitboard empty_squares = ~pawn_bitboard;
-
+    Bitboard pawns = bitboard::RANK_2;
+    faster::Move move_list[20];
+    int move_counter{ 0 };
+    
     // Act
-    auto single_push_moves = pawns.single_push(pawn_bitboard, empty_squares);
+    faster::generate_pawn_single_pushes<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, ~pawns);
 
     // Assert
-    EXPECT_EQ(single_push_moves.size(), 8);
+
+    EXPECT_EQ(move_counter, 8);
 }
 
 TEST(WhitePawnTests, CanGenerateDoublePushesFromUnobstructedStartingPosition) {
     // Assemble
-    pieces::WhitePawns pawns = pieces::WhitePawns();
-    Bitboard pawn_bitboard = bitboard::RANK_2;
-    Bitboard empty_squares = ~pawn_bitboard;
+    Bitboard pawns = bitboard::RANK_2;
+    faster::Move move_list[20];
+    int move_counter{ 0 };
 
     // Act
-    auto single_push_moves = pawns.double_push(pawn_bitboard, empty_squares);
+    faster::generate_pawn_single_pushes<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, ~pawns);
 
     // Assert
-    EXPECT_EQ(single_push_moves.size(), 8);
+
+    EXPECT_EQ(move_counter, 8);
 }
 
 TEST(WhitePawnTests, PieceObstructsSinglePush) {
@@ -237,16 +262,17 @@ TEST(WhitePawnTests, PieceObstructsSinglePush) {
     // . . . . . . . .
   
     // Arrange
-    auto pawns = pieces::WhitePawns();
-    auto pawn_bitboard = bitboard::RANK_2;
-    auto extra_piece = bitboard::RANK_3 & bitboard::FILE_C;
-    auto empty_squares = ~(pawn_bitboard ^ extra_piece);
+    Bitboard pawns = bitboard::RANK_2;
+    Bitboard extra_piece = bitboard::static_bitboard<C3>::value;
+    Bitboard empty_squares = ~(pawns ^ extra_piece);
+    faster::Move move_list[20];
+    int move_counter{ 0 };
 
     // Act
-    auto moves = pawns.single_push(pawn_bitboard, empty_squares);
+    faster::generate_pawn_single_pushes<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, empty_squares);
 
     // Assert
-    EXPECT_EQ(moves.size(), 7);
+    EXPECT_EQ(move_counter, 7);
 
 }
 
@@ -263,17 +289,17 @@ TEST(WhitePawnTests, PiecesObstructsDoublePush) {
     // . . . . . . . .
 
     // Arrange
-    auto pawns = pieces::WhitePawns();
-    auto pawn_bitboard = bitboard::RANK_2;
-    auto extra_piece_1 = bitboard::RANK_3 & bitboard::FILE_C;
-    auto extra_piece_2 = bitboard::RANK_4 & bitboard::FILE_E;
-    auto empty_squares = ~(pawn_bitboard ^ extra_piece_1 ^ extra_piece_2);
+    Bitboard pawns = bitboard::RANK_2;
+    Bitboard extra_pieces = bitboard::static_bitboard<C3, E4>::value;
+    Bitboard empty_squares = ~(pawns ^ extra_pieces);
+    faster::Move move_list[20];
+    int move_counter{ 0 };
 
     // Act
-    auto moves = pawns.double_push(pawn_bitboard, empty_squares);
+    faster::generate_pawn_double_pushes<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, empty_squares);
 
     // Assert
-    EXPECT_EQ(moves.size(), 6);
+    EXPECT_EQ(move_counter, 6);
 
 }
 
@@ -291,18 +317,17 @@ TEST(WhitePawnTests, OpponentPieceCanBeCaptured) {
     // . . . . . . . .
 
     // Assemble
-    pieces::WhitePawns pawns = pieces::WhitePawns();
-    Bitboard pawn_bitboard = bitboard::RANK_2;
-    Bitboard opponent_pieces = bitboard::RANK_3 & bitboard::FILE_C;
-    
+    Bitboard pawns = bitboard::RANK_2;
+    Bitboard opponent_pieces = bitboard::static_bitboard<C3>::value;
+    faster::Move move_list[20];
+    int move_counter{ 0 };
 
     // Act
-    auto west_moves = pawns.west_captures(pawn_bitboard, opponent_pieces);
-    auto east_moves = pawns.east_captures(pawn_bitboard, opponent_pieces);
+    faster::generate_pawn_east_captures<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, opponent_pieces);
+    faster::generate_pawn_west_captures<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, opponent_pieces);
 
     // Assert
-    EXPECT_EQ(west_moves.size(), 1);
-    EXPECT_EQ(east_moves.size(), 1);
+    EXPECT_EQ(move_counter, 2);
 }
 
 TEST(KnightTests, KnightOnA1AttacksTheCorrectSquares) {
