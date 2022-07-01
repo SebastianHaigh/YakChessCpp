@@ -1,9 +1,22 @@
 #include "bitboard.h"
 #include <string>
-#include <intrin.h>
+
 namespace bitboard {
 
 
+    Square pop_LS1B(Bitboard& board)
+    {
+        Square idx = LS1B(board);
+        board &= board - 1;
+        return idx;
+    }
+
+    Square pop_MS1B(Bitboard& board)
+    {
+        Square idx = MS1B(board);
+        board &= ~(Bitboard{ 1 } << idx);
+        return idx;
+    }
 
 void set_square(Bitboard& board, Square square) {
     Bitboard piece_to_set{ 1 };
@@ -16,11 +29,10 @@ void set_square(Bitboard& board, Rank rank, File file) {
 
 std::vector<Square> scan_backward(Bitboard board) {
     std::vector<Square> serialised_board;
-    for (Square square = 64; square > 0; square--) {
-        if (board & to_bitboard(square - 1)) {
-            serialised_board.push_back(square - 1);
-        }
-    }
+
+    while (board)
+        serialised_board.push_back(pop_MS1B(board));
+
     return serialised_board;
 }
 

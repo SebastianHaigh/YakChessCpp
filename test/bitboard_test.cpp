@@ -157,6 +157,66 @@ TEST(BitboardTest, SouthWestOneFromMiddleOfBoard) {
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
 }
 
+TEST(BitboardTest, PopMS1B) {
+    // Arrange
+    Bitboard initial = 0xff00000000000000;
+    Bitboard expected = 0x7f00000000000000;
+
+    // Act
+    Square MS1B_index = bitboard::pop_MS1B(initial);
+
+    // Assert
+    EXPECT_EQ(MS1B_index, 63);
+    EXPECT_EQ(initial, expected);
+
+}
+
+TEST(BitboardTest, PopMS1BWithValueOne) {
+    // Arrange
+    Bitboard initial =  0x0000000000000001;
+    Bitboard expected = 0x0000000000000000;
+
+    // Act
+    Square MS1B_index = bitboard::pop_MS1B(initial);
+
+    // Assert
+    EXPECT_EQ(MS1B_index, 0);
+    EXPECT_EQ(initial, expected);
+
+}
+
+TEST(BitboardTest, PopMS1BWithOnlyOneSetBit) {
+    // Arrange
+    Bitboard expected = 0x0000000000000000;
+    std::vector<Bitboard> actual;
+
+    // Act
+    for (int i = 0; i < 63; i++) {
+        Bitboard one = Bitboard{ 1 } << i;
+        Square MS1B_index = bitboard::pop_MS1B(one);
+        actual.push_back(one);
+    }
+    
+    // Assert
+    for (auto board : actual)
+        EXPECT_EQ(board, expected);
+   
+}
+
+TEST(BitboardTest, PopLS1B) {
+    // Arrange
+    Bitboard initial = 0xff00000000000000;
+    Bitboard expected = 0xfe00000000000000;
+
+    // Act
+    Square MS1B_index = bitboard::pop_LS1B(initial);
+
+    // Assert
+    EXPECT_EQ(MS1B_index, 56);
+    EXPECT_EQ(initial, expected);
+
+}
+
 TEST(BitboardTest, ScanForwardOnEmptyBoardReturnsEmptyStack) {
     // Arrange
     Bitboard initial_bitboard = 0;
