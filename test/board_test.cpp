@@ -714,7 +714,7 @@ TEST(BoardMoveGenerationTests, CanCastleQueenSideBlack) {
 	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Act
-	for (auto move : moves) {
+	for (auto& move : moves) {
 		if (move.castle != PieceType::NULL_PIECE) {
 			board.make_move(move);
 			break;
@@ -903,7 +903,6 @@ TEST(BoardMoveGenerationTests, DetectsASituationThatIsCheckmate) {
 	// P P P P . P P P  
 	// R N B   K . . R 
 
-
 	// Arrange
 	std::string fen = "r2q1bkr/ppp3pp/2n1B3/4p3/8/5Q2/PPPP1PPP/RNB1K2R b KQkq - 0 1";
 	Board board = Board(fen);
@@ -919,18 +918,26 @@ TEST(BoardMoveGenerationTests, DetectsASituationThatIsCheckmate) {
 TEST(BoardMoveGenerationTests, CannotCastleOutOfCheck) {
 
 	//   Test Board    
-	// r . . q . b k r   
-	// p p p . . . p p  
-	// . . n . B . . .  
-	// . . . . p . . .  
+	// . . . . . . . .   
+	// . . . . . . . .   
+	// . . . . r . . .   
+	// . . . . . . . .   
 	// . . . . . . . .  
-	// . . . . . Q . . 
-	// P P P P . P P P  
-	// R N B   K . . R 
+	// . . . . . . . .   
+	// . . . . . . . .   
+	// . . . . K . . R 
 
+	// Arrange
+	std::string fen = "8/8/4r3/8/8/8/8/4K2R w K - 0 1";
+	Board board = Board(fen);
+
+	std::vector<faster::Move> moves = board.generate_moves();
 
 	// Assert
-	EXPECT_TRUE(false);
+	for (auto& move : moves) {
+		EXPECT_TRUE(move.castle == PieceType::NULL_PIECE);
+	}
+	
 
 }
 TEST(CastlingRightsTests, CanBeCreatedFromFenAll) {
