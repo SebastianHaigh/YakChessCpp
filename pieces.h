@@ -35,7 +35,7 @@ namespace faster {
 
     /*
      * \brief Target squares of a pawn single push.
-     * \param COLOUR - the colour of the pawns.
+     * \tparam COLOUR - the colour of the pawns.
      * \param[in] source - the source squares for which to find the targets.
      * \return The Bitboard of the target squares.
      */
@@ -46,7 +46,12 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::south_one(source) : source;
     }
 
-
+    /*
+     * \brief Source squares of a pawn single push.
+     * \tparam COLOUR - the colour of the pawns.
+     * \param[in] target - the target squares for which to find the sources.
+     * \return The Bitboard of the source squares.
+     */
     template<PieceColour C>
     Bitboard pawn_single_push_source(Bitboard target)
     {
@@ -54,6 +59,11 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::north_one(target) : target;
     }
 
+    /*
+     * \brief The target squares for a double push from the starting rank.
+     * \tparam COLOUR - the colour of the pawns.
+     * \return The Bitboard of the target squares.
+     */
     template<PieceColour C>
     Bitboard pawn_double_push_target()
     {
@@ -61,13 +71,25 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::RANK_5 : bitboard::EMPTY;
     }
 
+    /*
+     * \brief Source squares of pawns attacking to the west.
+     * \tparam COLOUR - the colour of the pawns.
+     * \param[in] target - the target squares for which to find the sources.
+     * \return The Bitboard of the source squares.
+     */
     template<PieceColour C>
     Bitboard pawn_west_attack_source(Bitboard target)
     {
-        return (C == PieceColour::WHITE) ? bitboard::south_west_one(target) :
-            (C == PieceColour::BLACK) ? bitboard::north_west_one(target) : target;
+        return (C == PieceColour::WHITE) ? bitboard::south_east_one(target) :
+            (C == PieceColour::BLACK) ? bitboard::north_east_one(target) : target;
     }
 
+    /*
+     * \brief Target squares of pawns attacking to the west.
+     * \tparam COLOUR - the colour of the pawns.
+     * \param[in] source - the source squares for which to find the targets.
+     * \return The Bitboard of the target squares.
+     */
     template<PieceColour C>
     Bitboard pawn_west_attack_target(Bitboard source)
     {
@@ -75,13 +97,25 @@ namespace faster {
             (C == PieceColour::BLACK) ? bitboard::south_west_one(source) : source;
     }
 
+    /*
+     * \brief Target squares of pawns attacking to the east.
+     * \tparam COLOUR - the colour of the pawns.
+     * \param[in] source - the source squares for which to find the targets.
+     * \return The Bitboard of the target squares.
+     */
     template<PieceColour C>
     Bitboard pawn_east_attack_source(Bitboard target)
     {
-        return (C == PieceColour::WHITE) ? bitboard::south_east_one(target) :
-            (C == PieceColour::BLACK) ? bitboard::north_east_one(target) : target;
+        return (C == PieceColour::WHITE) ? bitboard::south_west_one(target) :
+            (C == PieceColour::BLACK) ? bitboard::north_west_one(target) : target;
     }
 
+    /*
+     * \brief Target squares of pawns attacking to the east.
+     * \tparam COLOUR - the colour of the pawns.
+     * \param[in] source - the source squares for which to find the targets.
+     * \return The Bitboard of the target squares.
+     */
     template<PieceColour C>
     Bitboard pawn_east_attack_target(Bitboard source)
     {

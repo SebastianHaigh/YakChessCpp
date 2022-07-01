@@ -66,6 +66,110 @@ TEST(BlackPawnsTest, FriendlyPieceBlocksPawnPushes) {
     EXPECT_EQ(moves.size(), 7);
 }
 
+TEST(BlackPawnsTest, WestAttackSources)
+{
+    // Arrange
+    Bitboard target = bitboard::to_bitboard("c6");
+    Bitboard expected = bitboard::to_bitboard("d7");
+
+    // Act
+    Bitboard actual = faster::pawn_west_attack_source<PieceColour::BLACK>(target);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(BlackPawnsTest, WestAttackTarget)
+{
+    // Arrange
+    Bitboard source = bitboard::to_bitboard("e6");
+    Bitboard expected = bitboard::to_bitboard("d5");
+
+    // Act
+    Bitboard actual = faster::pawn_west_attack_target<PieceColour::BLACK>(source);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(BlackPawnsTest, EastAttackSources)
+{
+    // Arrange
+    Bitboard target = bitboard::to_bitboard("c6");
+    Bitboard expected = bitboard::to_bitboard("b7");
+
+    // Act
+    Bitboard actual = faster::pawn_east_attack_source<PieceColour::BLACK>(target);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(BlackPawnsTest, EastAttackTarget)
+{
+    // Arrange
+    Bitboard source = bitboard::to_bitboard("e6");
+    Bitboard expected = bitboard::to_bitboard("f5");
+
+    // Act
+    Bitboard actual = faster::pawn_east_attack_target<PieceColour::BLACK>(source);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(WhitePawnsTest, WestAttackSources)
+{
+    // Arrange
+    Bitboard target = bitboard::to_bitboard("c6");
+    Bitboard expected = bitboard::to_bitboard("d5");
+
+    // Act
+    Bitboard actual = faster::pawn_west_attack_source<PieceColour::WHITE>(target);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(WhitePawnsTest, WestAttackTarget)
+{
+    // Arrange
+    Bitboard source = bitboard::to_bitboard("e6");
+    Bitboard expected = bitboard::to_bitboard("d7");
+
+    // Act
+    Bitboard actual = faster::pawn_west_attack_target<PieceColour::WHITE>(source);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(WhitePawnsTest, EastAttackSources)
+{
+    // Arrange
+    Bitboard target = bitboard::to_bitboard("c6");
+    Bitboard expected = bitboard::to_bitboard("b5");
+
+    // Act
+    Bitboard actual = faster::pawn_east_attack_source<PieceColour::WHITE>(target);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(WhitePawnsTest, EastAttackTarget)
+{
+    // Arrange
+    Bitboard source = bitboard::to_bitboard("e6");
+    Bitboard expected = bitboard::to_bitboard("f7");
+
+    // Act
+    Bitboard actual = faster::pawn_east_attack_target<PieceColour::WHITE>(source);
+
+    // Assert
+    EXPECT_EQ(actual, expected);
+}
+
 TEST(BlackPawnsTest, OpponentPieceCanBeCaptured) {
     // Tests if the white pawns on their starting squares can return valid 
     // capture moves for the situation on the board shown below.
@@ -83,15 +187,15 @@ TEST(BlackPawnsTest, OpponentPieceCanBeCaptured) {
     // Assemble
     Bitboard pawn_bitboard = bitboard::RANK_7;
     Bitboard opponent_pieces = bitboard::RANK_6 & bitboard::FILE_C;
-    pieces::BlackPawns pawns = pieces::BlackPawns();
 
+    faster::pawn_west_attack_source<PieceColour::BLACK>(opponent_pieces);
     // Act
-    auto west_moves = pawns.west_captures(pawn_bitboard, opponent_pieces);
-    auto east_moves = pawns.east_captures(pawn_bitboard, opponent_pieces);
+   // auto west_moves = pawns.west_captures(pawn_bitboard, opponent_pieces);
+    //auto east_moves = pawns.east_captures(pawn_bitboard, opponent_pieces);
 
     // Assert
-    EXPECT_EQ(west_moves.size(), 1);
-    EXPECT_EQ(east_moves.size(), 1);
+    //EXPECT_EQ(west_moves.size(), 1);
+    //EXPECT_EQ(east_moves.size(), 1);
 }
 
 TEST(WhitePawnTests, CanGenerateSinglePushesFromUnobstructedStartingPosition) {

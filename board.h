@@ -350,7 +350,6 @@ void Board::process_ep(const faster::Move& move) {
 	Bitboard to_bitboard = bitboard::to_bitboard(move.to);
 	Bitboard from_bitboard = bitboard::to_bitboard(move.from);
 	Bitboard from_to_bitboard = to_bitboard ^ from_bitboard;
-
 	piece_type_bitboard[static_cast<int>(PieceType::PAWN)] ^= from_to_bitboard;
 	colour_bitboard[static_cast<int>(C)] ^= from_to_bitboard;
 
