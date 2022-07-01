@@ -42,27 +42,8 @@ void PAWN_MOVE_GENERATION() {
 void KNIGHT_MOVE_GENERATION() {
 
 
-	attacks::KnightAttacks atks;
-	{
-		std::cout << "---------------------------" << std::endl;
-		std::cout << "KNIGHT_MOVE_GENERATION fast" << std::endl;
-		std::cout << "---------------------------" << std::endl;
-		faster::Move move_list[330];
-		Bitboard enemy = bitboard::RANK_3 | bitboard::RANK_4;
-		Bitboard friendly = bitboard::RANK_1;
-		Bitboard occupied = enemy | friendly;
-		Bitboard empty = ~occupied;
-		int move_counter = 0;
-		Timer timer;
-		
-		for (int i = 0; i < 1000; i++) {
-			jumping_piece_moves(&atks, &move_list[0], move_counter, friendly, empty, enemy);
-		}
+	
 
-		//for (int i = 0; i < 50; i++) {
-		//	std::cout << move_list[i].from << ", " << move_list[i].to << ", " << move_list[i].capture << std::endl;
-		//}
-	}
 }
 
 void ROOK_MOVE_GENERATION() {
@@ -84,8 +65,8 @@ void ROOK_MOVE_GENERATION() {
 		Bitboard friendly = bitboard::RANK_1 | bitboard::RANK_2;
 		Bitboard occupied = friendly;
 		Bitboard empty = ~occupied;
-		attacks::KnightAttacks knight_atks;
-		attacks::KingAttacks king_atks;
+		//attacks::KnightAttacks knight_atks;
+		//attacks::KingAttacks king_atks;
 		int move_counter = 0;
 
 		faster::RookMap rook_atks;
@@ -96,11 +77,11 @@ void ROOK_MOVE_GENERATION() {
 		for (int i = 0; i < 1000; i++) {
 			move_counter = 0;
 			faster::generate_pawn_moves<PieceColour::WHITE>(&move_list[0], move_counter, pawns, empty, 0);
-			faster::jumping_piece_moves(&knight_atks, &move_list[0], move_counter, knights, empty, 0);
-			faster::jumping_piece_moves(&king_atks, &move_list[0], move_counter, kings, empty, 0);
-			faster::generate_sliding_piece_moves(rook_atks, &move_list[0], move_counter, rooks, empty, 0);
-			faster::generate_sliding_piece_moves(bishop_atks, &move_list[0], move_counter, bishops, empty, 0);
-			faster::generate_sliding_piece_moves(queen_atks, &move_list[0], move_counter, queens, empty, 0);
+			faster::generate_piece_moves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty, 0);
+			faster::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter, knights, empty, 0);
+			faster::generate_piece_moves<PieceType::BISHOP>(&move_list[0], move_counter, knights, empty, 0);
+			faster::generate_piece_moves<PieceType::ROOK>(&move_list[0], move_counter, knights, empty, 0);
+			faster::generate_piece_moves<PieceType::QUEEN>(&move_list[0], move_counter, knights, empty, 0);
 		}
 
 		std::cout << move_counter << std::endl;
