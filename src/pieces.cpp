@@ -80,29 +80,6 @@ namespace faster {
         }
     }
 
-    void jumping_piece_moves(attacks::AttackMap* atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
-        
-        while (piece_positions) {
-            Square from = pop_first(piece_positions);
-            Bitboard quiet = atk_map->get(from) & empty_squares;
-            while (quiet)
-            {
-                *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
-                move_counter++;
-            }
-                
-
-            Bitboard capture = atk_map->get(from) & opponent_pieces;
-            while (capture)
-            {
-                *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
-                move_counter++;
-            }
-                
-        }
-    }
-
-
     void generate_sliding_piece_moves(const RookMap& atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces) {
         while (piece_positions) {
             Square from = pop_first(piece_positions);

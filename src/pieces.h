@@ -58,7 +58,7 @@ namespace faster {
     public:
         static Bitboard attacks(Square square)
         {
-            return jump_map<PieceType::KNIGHT>::value[square];
+            return jump_map<PieceType::KING>::value[square];
         }
     };
 
@@ -302,8 +302,6 @@ namespace faster {
             move_counter++;
         }
     };
-
-    void jumping_piece_moves(attacks::AttackMap* atk_map, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces);
 
     void generate_sliding_piece_moves(const RookMap&, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces);
 

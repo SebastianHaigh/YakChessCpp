@@ -121,15 +121,14 @@ std::vector<faster::Move> Board::generate_moves() {
 	faster::generate_piece_moves<PieceType::KING>(&psuedo_legal_move_list[move_counter], move_counter,
 		get_position(this_side, PieceType::KING), empty_squares(), get_position(other_side));
 
-	faster::generate_sliding_piece_moves(bishop_atks, &psuedo_legal_move_list[move_counter], move_counter,
+	faster::generate_piece_moves<PieceType::BISHOP>(&psuedo_legal_move_list[move_counter], move_counter,
 		get_position(this_side, PieceType::BISHOP), empty_squares(), get_position(other_side));
 
-	faster::generate_sliding_piece_moves(rook_atks, &psuedo_legal_move_list[move_counter], move_counter,
+	faster::generate_piece_moves<PieceType::ROOK>(&psuedo_legal_move_list[move_counter], move_counter,
 		get_position(this_side, PieceType::ROOK), empty_squares(), get_position(other_side));
 
-	faster::generate_sliding_piece_moves(queen_atks, &psuedo_legal_move_list[move_counter], move_counter,
+	faster::generate_piece_moves<PieceType::QUEEN>(&psuedo_legal_move_list[move_counter], move_counter,
 		get_position(this_side, PieceType::QUEEN), empty_squares(), get_position(other_side));
-
 	
 	std::vector<faster::Move> legal_moves;
 	for (int i = 0; i < move_counter; i++) {
@@ -152,7 +151,7 @@ std::vector<faster::Move> Board::generate_castling_moves(std::vector<faster::Mov
 
 	Bitboard king = get_position(current_state.side_to_move(), PieceType::KING);
 	
-	if (current_state.can_king_side_castle()) {
+	if (current_state.can_king_side_castle() && !is_check()) {
 		Bitboard king_path = bitboard::east_one(king) | bitboard::east_one(bitboard::east_one(king));
 		if ((king_path & occupied_squares()) == 0 && (king_path & squares_attacked_by_enemy) == 0) {
 			moves.push_back(faster::make_kingside_castle());
@@ -160,7 +159,7 @@ std::vector<faster::Move> Board::generate_castling_moves(std::vector<faster::Mov
 		}
 	} 
 	
-	if (current_state.can_queen_side_castle()) {
+	if (current_state.can_queen_side_castle() && !is_check()) {
 		Bitboard king_path = bitboard::west_one(king) | bitboard::west_one(bitboard::west_one(king));
 		Bitboard rook_path = king_path | bitboard::west_one(king_path);
 		if ((rook_path & occupied_squares()) == 0 && (king_path & squares_attacked_by_enemy) == 0) {
@@ -433,13 +432,9 @@ bool CastlingRights::queen_side(PieceColour colour) {
 		return white[1];
 	}
 }
-/*
-void CastlingRights::update(Move move, PieceColour side) {
-	white[0] = !(move.from_square() == 7 || move.to_square() == 7 || move.from_square() == 4) && white[0];
-	white[1] = !(move.from_square() == 0 || move.to_square() == 0 || move.from_square() == 4) && white[1];
-	black[0] = !(move.from_square() == 63 || move.to_square() == 63 || move.from_square() == 60) && black[0];
-	black[1] = !(move.from_square() == 56 || move.to_square() == 56 || move.from_square() == 60) && black[1];
-	if (move.is_castle()) {
+
+void CastlingRights::update(const faster::Move& move, PieceColour side) {
+	if (move.castle != PieceType::NULL_PIECE) {
 		if (side == PieceColour::WHITE) {
 			white[0] = false;
 			white[1] = false;
@@ -448,24 +443,13 @@ void CastlingRights::update(Move move, PieceColour side) {
 			black[0] = false;
 			black[1] = false;
 		}
+		return;
 	}
-}
-*/
-void CastlingRights::update(const faster::Move& move, PieceColour side) {
 	white[0] = !(move.from == 7 || move.to == 7 || move.from == 4) && white[0];
 	white[1] = !(move.from == 0 || move.to == 0 || move.from == 4) && white[1];
 	black[0] = !(move.from == 63 || move.to == 63 || move.from == 60) && black[0];
 	black[1] = !(move.from == 56 || move.to == 56 || move.from == 60) && black[1];
-	if (move.castle != PieceType::NULL_PIECE) { 
-		if (side == PieceColour::WHITE) {
-			white[0] = false;
-			white[1] = false; 
-		}
-		else {
-			black[0] = false;
-			black[1] = false;
-		}
-	}
+	
 }
 
 std::string CastlingRights::fen() {
