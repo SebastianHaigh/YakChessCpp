@@ -115,10 +115,10 @@ std::vector<faster::Move> Board::generate_moves() {
 			get_position(this_side, PieceType::PAWN), ep_target());
 	}
 
-	faster::jumping_piece_moves(&knight_atks, &psuedo_legal_move_list[move_counter], move_counter,
+	faster::generate_piece_moves<PieceType::KNIGHT>(&psuedo_legal_move_list[move_counter], move_counter,
 		get_position(this_side, PieceType::KNIGHT), empty_squares(), get_position(other_side));
 
-	faster::jumping_piece_moves(&king_atks, &psuedo_legal_move_list[move_counter], move_counter,
+	faster::generate_piece_moves<PieceType::KING>(&psuedo_legal_move_list[move_counter], move_counter,
 		get_position(this_side, PieceType::KING), empty_squares(), get_position(other_side));
 
 	faster::generate_sliding_piece_moves(bishop_atks, &psuedo_legal_move_list[move_counter], move_counter,

@@ -168,8 +168,7 @@ private:
 	/* \brief A record of the GameState before the last move, for undoing moves. */
 	GameState previous_state;
 
-	attacks::KnightAttacks knight_atks; /* \brief Attack map for Knights */
-	attacks::KingAttacks king_atks;		/* \brief Attack map for Kings */
+	
 	faster::RookMap rook_atks;			/* \brief Attack map for Rooks */
 	faster::BishopMap bishop_atks;		/* \brief Attack map for Bishops */
 	faster::QueenMap queen_atks;		/* \brief Attack map for Queens */

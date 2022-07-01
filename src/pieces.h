@@ -34,6 +34,35 @@ enum class PieceColour {
 namespace faster {
 
     /**
+     * \brief Static table of jumping piece attacks.
+     */
+    template<PieceType T, Square S = 0, Bitboard... B>
+    struct jump_map : jump_map <T, S + 1, B..., (T == PieceType::KNIGHT) ? knight_map<S>::value : (T == PieceType::KING) ? king_map<S>::value : Bitboard{ 0 }> { };
+
+    template<PieceType T, Bitboard... B>
+    struct jump_map<T, 63, B...> {
+        static constexpr std::array<Bitboard, 64> value = { B... };
+    };
+
+    class KnightMap
+    {
+    public:
+        static Bitboard attacks(Square square)
+        {
+            return jump_map<PieceType::KNIGHT>::value[square];
+        }
+    };
+
+    class KingMap
+    {
+    public:
+        static Bitboard attacks(Square square)
+        {
+            return jump_map<PieceType::KNIGHT>::value[square];
+        }
+    };
+
+    /**
      * \brief Target squares of a pawn single push.
      * \tparam COLOUR - the colour of the pawns.
      * \param[in] source - the source squares for which to find the targets.
@@ -282,6 +311,36 @@ namespace faster {
     
     void generate_sliding_piece_moves(const QueenMap&, Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces);
 
+    
+
+    template<PieceType T>
+    void generate_piece_moves(Move* move_list, int& move_counter, Bitboard piece_positions, Bitboard empty_squares, Bitboard opponent_pieces)
+    {
+        
+        while (piece_positions) {
+            Square from = bitboard::pop_LS1B(piece_positions);
+            Bitboard atk_bb = (T == PieceType::KNIGHT) ? KnightMap::attacks(from) :
+                              (T == PieceType::BISHOP) ? BishopMap::attacks(from, ~empty_squares) :
+                              (T == PieceType::ROOK) ? RookMap::attacks(from, ~empty_squares) :
+                              (T == PieceType::QUEEN) ? QueenMap::attacks(from, ~empty_squares) :
+                              (T == PieceType::KING) ? KingMap::attacks(from) : Bitboard{ 0 };
+
+            Bitboard quiet = atk_bb & empty_squares;
+            while (quiet)
+            {
+                *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
+                move_counter++;
+            }
+
+            Bitboard capture = atk_bb & opponent_pieces;
+            while (capture)
+            {
+                *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
+                move_counter++;
+            }
+        }
+    }
+
     /**
      * \brief Get all of the squares attacked by pawns of a given COLOUR.
      * \tparam COLOUR - The colour of the pawns.
@@ -305,13 +364,10 @@ namespace faster {
     template<PieceType TYPE>
     Bitboard piece_attacks(Bitboard piece_positions, Bitboard occupied_squares)
     {
-        // TODO: The Knight and King maps should be statically constructed, which means that eventually they can be removed from here.
-        attacks::KnightAttacks knight_map;
-        attacks::KingAttacks king_map;
         Bitboard atk_bb{ 0 };
         while (piece_positions) {
-            if (TYPE == PieceType::KNIGHT) atk_bb |= knight_map.get(bitboard::pop_LS1B(piece_positions));
-            if (TYPE == PieceType::KING) atk_bb |= king_map.get(bitboard::pop_LS1B(piece_positions));
+            if (TYPE == PieceType::KNIGHT) atk_bb |= KnightMap::attacks(bitboard::pop_LS1B(piece_positions));
+            if (TYPE == PieceType::KING) atk_bb |= KingMap::attacks(bitboard::pop_LS1B(piece_positions));
             if (TYPE == PieceType::BISHOP) atk_bb |= BishopMap::attacks(bitboard::pop_LS1B(piece_positions), occupied_squares);
             if (TYPE == PieceType::ROOK) atk_bb |= RookMap::attacks(bitboard::pop_LS1B(piece_positions), occupied_squares);
             if (TYPE == PieceType::QUEEN) atk_bb |= QueenMap::attacks(bitboard::pop_LS1B(piece_positions), occupied_squares);

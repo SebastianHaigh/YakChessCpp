@@ -330,9 +330,15 @@ TEST(WhitePawnTests, OpponentPieceCanBeCaptured) {
     EXPECT_EQ(move_counter, 2);
 }
 
+TEST(KnightTests, a) {
+    bitboard::print_board(faster::jump_map<PieceType::KING>::value[F6]);
+
+
+    EXPECT_TRUE(false);
+}
 TEST(KnightTests, KnightOnA1AttacksTheCorrectSquares) {
     // Arrange
-    attacks::KnightAttacks knight_attacks;
+    //attacks::KnightAttacks knight_attacks;
     Square starting_square{0};
     faster::Move move_list[50];
     int move_counter{ 0 };
@@ -340,7 +346,7 @@ TEST(KnightTests, KnightOnA1AttacksTheCorrectSquares) {
     Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    faster::jumping_piece_moves(&knight_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
+    //faster::jumping_piece_moves(&knight_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
   
     // Assert
     EXPECT_EQ(move_counter, 2);
@@ -350,7 +356,7 @@ TEST(KnightTests, KnightOnA1AttacksTheCorrectSquares) {
 
 TEST(KnightTests, KnightOnD4AttacksTheCorrectSquares) {
     // Arrange
-    attacks::KnightAttacks knight_attacks;
+    //attacks::KnightAttacks knight_attacks;
     Square starting_square = bitboard::square_index("d4");
     faster::Move move_list[50];
     int move_counter{ 0 };
@@ -358,7 +364,7 @@ TEST(KnightTests, KnightOnD4AttacksTheCorrectSquares) {
     Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    faster::jumping_piece_moves(&knight_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
+    //faster::jumping_piece_moves(&knight_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
 
     // Assert
     EXPECT_EQ(move_counter, 8);
@@ -376,45 +382,43 @@ TEST(KnightTests, KnightOnD4AttacksTheCorrectSquares) {
 
 TEST(KingTests, KnightOnA1AttacksTheCorrectSquares) {
     // Arrange
-    attacks::KingAttacks king_attacks;
-    Square starting_square{ 0 };
+    Square starting_square{ A1 };
     faster::Move move_list[50];
     int move_counter{ 0 };
     Bitboard empty_squares = bitboard::UNIVERSAL;
     Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    faster::jumping_piece_moves(&king_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
+    faster::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
 
     // Assert
     EXPECT_EQ(move_counter, 3);
-    EXPECT_EQ(move_list[0].to, bitboard::square_index("b1"));
-    EXPECT_EQ(move_list[1].to, bitboard::square_index("a2"));
-    EXPECT_EQ(move_list[2].to, bitboard::square_index("b2"));
+    EXPECT_EQ(move_list[0].to, B1);
+    EXPECT_EQ(move_list[1].to, A2);
+    EXPECT_EQ(move_list[2].to, B2);
 }
 
 TEST(KingTests, KnightOnD4AttacksTheCorrectSquares) {
     // Arrange
-    attacks::KingAttacks king_attacks;
-    Square starting_square = bitboard::square_index("d4");
+    Square starting_square{ D4 };
     faster::Move move_list[50];
     int move_counter{ 0 };
     Bitboard empty_squares = bitboard::UNIVERSAL;
     Bitboard opponent_pieces = bitboard::EMPTY;
 
     // Act
-    faster::jumping_piece_moves(&king_attacks, &move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
+    faster::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter, bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
 
     // Assert
     EXPECT_EQ(move_counter, 8);
-    EXPECT_EQ(move_list[0].to, bitboard::square_index("c3"));
-    EXPECT_EQ(move_list[1].to, bitboard::square_index("d3"));
-    EXPECT_EQ(move_list[2].to, bitboard::square_index("e3"));
-    EXPECT_EQ(move_list[3].to, bitboard::square_index("c4"));
-    EXPECT_EQ(move_list[4].to, bitboard::square_index("e4"));
-    EXPECT_EQ(move_list[5].to, bitboard::square_index("c5"));
-    EXPECT_EQ(move_list[6].to, bitboard::square_index("d5"));
-    EXPECT_EQ(move_list[7].to, bitboard::square_index("e5"));
+    EXPECT_EQ(move_list[0].to, C3);
+    EXPECT_EQ(move_list[1].to, D3);
+    EXPECT_EQ(move_list[2].to, E3);
+    EXPECT_EQ(move_list[3].to, C4);
+    EXPECT_EQ(move_list[4].to, E4);
+    EXPECT_EQ(move_list[5].to, C5);
+    EXPECT_EQ(move_list[6].to, D5);
+    EXPECT_EQ(move_list[7].to, E5);
 }
 
 TEST(RookTests, RookAttacksProperly) {

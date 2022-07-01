@@ -1009,7 +1009,7 @@ TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForWhite) {
 	// Arrange
 	std::string fen = "KQkq";
 	CastlingRights castling_rights(fen);
-	faster::Move move = faster::make_quiet(bitboard::square_index("e1"), bitboard::square_index("e1"));
+	faster::Move move = faster::make_quiet(E1, E1);
 
 	// Act
 	castling_rights.update(move, PieceColour::WHITE);
@@ -1022,7 +1022,7 @@ TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForBlack) {
 	// Arrange
 	std::string fen = "KQkq";
 	CastlingRights castling_rights(fen);
-	faster::Move move = faster::make_quiet(bitboard::square_index("e8"), bitboard::square_index("e1"));
+	faster::Move move = faster::make_quiet(E8, E1);
 
 	// Act
 	castling_rights.update(move, PieceColour::BLACK);

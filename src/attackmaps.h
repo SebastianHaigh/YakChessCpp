@@ -143,34 +143,42 @@ namespace faster {
         }
     };
 
-    
-}
+    /**
+     * \brief Attack map for a knight on a given square.
+     * \tparam S - The square the the knight is on.
+     */
+    template<Square S>
+    struct knight_map {
+        static constexpr Bitboard value = shifta<Direction::NORTH>(shifta<Direction::NORTH_EAST>(bitboard::static_bitboard<S>::value))
+            | shifta<Direction::NORTH>(shifta<Direction::NORTH_WEST>(bitboard::static_bitboard<S>::value))
+            | shifta<Direction::EAST>(shifta<Direction::NORTH_EAST>(bitboard::static_bitboard<S>::value))
+            | shifta<Direction::EAST>(shifta<Direction::SOUTH_EAST>(bitboard::static_bitboard<S>::value))
+            | shifta<Direction::SOUTH>(shifta<Direction::SOUTH_EAST>(bitboard::static_bitboard<S>::value))
+            | shifta<Direction::SOUTH>(shifta<Direction::SOUTH_WEST>(bitboard::static_bitboard<S>::value))
+            | shifta<Direction::WEST>(shifta<Direction::SOUTH_WEST>(bitboard::static_bitboard<S>::value))
+            | shifta<Direction::WEST>(shifta<Direction::NORTH_WEST>(bitboard::static_bitboard<S>::value));
+    };
+
+    /**
+     * \brief Attack map for a king on a given square.
+     * \tparam S - The square the the king is on.
+     */
+    template<Square S>
+    struct king_map {
+        static constexpr Bitboard value = shifta<Direction::NORTH>(bitboard::static_bitboard<S>::value)
+            | shifta<Direction::EAST>(bitboard::static_bitboard<S>::value)
+            | shifta<Direction::SOUTH>(bitboard::static_bitboard<S>::value)
+            | shifta<Direction::WEST>(bitboard::static_bitboard<S>::value)
+            | shifta<Direction::NORTH_EAST>(bitboard::static_bitboard<S>::value)
+            | shifta<Direction::NORTH_WEST>(bitboard::static_bitboard<S>::value)
+            | shifta<Direction::SOUTH_EAST>(bitboard::static_bitboard<S>::value)
+            | shifta<Direction::SOUTH_WEST>(bitboard::static_bitboard<S>::value);
+    };
+
+};
 
 namespace attacks {
 
-    class AttackMap {
-    public:
-        AttackMap() {}
-        virtual ~AttackMap() {}
-        virtual Bitboard get(Square serialised_piece) = 0;
-    };
-
-    class KnightAttacks : public AttackMap {
-        private:
-            Bitboard maps[64] = { 0 };
-
-        public:
-            KnightAttacks();
-            Bitboard get(Square serialised_piece) override;
-    };
-
-    class KingAttacks : public AttackMap {
-        private:
-            Bitboard maps[64] = { 0 };
-        public:
-            KingAttacks();
-            Bitboard get(Square serialised_piece) override;
-    };
 
 } // namespace attacks
 
