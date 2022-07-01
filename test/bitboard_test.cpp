@@ -81,12 +81,11 @@ TEST(BitboardTest, EastOneFromHFile) {
 
 TEST(BitboardTest, WestOne) {
     // Arrange
-    Bitboard initial_bitboard = 0x0202020202020202; // B FILE
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 0x0101010101010101; // A FILE
+    Bitboard initial_bitboard = bitboard::FILE_B;
+    Bitboard expected_bitboard = bitboard::FILE_A;
   
     // Act
-    shifted_bitboard = bitboard::west_one(initial_bitboard);
+    Bitboard shifted_bitboard = bitboard::west_one(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -94,12 +93,11 @@ TEST(BitboardTest, WestOne) {
 
 TEST(BitboardTest, WestOneFromAFile) {
     // Arrange
-    Bitboard initial_bitboard = 0x0101010101010101; // A FILE
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 0; // EMPTY BOARD
+    Bitboard initial_bitboard = bitboard::FILE_A; // 0x0101010101010101; // A FILE
+    Bitboard expected_bitboard = bitboard::EMPTY; // EMPTY BOARD
 
     // Act
-    shifted_bitboard = bitboard::west_one(initial_bitboard);
+    Bitboard shifted_bitboard = bitboard::west_one(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -107,12 +105,11 @@ TEST(BitboardTest, WestOneFromAFile) {
 
 TEST(BitboardTest, NorthEastOneFromMiddleOfBoard) { 
     // Arrange
-    Bitboard initial_bitboard = 1 << 8; // A2
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 1 << 17; // A2 should go to B3 (square 17)
+    Bitboard initial_bitboard = bitboard::static_bitboard<A2>::value; // A2
+    Bitboard expected_bitboard = bitboard::static_bitboard<B3>::value; // A2 should go to B3 (square 17)
   
     // Act
-    shifted_bitboard = bitboard::north_east_one(initial_bitboard);
+    Bitboard shifted_bitboard = bitboard::north_east_one(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -120,15 +117,14 @@ TEST(BitboardTest, NorthEastOneFromMiddleOfBoard) {
 
 TEST(BitboardTest, SouthEastOneFromMiddleOfBoard) { 
     // Arrange
-    Bitboard initial_bitboard = 1 << 8; // A2
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 1 << 1; // A2 should go to B1 (square 1)
+    Bitboard initial = bitboard::static_bitboard<A2>::value; // A2
+    Bitboard expected = bitboard::static_bitboard<B1>::value; // A2 should go to B1 (square 1)
 
     // Act
-    shifted_bitboard =  bitboard::south_east_one(initial_bitboard);
+    Bitboard actual =  bitboard::south_east_one(initial);
 
     // Assert
-    EXPECT_EQ(shifted_bitboard, expected_bitboard);
+    EXPECT_EQ(actual, expected);
 }
 
 TEST(BitboardTest, NorthWestOneFromMiddleOfBoard) { 
@@ -229,13 +225,13 @@ TEST(BitboardTest, ScanForwardOnEmptyBoardReturnsEmptyStack) {
 
 TEST(BitboardTest, ScanForwardForPieceOnE4) {
     // Arrange
-    Bitboard initial_bitboard = 1 << 28;  // E4
+    Bitboard initial_bitboard = bitboard::static_bitboard<E4>::value;
 
     // Act
     std::vector<Square> serialised_bitboard = bitboard::scan_forward(initial_bitboard);
 
     // Assert
-    EXPECT_EQ(serialised_bitboard[0], 28);
+    EXPECT_EQ(serialised_bitboard[0], E4);
 }
 
 TEST(BitboardTest, ScanBackwardOnEmptyBoardReturnsEmptyStack) {
@@ -246,23 +242,23 @@ TEST(BitboardTest, ScanBackwardOnEmptyBoardReturnsEmptyStack) {
     std::vector<Square> serialised_bitboard = bitboard::scan_backward(initial_bitboard);
 
     // Assert
-    EXPECT_EQ(serialised_bitboard.size(), 0); // Force Fail
+    EXPECT_EQ(serialised_bitboard.size(), 0);
 }
 
 TEST(BitboardTest, ScanBackwardForPieceOnE4) { 
     // Arrange
-    Bitboard initial_bitboard = 1 << 28;  // E4
+    Bitboard initial_bitboard = bitboard::static_bitboard<E4>::value;
 
     // Act
     std::vector<Square> serialised_bitboard = bitboard::scan_backward(initial_bitboard);
 
     // Assert
-    EXPECT_EQ(serialised_bitboard[0], 28); // Force Fail   
+    EXPECT_EQ(serialised_bitboard[0], E4);  
 }
 
 TEST(BitboardTest, CanGetFileIndexOfSquareOnTheBoard) { 
     // Arrange
-    Square square_index = 7;  // I think this is A8
+    Square square_index = H8;
     File expected_file = 7;
     File file_of_a8;
 
@@ -353,8 +349,8 @@ TEST(BitboardTest, SetSquareCanCorrectlySetAnUnsetSquareOnBitboardWithRankAndFil
 
 TEST(BitboardTest, SquareToBitboardDetectsE4) {
     // Arrange
-    Square square{ 28 }; // E4
-    Bitboard expected{ bitboard::RANK_4 & bitboard::FILE_E };
+    Square square{ E4 }; // E4
+    Bitboard expected = bitboard::static_bitboard<E4>::value;
 
     // Act
     Bitboard actual = bitboard::to_bitboard(square);
@@ -366,7 +362,7 @@ TEST(BitboardTest, SquareToBitboardDetectsE4) {
 TEST(BitboardTest, AlgebraicToBitboardDetectsE4) {
     // Arrange
     std::string square = "e4";
-    Bitboard expected{ bitboard::RANK_4 & bitboard::FILE_E };
+    Bitboard expected = bitboard::static_bitboard<E4>::value;
 
     // Act
     Bitboard actual = bitboard::to_bitboard(square);
@@ -437,4 +433,15 @@ TEST(BitboardTest, CanConvertSquareIndexToAlgebraicSquareNotation) {
         std::string actual = bitboard::to_algebraic(i);
         EXPECT_EQ(actual, expected[i]);
     }
+}
+
+TEST(StaticBitboardTest, MultiPieceBitboardGeneratesCorrectly) {
+    // Arrange
+    Bitboard expected = bitboard::RANK_1;
+
+    // Act
+    Bitboard actual = bitboard::static_bitboard<0, 1, 2, 3, 4, 5, 6, 7> ::value;
+
+    // Assert
+    EXPECT_EQ(actual, expected);
 }

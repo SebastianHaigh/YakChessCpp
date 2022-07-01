@@ -9,8 +9,8 @@
     #include <intrin.h>
 #endif
 
-typedef uint64_t Bitboard; /* Type for holding representations of the chess board. */
-typedef uint64_t Square;
+typedef uint64_t Bitboard; //!< Type for holding representations of the chess board.
+typedef uint64_t Square; /** Type for holding representation of squares. */
 typedef uint64_t File;
 typedef uint64_t Rank;
 
@@ -31,6 +31,18 @@ typedef uint64_t Rank;
 //  | - - - - - - - + - - - - - - - - - - - - - - - - - +   WEST        EAST  |
 //  |     FILE      |   A   B   C   D   E   F   G   H   |                     |
 //  | - - - - - - - + - - - - - - - - - - - - - - - - - + - - - - - - - - - - +
+
+
+enum Squares {
+    A1 = 0, B1, C1, D1, E1, F1, G1, H1, 
+    A2, B2, C2, D2, E2, F2, G2, H2,
+    A3, B3, C3, D3, E3, F3, G3, H3,
+    A4, B4, C4, D4, E4, F4, G4, H4,
+    A5, B5, C5, D5, E5, F5, G5, H5,
+    A6, B6, C6, D6, E6, F6, G6, H6,
+    A7, B7, C7, D7, E7, F7, G7, H7,
+    A8, B8, C8, D8, E8, F8, G8, H8
+};
 
 enum class RayType {
     POSITIVE,
@@ -132,7 +144,12 @@ inline Bitboard south_east_one(Bitboard board) { return (board >> 7) & NOT_FILE_
 inline Bitboard north_west_one(Bitboard board) { return (board << 7) & NOT_FILE_H; }
 inline Bitboard south_west_one(Bitboard board) { return (board >> 9) & NOT_FILE_H; }
 
-
+/**
+ * \brief Shifts a Bitboard by one square in a specified direction.
+ * \tparam D - The direction in which to shift.
+ * \param[in] board - The bitboard to be shifted.
+ * \return The shifted bitboard.
+ */
 template<Direction D>
 Bitboard shift(Bitboard board) {
     if (dir == Direction::NORTH) return north_one(board);
@@ -145,7 +162,7 @@ Bitboard shift(Bitboard board) {
     if (dir == Direction::SOUTH_WEST) return south_west_one(board);
 }
 
-/*
+/**
  * \brief Returns the index of the most significant 1 bit (MS1B).
  * \param[in] board - A non-zero bitboard.
  * \return A Square corresponding to the index of the MS1B.
@@ -164,7 +181,7 @@ inline Square MS1B(Bitboard board)
     #endif
 }
 
-/*
+/**
  * \brief Returns the index of the least significant 1 bit (LS1B).
  * \param[in] board - A non-zero bitboard.
  * \return A Square corresponding to the index of the LS1B.
@@ -183,14 +200,14 @@ inline Square LS1B(Bitboard board)
     #endif
 }
 
-/*
+/**
  * \brief Clears the least significant 1 bit (LS1B).
  * \param[in] board - A reference to a non-zero bitboard.
  * \return A Square corresponding to the index of the bit that was cleared.
  */
 Square pop_LS1B(Bitboard& board);
 
-/*
+/**
  * \brief Clears the most significant 1 bit (MS1B).
  * \param[in] board - A reference to a non-zero bitboard.
  * \return A Square corresponding to the index of the bit that was cleared.
@@ -204,7 +221,7 @@ void set_square(Bitboard& board, Rank rank, File file);
 std::vector<Square> scan_forward(Bitboard board);
 std::vector<Square> scan_backward(Bitboard board);
 
-/* 
+/**
  * \brief Returns the file index of the specified square.
  * \param[in] square_index - The index of the square.
  * \return The file that the square is on.
@@ -213,7 +230,7 @@ File file_index(Square square_index);
 File file_index(char algebraic_file);
 File file_index(std::string algebraic_square);
 
-/*
+/**
  * \brief Returns the rank index of the specified square.
  * \param[in] square_index - The index of the square.
  * \return The rank that the square is on.
@@ -229,7 +246,23 @@ Bitboard to_bitboard(Square square);
 Bitboard to_bitboard(File file, Rank rank);
 Bitboard to_bitboard(std::string algebraic_square);
 
-template<Square N> struct static_bitboard { static constexpr Bitboard value = (Bitboard{ 1 } << N); };
+/**
+ * \brief Provides single and multi piece bitboards at compile time.
+ * \tparam S... - The squares on which the pieces are placed.
+ */
+template<Square... S> struct static_bitboard { static constexpr Bitboard value = 0; };
+
+template<Square S, Square... Sp> struct static_bitboard<S, Sp...>
+{
+    static constexpr Bitboard value = (Bitboard{ 1 } << S) | static_bitboard<Sp...>::value;
+};
+template<Square S1, Square S2> struct static_bitboard<S1, S2>
+{
+    static constexpr Bitboard value = (Bitboard{ 1 } << S1) | (Bitboard{ 1 } << S2);
+};
+
+
+
 
 void print_board(Bitboard board);
 
