@@ -8,7 +8,6 @@
 
 namespace faster {
 
-
     template<Direction D>
     constexpr Bitboard shifta(Bitboard board) {
         if (D == Direction::NORTH) return board << 8;
@@ -21,7 +20,6 @@ namespace faster {
         if (D == Direction::SOUTH_WEST) return (board >> 9) & bitboard::NOT_FILE_H;
         return board;
     };
-
 
     /* ------------------------------------------------------------------ */
     /* GENERATE STATIC TABLE FOR RAY MAP LOOKUP                           */
@@ -70,19 +68,20 @@ namespace faster {
     template<Direction D>
     Bitboard blocked_ray(Square square, Bitboard occupied)
     {
-        Bitboard pieces_in_ray = ray_map<D>::value[square] & occupied;
+        constexpr std::array<Bitboard, 64> rayMap = ray_map<D>::value;
 
-        if (pieces_in_ray == 0) return ray_map<D>::value[square];
+        Bitboard pieces_in_ray = rayMap[square] & occupied;
+
+        if (pieces_in_ray == 0) return rayMap[square];
 
         Square blocker_square{ 0 };
 
-        if (is_positive_ray<D>::value) {
-            blocker_square = bitboard::LS1B(pieces_in_ray);
-        }
-        else {
-            blocker_square = bitboard::MS1B(pieces_in_ray);
-        }
-        return ray_map<D>::value[square] ^ ray_map<D>::value[blocker_square];
+      if (is_positive_ray<D>::value)
+        blocker_square = bitboard::LS1B(pieces_in_ray);
+      else
+        blocker_square = bitboard::MS1B(pieces_in_ray);
+
+      return rayMap[square] ^ rayMap[blocker_square];
     }
 
     /**
@@ -175,12 +174,8 @@ namespace faster {
             | shifta<Direction::SOUTH_WEST>(bitboard::static_bitboard<S>::value);
     };
 
-};
+} // namespace faster
 
-namespace attacks {
-
-
-} // namespace attacks
 
 
 #endif // YAK_ATTACK_MAPS_H_
