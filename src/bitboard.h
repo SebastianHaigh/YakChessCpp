@@ -6,7 +6,7 @@
 #include <vector>
 
 #if defined _MVC_VER
-    #include <intrin.h>
+#include <intrin.h>
 #endif
 
 typedef uint64_t Bitboard; //!< Type for holding representations of the chess board.
@@ -34,30 +34,30 @@ typedef uint64_t Rank;
 
 
 enum Squares {
-    A1 = 0, B1, C1, D1, E1, F1, G1, H1, 
-    A2, B2, C2, D2, E2, F2, G2, H2,
-    A3, B3, C3, D3, E3, F3, G3, H3,
-    A4, B4, C4, D4, E4, F4, G4, H4,
-    A5, B5, C5, D5, E5, F5, G5, H5,
-    A6, B6, C6, D6, E6, F6, G6, H6,
-    A7, B7, C7, D7, E7, F7, G7, H7,
-    A8, B8, C8, D8, E8, F8, G8, H8
+  A1 = 0, B1, C1, D1, E1, F1, G1, H1,
+  A2, B2, C2, D2, E2, F2, G2, H2,
+  A3, B3, C3, D3, E3, F3, G3, H3,
+  A4, B4, C4, D4, E4, F4, G4, H4,
+  A5, B5, C5, D5, E5, F5, G5, H5,
+  A6, B6, C6, D6, E6, F6, G6, H6,
+  A7, B7, C7, D7, E7, F7, G7, H7,
+  A8, B8, C8, D8, E8, F8, G8, H8
 };
 
 enum class RayType {
-    POSITIVE,
-    NEGATIVE
+  POSITIVE,
+  NEGATIVE
 };
 
 enum class Direction {
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST,
-    NORTH_EAST,
-    NORTH_WEST,
-    SOUTH_EAST,
-    SOUTH_WEST
+  NORTH,
+  EAST,
+  SOUTH,
+  WEST,
+  NORTH_EAST,
+  NORTH_WEST,
+  SOUTH_EAST,
+  SOUTH_WEST
 };
 
 namespace bitboard {
@@ -152,15 +152,15 @@ inline Bitboard south_west_one(Bitboard board) { return (board >> 9) & NOT_FILE_
  */
 template<Direction D>
 Bitboard shift(Bitboard board) {
-    if (D == Direction::NORTH) return north_one(board);
-    if (D == Direction::SOUTH) return south_one(board);
-    if (D == Direction::EAST) return east_one(board);
-    if (D == Direction::WEST) return west_one(board);
-    if (D == Direction::NORTH_EAST) return north_east_one(board);
-    if (D == Direction::NORTH_WEST) return north_west_one(board);
-    if (D == Direction::SOUTH_EAST) return south_east_one(board);
-    if (D == Direction::SOUTH_WEST) return south_west_one(board);
-    return board;
+  if (D == Direction::NORTH) return north_one(board);
+  if (D == Direction::SOUTH) return south_one(board);
+  if (D == Direction::EAST) return east_one(board);
+  if (D == Direction::WEST) return west_one(board);
+  if (D == Direction::NORTH_EAST) return north_east_one(board);
+  if (D == Direction::NORTH_WEST) return north_west_one(board);
+  if (D == Direction::SOUTH_EAST) return south_east_one(board);
+  if (D == Direction::SOUTH_WEST) return south_west_one(board);
+  return board;
 }
 
 /**
@@ -168,18 +168,18 @@ Bitboard shift(Bitboard board) {
  * \param[in] board - A non-zero bitboard.
  * \return A Square corresponding to the index of the MS1B.
  */
-inline Square MS1B(Bitboard board) 
+inline Square MS1B(Bitboard board)
 {
-    #if defined __GNUC__
-        int idx = __builtin_clzll(board); // Returns number of leading zeros
-        return static_cast<Square>(63 - idx);
-    #elif defined _MSC_VER
-        unsigned long idx;
+#if defined __GNUC__
+  int idx = __builtin_clzll(board); // Returns number of leading zeros
+  return static_cast<Square>(63 - idx);
+#elif defined _MSC_VER
+  unsigned long idx;
         _BitScanReverse64(&idx, board);
         return static_cast<Square>(idx);
     #else
         return 0;
-    #endif
+#endif
 }
 
 /**
@@ -187,18 +187,18 @@ inline Square MS1B(Bitboard board)
  * \param[in] board - A non-zero bitboard.
  * \return A Square corresponding to the index of the LS1B.
  */
-inline Square LS1B(Bitboard board) 
+inline Square LS1B(Bitboard board)
 {
-    #if defined __GNUC__
-        int idx = __builtin_ffsll(board) - 1;
-        return static_cast<Square>(idx);
-    #elif defined _MSC_VER
-        unsigned long idx;
+#if defined __GNUC__
+  int idx = __builtin_ffsll(board) - 1;
+  return static_cast<Square>(idx);
+#elif defined _MSC_VER
+  unsigned long idx;
         _BitScanForward64(&idx, board);
         return static_cast<Square>(idx);
     #else
         return 0;
-    #endif
+#endif
 }
 
 /**
@@ -255,11 +255,11 @@ template<Square... S> struct static_bitboard { static constexpr Bitboard value =
 
 template<Square S, Square... Sp> struct static_bitboard<S, Sp...>
 {
-    static constexpr Bitboard value = (Bitboard{ 1 } << S) | static_bitboard<Sp...>::value;
+  static constexpr Bitboard value = (Bitboard{ 1 } << S) | static_bitboard<Sp...>::value;
 };
 template<Square S1, Square S2> struct static_bitboard<S1, S2>
 {
-    static constexpr Bitboard value = (Bitboard{ 1 } << S1) | (Bitboard{ 1 } << S2);
+  static constexpr Bitboard value = (Bitboard{ 1 } << S1) | (Bitboard{ 1 } << S2);
 };
 
 
