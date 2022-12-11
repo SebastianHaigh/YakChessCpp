@@ -5,13 +5,12 @@
 
 #include <string>
 
-
 TEST(MoveTest, DoublePawnPushCreatesEpTargetSquare) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
 	std::string expected{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1" };
-	Board board(fen);
-	faster::Move move = faster::make_double_push(8, 24);
+  yak::Board board(fen);
+	auto move = yak::piece::make_double_push(8, 24);
 
 	// Act
 	board.make_move(move);
@@ -25,9 +24,9 @@ TEST(MoveTest, CanMakeEpCapture) {
 	// Arrange
 	std::string fen{ "8/8/8/8/Pp6/1P6/8/8 b KQkq a3 0 1" };
 	std::string expected{ "8/8/8/8/8/pP6/8/8 w KQkq - 0 2" };
-	auto board = Board(fen);
-	faster::Move move = faster::make_ep_capture(25, 16);
-	//move.set_en_passant(bitboard::to_bitboard(Square(24)));
+	yak::Board board(fen);
+	auto move = yak::piece::make_ep_capture(25, 16);
+	//move.set_en_passant(yak::bitboard::to_yak::bitboard(Square(24)));
 	
 	// Act
 	board.make_move(move);
@@ -54,10 +53,10 @@ TEST(MoveFactoryTest, CanCreatePawnPushMove) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
 	std::string expected{ "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1" };
-	Board board = Board(fen);
+	yak::Board board(fen);
 
 	// Act
-	faster::Move pawn_push = faster::make_quiet(8, 16);
+	auto pawn_push = yak::piece::make_quiet(8, 16);
 	//Move pawn_push = mf.create_pawn_push(8, 16);
 
 	// Assert
@@ -69,10 +68,10 @@ TEST(MoveFactoryTest, CanCreatePawnDoublePushMove) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
 	std::string expected{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1" };
-	Board board = Board(fen);
+	yak::Board board(fen);
 
 	// Act
-	faster::Move pawn_push = faster::make_double_push(8, 24);
+	yak::piece::Move pawn_push = yak::piece::make_double_push(8, 24);
 
 	// Assert
 	board.make_move(pawn_push);
@@ -81,8 +80,8 @@ TEST(MoveFactoryTest, CanCreatePawnDoublePushMove) {
 TEST(BoardTest, BoardCanReturnCorrectPawnPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_2 | bitboard::RANK_7;
+	yak::Board board(fen);
+	auto expected = yak::bitboard::RANK_2 | yak::bitboard::RANK_7;
 
 	// Act
 	Bitboard actual = board.get_position(PieceType::PAWN);
@@ -94,8 +93,8 @@ TEST(BoardTest, BoardCanReturnCorrectPawnPositions) {
 TEST(BoardTest, BoardCanReturnCorrectKnightPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = (bitboard::RANK_1 | bitboard::RANK_8) & (bitboard::FILE_B | bitboard::FILE_G);
+	yak::Board board(fen);
+	Bitboard expected = (yak::bitboard::RANK_1 | yak::bitboard::RANK_8) & (yak::bitboard::FILE_B | yak::bitboard::FILE_G);
 
 	// Act
 	Bitboard actual = board.get_position(PieceType::KNIGHT);
@@ -107,8 +106,8 @@ TEST(BoardTest, BoardCanReturnCorrectKnightPositions) {
 TEST(BoardTest, BoardCanReturnCorrectBishopPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = (bitboard::RANK_1 | bitboard::RANK_8) & (bitboard::FILE_C | bitboard::FILE_F);
+	yak::Board board(fen);
+	Bitboard expected = (yak::bitboard::RANK_1 | yak::bitboard::RANK_8) & (yak::bitboard::FILE_C | yak::bitboard::FILE_F);
 
 	// Act
 	Bitboard actual = board.get_position(PieceType::BISHOP);
@@ -121,8 +120,8 @@ TEST(BoardTest, BoardCanReturnCorrectBishopPositions) {
 TEST(BoardTest, BoardCanReturnCorrectRookPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = (bitboard::RANK_1 | bitboard::RANK_8) & (bitboard::FILE_A | bitboard::FILE_H);
+	yak::Board board(fen);
+	Bitboard expected = (yak::bitboard::RANK_1 | yak::bitboard::RANK_8) & (yak::bitboard::FILE_A | yak::bitboard::FILE_H);
 
 	// Act
 	Bitboard actual = board.get_position(PieceType::ROOK);
@@ -134,8 +133,8 @@ TEST(BoardTest, BoardCanReturnCorrectRookPositions) {
 TEST(BoardTest, BoardCanReturnCorrectQueenPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = (bitboard::RANK_1 | bitboard::RANK_8) & bitboard::FILE_D;
+  yak::Board board(fen);
+	Bitboard expected = (yak::bitboard::RANK_1 | yak::bitboard::RANK_8) & yak::bitboard::FILE_D;
 
 	// Act
 	Bitboard actual = board.get_position(PieceType::QUEEN);
@@ -147,8 +146,8 @@ TEST(BoardTest, BoardCanReturnCorrectQueenPositions) {
 TEST(BoardTest, BoardCanReturnCorrectKingPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = (bitboard::RANK_1 | bitboard::RANK_8) & bitboard::FILE_E;
+  yak::Board board(fen);
+	Bitboard expected = (yak::bitboard::RANK_1 | yak::bitboard::RANK_8) & yak::bitboard::FILE_E;
 
 	// Act
 	Bitboard actual = board.get_position(PieceType::KING);
@@ -160,8 +159,8 @@ TEST(BoardTest, BoardCanReturnCorrectKingPositions) {
 TEST(BoardTest, BoardCanReturnCorrectWhitePieces) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = (bitboard::RANK_1 | bitboard::RANK_2);
+  yak::Board board(fen);
+	Bitboard expected = (yak::bitboard::RANK_1 | yak::bitboard::RANK_2);
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::WHITE);
@@ -173,8 +172,8 @@ TEST(BoardTest, BoardCanReturnCorrectWhitePieces) {
 TEST(BoardTest, BoardCanReturnCorrectBlackPieces) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = (bitboard::RANK_7 | bitboard::RANK_8);
+  yak::Board board(fen);
+	Bitboard expected = (yak::bitboard::RANK_7 | yak::bitboard::RANK_8);
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::BLACK);
@@ -186,8 +185,8 @@ TEST(BoardTest, BoardCanReturnCorrectBlackPieces) {
 TEST(BoardTest, BoardCanReturnCorrectWhitePawnPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_2;
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_2;
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::PAWN);
@@ -199,8 +198,8 @@ TEST(BoardTest, BoardCanReturnCorrectWhitePawnPositions) {
 TEST(BoardTest, BoardCanReturnCorrectBlackPawnPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_7;
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_7;
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::PAWN);
@@ -212,8 +211,8 @@ TEST(BoardTest, BoardCanReturnCorrectBlackPawnPositions) {
 TEST(BoardTest, BoardCanReturnCorrectWhiteKnightPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_1 & (bitboard::FILE_B | bitboard::FILE_G);
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_1 & (yak::bitboard::FILE_B | yak::bitboard::FILE_G);
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::KNIGHT);
@@ -225,8 +224,8 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteKnightPositions) {
 TEST(BoardTest, BoardCanReturnCorrectBlackKnightPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_8 & (bitboard::FILE_B | bitboard::FILE_G);
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_8 & (yak::bitboard::FILE_B | yak::bitboard::FILE_G);
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::KNIGHT);
@@ -238,8 +237,8 @@ TEST(BoardTest, BoardCanReturnCorrectBlackKnightPositions) {
 TEST(BoardTest, BoardCanReturnCorrectWhiteBishopPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_1 & (bitboard::FILE_C | bitboard::FILE_F);
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_1 & (yak::bitboard::FILE_C | yak::bitboard::FILE_F);
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::BISHOP);
@@ -251,8 +250,8 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteBishopPositions) {
 TEST(BoardTest, BoardCanReturnCorrectBlackBishopPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_8 & (bitboard::FILE_C | bitboard::FILE_F);
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_8 & (yak::bitboard::FILE_C | yak::bitboard::FILE_F);
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::BISHOP);
@@ -264,8 +263,8 @@ TEST(BoardTest, BoardCanReturnCorrectBlackBishopPositions) {
 TEST(BoardTest, BoardCanReturnCorrectWhiteRookPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_1 & (bitboard::FILE_A | bitboard::FILE_H);
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_1 & (yak::bitboard::FILE_A | yak::bitboard::FILE_H);
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::ROOK);
@@ -277,8 +276,8 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteRookPositions) {
 TEST(BoardTest, BoardCanReturnCorrectBlackRookPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_8 & (bitboard::FILE_A | bitboard::FILE_H);
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_8 & (yak::bitboard::FILE_A | yak::bitboard::FILE_H);
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::ROOK);
@@ -290,8 +289,8 @@ TEST(BoardTest, BoardCanReturnCorrectBlackRookPositions) {
 TEST(BoardTest, BoardCanReturnCorrectWhiteQueenPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_1 & bitboard::FILE_D;
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_1 & yak::bitboard::FILE_D;
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::QUEEN);
@@ -303,8 +302,8 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteQueenPositions) {
 TEST(BoardTest, BoardCanReturnCorrectBlackQueenPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_8 & bitboard::FILE_D;
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_8 & yak::bitboard::FILE_D;
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::QUEEN);
@@ -316,8 +315,8 @@ TEST(BoardTest, BoardCanReturnCorrectBlackQueenPositions) {
 TEST(BoardTest, BoardCanReturnCorrectWhiteKingPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_1 & bitboard::FILE_E;
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_1 & yak::bitboard::FILE_E;
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::KING);
@@ -329,8 +328,8 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteKingPositions) {
 TEST(BoardTest, BoardCanReturnCorrectBlackKingPositions) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_8 & bitboard::FILE_E;
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_8 & yak::bitboard::FILE_E;
 
 	// Act
 	Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::KING);
@@ -342,8 +341,8 @@ TEST(BoardTest, BoardCanReturnCorrectBlackKingPositions) {
 TEST(BoardTest, CanReturnEmptySquares) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	Bitboard expected = bitboard::RANK_3 | bitboard::RANK_4 | bitboard::RANK_5 | bitboard::RANK_6;
+  yak::Board board(fen);
+	Bitboard expected = yak::bitboard::RANK_3 | yak::bitboard::RANK_4 | yak::bitboard::RANK_5 | yak::bitboard::RANK_6;
 
 	// Act
 	Bitboard actual = board.empty_squares();
@@ -355,7 +354,7 @@ TEST(BoardTest, CanReturnEmptySquares) {
 TEST(BoardTest, EpSquareLoads) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1" };
-	Board board(fen);
+  yak::Board board(fen);
 
 	// Act
 	std::string actual = board.to_fen();
@@ -367,7 +366,7 @@ TEST(BoardTest, EpSquareLoads) {
 TEST(BoardTest, DetectsCastlingRightsFromFenAll) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1" };
-	Board board(fen);
+  yak::Board board(fen);
 
 	// Assert
 	EXPECT_TRUE(board.can_king_side_castle(PieceColour::BLACK));
@@ -379,7 +378,7 @@ TEST(BoardTest, DetectsCastlingRightsFromFenAll) {
 TEST(BoardTest, DetectsCastlingRightsFromFenNoKingSideWhite) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b Qkq a3 0 1" };
-	Board board(fen);
+  yak::Board board(fen);
 
 	// Assert
 	EXPECT_TRUE(board.can_king_side_castle(PieceColour::BLACK));
@@ -392,9 +391,9 @@ TEST(BoardTest, CastlingRightsChangeWhenRookIsCaptured) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNR b KQkq - 0 1" };
 	std::string expected{ "rnbqkbn1/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNr w Qq - 0 2" };
-	Board board(fen);
+  yak::Board board(fen);
 
-	faster::Move move = faster::make_capture(63, 7);
+	yak::piece::Move move = yak::piece::make_capture(63, 7);
 	//move.set_capture(PieceType::ROOK);
 
 	board.make_move(move);
@@ -408,8 +407,8 @@ TEST(BoardTest, CastlingRightsChangeWhenRookIsCaptured) {
 TEST(BoardTest, UndoingMoveRestoresState) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
-	faster::Move move = faster::make_quiet(bitboard::square_index("e2"), bitboard::square_index("e4"));
+  yak::Board board(fen);
+	yak::piece::Move move = yak::piece::make_quiet(yak::bitboard::square_index("e2"), yak::bitboard::square_index("e4"));
 	board.make_move(move);
 
 	//std::cout << board.to_fen() << std::endl;
@@ -424,58 +423,58 @@ TEST(BoardTest, UndoingMoveRestoresState) {
 TEST(BoardTest, CalculatesAllAttackedSquares) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board(fen);
+  yak::Board board(fen);
 
 	// Act
 	Bitboard white_actual = board.attacked_by(PieceColour::WHITE);
 	Bitboard black_actual = board.attacked_by(PieceColour::BLACK);
 
 	// Assert
-	EXPECT_EQ(white_actual, bitboard::RANK_3);
-	EXPECT_EQ(black_actual, bitboard::RANK_6);
+	EXPECT_EQ(white_actual, yak::bitboard::RANK_3);
+	EXPECT_EQ(black_actual, yak::bitboard::RANK_6);
 }
 
 TEST(BoardTest, CalculatesAllAttackedSquares2) {
 	// Arrange
 	std::string fen{ "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1" };
-	Board board(fen);
+  yak::Board board(fen);
 		
 		// Pawns
-		Bitboard white_expected = bitboard::to_bitboard("a3");
-		white_expected |= bitboard::to_bitboard("b3");
-		white_expected |= bitboard::to_bitboard("c3");
-		white_expected |= bitboard::to_bitboard("d3");
-		white_expected |= bitboard::to_bitboard("e3");
-		white_expected |= bitboard::to_bitboard("g3");
-		white_expected |= bitboard::to_bitboard("h3");
-		white_expected |= bitboard::to_bitboard("f5");
+		Bitboard white_expected = yak::bitboard::to_bitboard("a3");
+		white_expected |= yak::bitboard::to_bitboard("b3");
+		white_expected |= yak::bitboard::to_bitboard("c3");
+		white_expected |= yak::bitboard::to_bitboard("d3");
+		white_expected |= yak::bitboard::to_bitboard("e3");
+		white_expected |= yak::bitboard::to_bitboard("g3");
+		white_expected |= yak::bitboard::to_bitboard("h3");
+		white_expected |= yak::bitboard::to_bitboard("f5");
 
 		// Knights
-		white_expected |= bitboard::to_bitboard("d4");
-		white_expected |= bitboard::to_bitboard("e5");
-		white_expected |= bitboard::to_bitboard("g5");
-		white_expected |= bitboard::to_bitboard("h4");
-		white_expected |= bitboard::to_bitboard("g1");
+		white_expected |= yak::bitboard::to_bitboard("d4");
+		white_expected |= yak::bitboard::to_bitboard("e5");
+		white_expected |= yak::bitboard::to_bitboard("g5");
+		white_expected |= yak::bitboard::to_bitboard("h4");
+		white_expected |= yak::bitboard::to_bitboard("g1");
 
 		// Bishop
-		white_expected |= bitboard::to_bitboard("a6");
-		white_expected |= bitboard::to_bitboard("b5");
-		white_expected |= bitboard::to_bitboard("d3");
-		white_expected |= bitboard::to_bitboard("e2");
-		white_expected |= bitboard::to_bitboard("f1");
-		white_expected |= bitboard::to_bitboard("b3");
-		white_expected |= bitboard::to_bitboard("d5");
-		white_expected |= bitboard::to_bitboard("e6");
-		white_expected |= bitboard::to_bitboard("f7");
+		white_expected |= yak::bitboard::to_bitboard("a6");
+		white_expected |= yak::bitboard::to_bitboard("b5");
+		white_expected |= yak::bitboard::to_bitboard("d3");
+		white_expected |= yak::bitboard::to_bitboard("e2");
+		white_expected |= yak::bitboard::to_bitboard("f1");
+		white_expected |= yak::bitboard::to_bitboard("b3");
+		white_expected |= yak::bitboard::to_bitboard("d5");
+		white_expected |= yak::bitboard::to_bitboard("e6");
+		white_expected |= yak::bitboard::to_bitboard("f7");
 
 		// King
-		white_expected |= bitboard::to_bitboard("e2") | bitboard::to_bitboard("f1");
+		white_expected |= yak::bitboard::to_bitboard("e2") | yak::bitboard::to_bitboard("f1");
 
 	// Act
 	Bitboard white_actual = board.attacked_by(PieceColour::WHITE);
 	Bitboard black_actual = board.attacked_by(PieceColour::BLACK);
-	bitboard::print_board(white_actual);
-	bitboard::print_board(white_expected);
+  yak::bitboard::print_board(white_actual);
+  yak::bitboard::print_board(white_expected);
 	// Assert
 	EXPECT_EQ(white_actual, white_expected);
 }
@@ -483,7 +482,7 @@ TEST(BoardTest, CalculatesAllAttackedSquares2) {
 TEST(BoardTest, CanDetectCheck) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/ppp2ppp/3p4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1" };
-	Board board(fen);
+  yak::Board board(fen);
 
 	// Act
 	bool actual = board.is_check();
@@ -495,7 +494,7 @@ TEST(BoardTest, CanDetectCheck) {
 TEST(BoardTest, CanDetectNotCheck) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pp3ppp/2pp4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1" };
-	Board board(fen);
+  yak::Board board(fen);
 
 	// Act
 	bool actual = board.is_check();
@@ -519,10 +518,10 @@ TEST(BoardMoveGenerationTests, DetectsLegalCapturesWithWhitePawns) {
 
 	// Arrange
 	std::string fen = "8/8/8/8/8/2p5/1P6/8 w - - 0 1";
-	Board board = Board(fen);
+  yak::Board board(fen);
 
 	// Act
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 3);
@@ -543,10 +542,10 @@ TEST(BoardMoveGenerationTests, DetectsLegalCapturesWithBlackPawns) {
 
 	// Arrange
 	std::string fen = "8/1p6/2P5/8/8/8/8/8 b - - 0 1";
-	Board board = Board(fen);
+  yak::Board board(fen);
 
 	// Act
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 3);
@@ -555,10 +554,10 @@ TEST(BoardMoveGenerationTests, DetectsLegalCapturesWithBlackPawns) {
 TEST(BoardMoveGenerationTests, Kiwipete) {
 	// Arrange
 	std::string fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
-	Board board = Board(fen);
+  yak::Board board(fen);
 
 	// Act
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 48);
@@ -568,19 +567,19 @@ TEST(BoardMoveGenerationTests, KiwipeteFast) {
 	// Arrange
 	std::string fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
 	Board board = Board(fen);
-	faster::Move move_list[330];
-	faster::SpecialisedRay<Direction::NORTH> n_ray;
-	faster::SpecialisedRay<Direction::EAST> e_ray;
-	faster::SpecialisedRay<Direction::SOUTH> s_ray;
-	faster::SpecialisedRay<Direction::WEST> w_ray;
-	std::vector<faster::Ray*> rook_atks{&n_ray, & e_ray, & s_ray, & w_ray};
+	yak::piece::Move move_list[330];
+	yak::piece::SpecialisedRay<Direction::NORTH> n_ray;
+	yak::piece::SpecialisedRay<Direction::EAST> e_ray;
+	yak::piece::SpecialisedRay<Direction::SOUTH> s_ray;
+	yak::piece::SpecialisedRay<Direction::WEST> w_ray;
+	std::vector<yak::piece::Ray*> rook_atks{&n_ray, & e_ray, & s_ray, & w_ray};
 	int move_counter{ 0 };
 
 	// Act
-	faster::generate_pawn_moves(PieceColour::WHITE, &move_list[0], move_counter,
+	yak::piece::generate_pawn_moves(PieceColour::WHITE, &move_list[0], move_counter,
 		board.get_position(PieceColour::WHITE, PieceType::PAWN),
 		board.empty_squares(), board.get_position(PieceColour::BLACK));
-	faster::generate_sliding_piece_moves(rook_atks, &move_list[0], move_counter,
+	yak::piece::generate_sliding_piece_moves(rook_atks, &move_list[0], move_counter,
 		board.get_position(PieceColour::WHITE, PieceType::ROOK),
 		board.empty_squares(), board.get_position(PieceColour::BLACK));
 
@@ -603,9 +602,9 @@ TEST(BoardMoveGenerationTests, CanGenerateAndMakeEpCapture) {
 	// Arrange
 	std::string fen{ "8/8/8/8/Pp6/1P6/8/8 b - a3 0 1" };
 	std::string expected{ "8/8/8/8/8/pP6/8/8 w - - 0 2" };
-	Board board = Board(fen);
+  yak::Board board(fen);
 
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Act
 	for (auto move : moves) {
@@ -624,9 +623,9 @@ TEST(BoardMoveGenerationTests, CanCastleKingSideWhiteOnlyKingAndRook) {
 	// Arrange
 	std::string fen{ "8/8/8/8/8/8/8/4K2R w K - 0 1" };
 	std::string expected{ "8/8/8/8/8/8/8/5RK1 b - - 0 1" };
-	Board board = Board(fen);
+  yak::Board board(fen);
 
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Act
 	for (auto move : moves) {
@@ -646,9 +645,9 @@ TEST(BoardMoveGenerationTests, CanCastleKingSideWhite) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1" };
 	std::string expected{ "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 0 1" };
-	Board board = Board(fen);
+  yak::Board board(fen);
 
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Act
 	for (auto move : moves) {
@@ -667,9 +666,9 @@ TEST(BoardMoveGenerationTests, CanCastleKingSideBlack) {
 	// Arrange
 	std::string fen{ "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 1" };
 	std::string expected{ "rnbq1rk1/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 w - - 0 2" };
-	Board board = Board(fen);
+  yak::Board board = yak::Board(fen);
 
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Act
 	for (auto move : moves) {
@@ -688,9 +687,9 @@ TEST(BoardMoveGenerationTests, CanCastleQueenSideWhite) {
 	// Arrange
 	std::string fen{ "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/R3K1NR w KQkq - 0 1" };
 	std::string expected{ "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/2KR2NR b kq - 0 1" };
-	Board board = Board(fen);
+  yak::Board board = yak::Board(fen);
 
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Act
 	for (auto move : moves) {
@@ -709,9 +708,9 @@ TEST(BoardMoveGenerationTests, CanCastleQueenSideBlack) {
 	// Arrange
 	std::string fen{ "r3kbnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR b KQkq - 0 1" };
 	std::string expected{ "2kr1bnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR w KQ - 0 2" };
-	Board board = Board(fen);
+  yak::Board board(fen);
 
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Act
 	for (auto& move : moves) {
@@ -729,9 +728,9 @@ TEST(BoardMoveGenerationTests, CanCastleQueenSideBlack) {
 TEST(BoardMoveGenerationTests, PawnCanPromote) {
 	// Arrange
 	std::string fen{ "8/P7/8/8/8/8/8/8 w - - 0 1" };
-	Board board = Board(fen);
+  yak::Board board(fen);
 
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Act & Assert
 	
@@ -755,10 +754,10 @@ TEST(BoardMoveGenerationTests, PawnCanPromote) {
 TEST(MoveTest, FirstMoveOfTheGameHas20LegalMoves) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
-	Board board = Board(fen);
+  yak::Board board(fen);
 
 	// Act
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 20);
@@ -778,10 +777,10 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition) {
 
 	// Arrange
 	std::string fen = "rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1";
-	Board board = Board(fen);
+  yak::Board board(fen);
 
 	// Act
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 27);
@@ -803,10 +802,10 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition2) {
 
 	// Arrange
 	std::string fen = "rnbqkbnr/ppp3pp/3p1p2/4p3/3PP3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 1";
-	Board board = Board(fen);
+  yak::Board board(fen);
 
 	// Act
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 36);
@@ -828,10 +827,10 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition3) {
 
 	// Arrange
 	std::string fen = "rnbqkbnr/pp4pp/2pp1p2/1B2p3/3PP3/5N2/PPP2PPP/RNBQK2R w KQkq - 0 1";
-	Board board = Board(fen);
+  yak::Board board(fen);
 
 	// Act
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 41);
@@ -853,10 +852,10 @@ TEST(BoardMoveGenerationTests, DetectsLegalMovesWhenInCheck) {
 
 	// Arrange
 	std::string fen = "rnbqkbnr/ppp2ppp/3p4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1";
-	Board board = Board(fen);
+  yak::Board board(fen);
 
 	// Act
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	for (auto move : moves)
 		std::cout << move.to_algebraic() << std::endl;
@@ -881,7 +880,7 @@ TEST(BoardMoveGenerationTests, DetectsASituationThatIsNOTCheckmate) {
 
 	// Arrange
 	std::string fen = "rnbqkbnr/ppp2ppp/3p4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1";
-	Board board = Board(fen);
+  yak::Board board = yak::Board(fen);
 
 	// Act
 	bool actual = board.is_checkmate();
@@ -905,7 +904,7 @@ TEST(BoardMoveGenerationTests, DetectsASituationThatIsCheckmate) {
 
 	// Arrange
 	std::string fen = "r2q1bkr/ppp3pp/2n1B3/4p3/8/5Q2/PPPP1PPP/RNB1K2R b KQkq - 0 1";
-	Board board = Board(fen);
+  yak::Board board = yak::Board(fen);
 
 	// Act
 	bool actual = board.is_checkmate();
@@ -929,9 +928,9 @@ TEST(BoardMoveGenerationTests, CannotCastleOutOfCheck) {
 
 	// Arrange
 	std::string fen = "8/8/4r3/8/8/8/8/4K2R w K - 0 1";
-	Board board = Board(fen);
+  yak::Board board = yak::Board(fen);
 
-	std::vector<faster::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generate_moves();
 
 	// Assert
 	for (auto& move : moves) {
@@ -943,7 +942,7 @@ TEST(BoardMoveGenerationTests, CannotCastleOutOfCheck) {
 TEST(CastlingRightsTests, CanBeCreatedFromFenAll) {
 	// Arrange
 	std::string fen = "KQkq";
-	CastlingRights castling_rights(fen);
+	yak::CastlingRights castling_rights(fen);
 
 	// Assert
 	EXPECT_TRUE(castling_rights.king_side(PieceColour::WHITE));
@@ -955,7 +954,7 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenAll) {
 TEST(CastlingRightsTests, CanBeCreatedFromFenNone) {
 	// Arrange
 	std::string fen = "-";
-	CastlingRights castling_rights(fen);
+	yak::CastlingRights castling_rights(fen);
 
 	// Assert
 	EXPECT_FALSE(castling_rights.king_side(PieceColour::WHITE));
@@ -967,7 +966,7 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenNone) {
 TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyWhite) {
 	// Arrange
 	std::string fen = "KQ";
-	CastlingRights castling_rights(fen);
+	yak::CastlingRights castling_rights(fen);
 
 	// Assert
 	EXPECT_TRUE(castling_rights.king_side(PieceColour::WHITE));
@@ -979,7 +978,7 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyWhite) {
 TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyBlack) {
 	// Arrange
 	std::string fen = "kq";
-	CastlingRights castling_rights(fen);
+	yak::CastlingRights castling_rights(fen);
 
 	// Assert
 	EXPECT_FALSE(castling_rights.king_side(PieceColour::WHITE));
@@ -991,7 +990,7 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyBlack) {
 TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyKings) {
 	// Arrange
 	std::string fen = "Kk";
-	CastlingRights castling_rights(fen);
+	yak::CastlingRights castling_rights(fen);
 
 	// Assert
 	EXPECT_TRUE(castling_rights.king_side(PieceColour::WHITE));
@@ -1003,7 +1002,7 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyKings) {
 TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyQueens) {
 	// Arrange
 	std::string fen = "Qq";
-	CastlingRights castling_rights(fen);
+	yak::CastlingRights castling_rights(fen);
 
 	// Assert
 	EXPECT_FALSE(castling_rights.king_side(PieceColour::WHITE));
@@ -1015,8 +1014,8 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyQueens) {
 TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForWhite) {
 	// Arrange
 	std::string fen = "KQkq";
-	CastlingRights castling_rights(fen);
-	faster::Move move = faster::make_quiet(E1, E1);
+	yak::CastlingRights castling_rights(fen);
+	yak::piece::Move move = yak::piece::make_quiet(E1, E1);
 
 	// Act
 	castling_rights.update(move, PieceColour::WHITE);
@@ -1028,8 +1027,8 @@ TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForWhite) {
 TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForBlack) {
 	// Arrange
 	std::string fen = "KQkq";
-	CastlingRights castling_rights(fen);
-	faster::Move move = faster::make_quiet(E8, E1);
+	yak::CastlingRights castling_rights(fen);
+	yak::piece::Move move = yak::piece::make_quiet(E8, E1);
 
 	// Act
 	castling_rights.update(move, PieceColour::BLACK);
@@ -1041,8 +1040,8 @@ TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForBlack) {
 TEST(CastlingRightsTests, H1RookMoveRemovesRightToCastleForWhite) {
 	// Arrange
 	std::string fen = "KQkq";
-	CastlingRights castling_rights(fen);
-	faster::Move move = faster::make_quiet(bitboard::square_index("h1"), bitboard::square_index("e1"));
+	yak::CastlingRights castling_rights(fen);
+	yak::piece::Move move = yak::piece::make_quiet(yak::bitboard::square_index("h1"), yak::bitboard::square_index("e1"));
 
 	// Act
 	castling_rights.update(move, PieceColour::WHITE);
@@ -1054,8 +1053,8 @@ TEST(CastlingRightsTests, H1RookMoveRemovesRightToCastleForWhite) {
 TEST(CastlingRightsTests, A8RookMoveRemovesRightToCastleForBlack) {
 	// Arrange
 	std::string fen = "KQkq";
-	CastlingRights castling_rights(fen);
-	faster::Move move = faster::make_quiet(bitboard::square_index("a8"), bitboard::square_index("e1"));
+	yak::CastlingRights castling_rights(fen);
+	yak::piece::Move move = yak::piece::make_quiet(yak::bitboard::square_index("a8"), yak::bitboard::square_index("e1"));
 
 	// Act
 	castling_rights.update(move, PieceColour::BLACK);
