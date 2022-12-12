@@ -315,14 +315,14 @@ inline void generate_pawn_single_pushes(Move *move_list,
   Bitboard targets = pawn_single_push_target<C>(sources);
   while (sources && !PROMOTIONS)
   {
-    *move_list++ = make_quiet(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_quiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
   while (sources && PROMOTIONS)
   {
-    Square from = bitboard::pop_LS1B(sources);
-    Square to = bitboard::pop_LS1B(targets);
+    Square from = bitboard::popLS1B(sources);
+    Square to = bitboard::popLS1B(targets);
     *move_list++ = make_quiet_promotion(from, to, PieceType::KNIGHT);
     *move_list++ = make_quiet_promotion(from, to, PieceType::BISHOP);
     *move_list++ = make_quiet_promotion(from, to, PieceType::ROOK);
@@ -342,7 +342,7 @@ inline void generate_pawn_double_pushes(Move *move_list,
   sources = pawn_single_push_source<C>(sources) & pawn_positions;
   while (sources)
   {
-    *move_list++ = make_double_push(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_double_push(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -359,14 +359,14 @@ inline void generate_pawn_west_captures(Move *move_list,
   Bitboard targets = pawn_west_attack_target<C>(sources);
   while (sources && !PROMOTIONS)
   {
-    *move_list++ = make_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
   while (sources && PROMOTIONS)
   {
-    Square from = bitboard::pop_LS1B(sources);
-    Square to = bitboard::pop_LS1B(targets);
+    Square from = bitboard::popLS1B(sources);
+    Square to = bitboard::popLS1B(targets);
     *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
     *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
     *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
@@ -386,14 +386,14 @@ inline void generate_pawn_east_captures(Move *move_list,
   Bitboard targets = pawn_east_attack_target<C>(sources);
   while (sources && !PROMOTIONS)
   {
-    *move_list++ = make_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
   while (sources && PROMOTIONS)
   {
-    Square from = bitboard::pop_LS1B(sources);
-    Square to = bitboard::pop_LS1B(targets);
+    Square from = bitboard::popLS1B(sources);
+    Square to = bitboard::popLS1B(targets);
     *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
     *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
     *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
@@ -430,7 +430,7 @@ void generate_ep_captures(Move *move_list, int &move_counter, Bitboard pawn_posi
   Bitboard targets = pawn_west_attack_target<C>(sources);
   while (sources)
   {
-    *move_list++ = make_ep_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_ep_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -438,7 +438,7 @@ void generate_ep_captures(Move *move_list, int &move_counter, Bitboard pawn_posi
   targets = pawn_east_attack_target<C>(sources);
   while (sources)
   {
-    *move_list++ = make_ep_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_ep_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 };
@@ -474,7 +474,7 @@ void generate_piece_moves(Move *move_list,
 
   while (piece_positions)
   {
-    Square from = bitboard::pop_LS1B(piece_positions);
+    Square from = bitboard::popLS1B(piece_positions);
     Bitboard atk_bb = (T == PieceType::KNIGHT) ? KnightMap::attacks(from) :
                       (T == PieceType::BISHOP) ? attackmap::BishopMap::attacks(from, ~empty_squares) :
                       (T == PieceType::ROOK) ? attackmap::RookMap::attacks(from, ~empty_squares) :
@@ -484,14 +484,14 @@ void generate_piece_moves(Move *move_list,
     Bitboard quiet = atk_bb & empty_squares;
     while (quiet)
     {
-      *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
+      *move_list++ = make_quiet(from, bitboard::popLS1B(quiet));
       move_counter++;
     }
 
     Bitboard capture = atk_bb & opponent_pieces;
     while (capture)
     {
-      *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
+      *move_list++ = make_capture(from, bitboard::popLS1B(capture));
       move_counter++;
     }
   }
@@ -530,15 +530,15 @@ Bitboard piece_attacks(Bitboard piece_positions, Bitboard occupied_squares)
   while (piece_positions)
   {
     if (TYPE == PieceType::KNIGHT)
-      atk_bb |= KnightMap::attacks(bitboard::pop_LS1B(piece_positions));
+      atk_bb |= KnightMap::attacks(bitboard::popLS1B(piece_positions));
     if (TYPE == PieceType::KING)
-      atk_bb |= KingMap::attacks(bitboard::pop_LS1B(piece_positions));
+      atk_bb |= KingMap::attacks(bitboard::popLS1B(piece_positions));
     if (TYPE == PieceType::BISHOP)
-      atk_bb |= attackmap::BishopMap::attacks(bitboard::pop_LS1B(piece_positions), occupied_squares);
+      atk_bb |= attackmap::BishopMap::attacks(bitboard::popLS1B(piece_positions), occupied_squares);
     if (TYPE == PieceType::ROOK)
-      atk_bb |= attackmap::RookMap::attacks(bitboard::pop_LS1B(piece_positions), occupied_squares);
+      atk_bb |= attackmap::RookMap::attacks(bitboard::popLS1B(piece_positions), occupied_squares);
     if (TYPE == PieceType::QUEEN)
-      atk_bb |= attackmap::QueenMap::attacks(bitboard::pop_LS1B(piece_positions), occupied_squares);
+      atk_bb |= attackmap::QueenMap::attacks(bitboard::popLS1B(piece_positions), occupied_squares);
   }
   return atk_bb;
 }

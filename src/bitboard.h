@@ -240,45 +240,45 @@ inline Square LS1B(Bitboard board)
  * \param[in] board - A reference to a non-zero bitboard.
  * \return A Square corresponding to the index of the bit that was cleared.
  */
-Square pop_LS1B(Bitboard &board);
+Square popLS1B(Bitboard &board);
 
 /**
  * \brief Clears the most significant 1 bit (MS1B).
  * \param[in] board - A reference to a non-zero bitboard.
  * \return A Square corresponding to the index of the bit that was cleared.
  */
-Square pop_MS1B(Bitboard &board);
+Square popMS1B(Bitboard &board);
 
-void set_square(Bitboard &board, Square square);
-void set_square(Bitboard &board, Rank rank, File file);
+void setSquare(Bitboard& board, const Square& square);
+void setSquare(Bitboard &board, const Rank& rank, const File& file);
 
-std::vector<Square> scan_forward(Bitboard board);
-std::vector<Square> scan_backward(Bitboard board);
+std::vector<Square> scanForward(Bitboard board);
+std::vector<Square> scanBackward(Bitboard board);
 
 /**
  * \brief Returns the file index of the specified square.
- * \param[in] square_index - The index of the square.
+ * \param[in] squareIndex - The index of the square.
  * \return The file that the square is on.
  */
-File file_index(Square square_index);
-File file_index(char algebraic_file);
+File fileIndex(const Square& squareIndex);
+File fileIndex(char algebraicFile);
 File file_index(std::string algebraic_square);
 
 /**
  * \brief Returns the rank index of the specified square.
- * \param[in] square_index - The index of the square.
+ * \param[in] squareIndex - The index of the square.
  * \return The rank that the square is on.
  */
-Rank rank_index(Square square_index);
-Rank rank_index(char algebraic_file);
-Rank rank_index(std::string algebraic_square);
+Rank rankIndex(const Square& squareIndex);
+Rank rankIndex(char algebraic_file);
+Rank rankIndex(const std::string& algebraicSquare);
 
-Square square_index(File file_index, Rank rank_index);
-Square square_index(std::string square);
+Square squareIndex(File fileIndex, Rank rankIndex);
+Square squareIndex(const std::string& square);
 
-Bitboard to_bitboard(Square square);
-Bitboard to_bitboard(File file, Rank rank);
-Bitboard to_bitboard(std::string algebraic_square);
+Bitboard toBitboard(const Square& square);
+Bitboard toBitboard(const File& file, const Rank& rank);
+Bitboard toBitboard(const std::string& algebraic_square);
 
 /**
  * \brief Provides single and multi piece bitboards at compile time.

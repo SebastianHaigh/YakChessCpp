@@ -105,8 +105,8 @@ TEST(BlackPawnsTest, WestAttackSources)
 TEST(BlackPawnsTest, WestAttackTarget)
 {
     // Arrange
-    Bitboard source = yak::bitboard::to_bitboard("e6");
-    Bitboard expected = yak::bitboard::to_bitboard("d5");
+    Bitboard source = yak::bitboard::toBitboard("e6");
+    Bitboard expected = yak::bitboard::toBitboard("d5");
 
     // Act
     Bitboard actual = yak::piece::pawn_west_attack_target<PieceColour::BLACK>(source);
@@ -118,8 +118,8 @@ TEST(BlackPawnsTest, WestAttackTarget)
 TEST(BlackPawnsTest, EastAttackSources)
 {
     // Arrange
-    Bitboard target = yak::bitboard::to_bitboard("c6");
-    Bitboard expected = yak::bitboard::to_bitboard("b7");
+    Bitboard target = yak::bitboard::toBitboard("c6");
+    Bitboard expected = yak::bitboard::toBitboard("b7");
 
     // Act
     Bitboard actual = yak::piece::pawn_east_attack_source<PieceColour::BLACK>(target);
@@ -131,8 +131,8 @@ TEST(BlackPawnsTest, EastAttackSources)
 TEST(BlackPawnsTest, EastAttackTarget)
 {
     // Arrange
-    Bitboard source = yak::bitboard::to_bitboard("e6");
-    Bitboard expected = yak::bitboard::to_bitboard("f5");
+    Bitboard source = yak::bitboard::toBitboard("e6");
+    Bitboard expected = yak::bitboard::toBitboard("f5");
 
     // Act
     Bitboard actual = yak::piece::pawn_east_attack_target<PieceColour::BLACK>(source);
@@ -144,8 +144,8 @@ TEST(BlackPawnsTest, EastAttackTarget)
 TEST(WhitePawnsTest, WestAttackSources)
 {
     // Arrange
-    Bitboard target = yak::bitboard::to_bitboard("c6");
-    Bitboard expected = yak::bitboard::to_bitboard("d5");
+    Bitboard target = yak::bitboard::toBitboard("c6");
+    Bitboard expected = yak::bitboard::toBitboard("d5");
 
     // Act
     Bitboard actual = yak::piece::pawn_west_attack_source<PieceColour::WHITE>(target);
@@ -157,8 +157,8 @@ TEST(WhitePawnsTest, WestAttackSources)
 TEST(WhitePawnsTest, WestAttackTarget)
 {
     // Arrange
-    Bitboard source = yak::bitboard::to_bitboard("e6");
-    Bitboard expected = yak::bitboard::to_bitboard("d7");
+    Bitboard source = yak::bitboard::toBitboard("e6");
+    Bitboard expected = yak::bitboard::toBitboard("d7");
 
     // Act
     Bitboard actual = yak::piece::pawn_west_attack_target<PieceColour::WHITE>(source);
@@ -170,8 +170,8 @@ TEST(WhitePawnsTest, WestAttackTarget)
 TEST(WhitePawnsTest, EastAttackSources)
 {
     // Arrange
-    Bitboard target = yak::bitboard::to_bitboard("c6");
-    Bitboard expected = yak::bitboard::to_bitboard("b5");
+    Bitboard target = yak::bitboard::toBitboard("c6");
+    Bitboard expected = yak::bitboard::toBitboard("b5");
 
     // Act
     Bitboard actual = yak::piece::pawn_east_attack_source<PieceColour::WHITE>(target);
@@ -183,8 +183,8 @@ TEST(WhitePawnsTest, EastAttackSources)
 TEST(WhitePawnsTest, EastAttackTarget)
 {
     // Arrange
-    Bitboard source = yak::bitboard::to_bitboard("e6");
-    Bitboard expected = yak::bitboard::to_bitboard("f7");
+    Bitboard source = yak::bitboard::toBitboard("e6");
+    Bitboard expected = yak::bitboard::toBitboard("f7");
 
     // Act
     Bitboard actual = yak::piece::pawn_east_attack_target<PieceColour::WHITE>(source);
@@ -380,7 +380,8 @@ TEST(KingTests, KnightOnA1AttacksTheCorrectSquares) {
     Bitboard opponent_pieces = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter, yak::bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
+    yak::piece::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter,
+                                                      yak::bitboard::toBitboard(starting_square), empty_squares, opponent_pieces);
 
     // Assert
     EXPECT_EQ(move_counter, 3);
@@ -398,7 +399,8 @@ TEST(KingTests, KnightOnD4AttacksTheCorrectSquares) {
     Bitboard opponent_pieces = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter, yak::bitboard::to_bitboard(starting_square), empty_squares, opponent_pieces);
+    yak::piece::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter,
+                                                      yak::bitboard::toBitboard(starting_square), empty_squares, opponent_pieces);
 
     // Assert
     EXPECT_EQ(move_counter, 8);

@@ -21,7 +21,7 @@ void generate_pawn_moves(PieceColour colour,
   Bitboard targets = colour == PieceColour::BLACK ? bitboard::south_one(sources) : bitboard::north_one(sources);
   while (sources)
   {
-    *move_list++ = make_quiet(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_quiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -30,7 +30,7 @@ void generate_pawn_moves(PieceColour colour,
   sources = (colour == PieceColour::BLACK) ? bitboard::north_one(sources) : bitboard::south_one(sources) & not_promotable;
   while (sources)
   {
-    *move_list++ = make_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -38,7 +38,7 @@ void generate_pawn_moves(PieceColour colour,
   targets = colour == PieceColour::BLACK ? bitboard::south_east_one(sources) : bitboard::north_east_one(sources);
   while (sources)
   {
-    *move_list++ = make_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -46,7 +46,7 @@ void generate_pawn_moves(PieceColour colour,
   targets = colour == PieceColour::BLACK ? bitboard::south_west_one(sources) : bitboard::north_west_one(sources);
   while (sources)
   {
-    *move_list++ = make_capture(bitboard::pop_LS1B(sources), bitboard::pop_LS1B(targets));
+    *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -55,8 +55,8 @@ void generate_pawn_moves(PieceColour colour,
   targets = colour == PieceColour::BLACK ? bitboard::south_one(sources) : bitboard::north_one(sources);
   while (sources)
   {
-    Square from = bitboard::pop_LS1B(sources);
-    Square to = bitboard::pop_LS1B(targets);
+    Square from = bitboard::popLS1B(sources);
+    Square to = bitboard::popLS1B(targets);
     *move_list++ = make_quiet_promotion(from, to, PieceType::KNIGHT);
     *move_list++ = make_quiet_promotion(from, to, PieceType::BISHOP);
     *move_list++ = make_quiet_promotion(from, to, PieceType::ROOK);
@@ -68,8 +68,8 @@ void generate_pawn_moves(PieceColour colour,
   targets = colour == PieceColour::BLACK ? bitboard::south_east_one(sources) : bitboard::north_east_one(sources);
   while (sources)
   {
-    Square from = bitboard::pop_LS1B(sources);
-    Square to = bitboard::pop_LS1B(targets);
+    Square from = bitboard::popLS1B(sources);
+    Square to = bitboard::popLS1B(targets);
     *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
     *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
     *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
@@ -81,8 +81,8 @@ void generate_pawn_moves(PieceColour colour,
   targets = colour == PieceColour::BLACK ? bitboard::south_west_one(sources) : bitboard::north_west_one(sources);
   while (sources)
   {
-    Square from = bitboard::pop_LS1B(sources);
-    Square to = bitboard::pop_LS1B(targets);
+    Square from = bitboard::popLS1B(sources);
+    Square to = bitboard::popLS1B(targets);
     *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
     *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
     *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
@@ -100,20 +100,20 @@ void generate_sliding_piece_moves(const attackmap::RookMap &atk_map,
 {
   while (piece_positions)
   {
-    Square from = bitboard::pop_LS1B(piece_positions);
+    Square from = bitboard::popLS1B(piece_positions);
     Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
 
     Bitboard quiet = atk_bb & empty_squares;
     while (quiet)
     {
-      *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
+      *move_list++ = make_quiet(from, bitboard::popLS1B(quiet));
       move_counter++;
     }
 
     Bitboard capture = atk_bb & opponent_pieces;
     while (capture)
     {
-      *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
+      *move_list++ = make_capture(from, bitboard::popLS1B(capture));
       move_counter++;
     }
   }
@@ -128,20 +128,20 @@ void generate_sliding_piece_moves(const attackmap::BishopMap &atk_map,
 {
   while (piece_positions)
   {
-    Square from = bitboard::pop_LS1B(piece_positions);
+    Square from = bitboard::popLS1B(piece_positions);
     Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
 
     Bitboard quiet = atk_bb & empty_squares;
     while (quiet)
     {
-      *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
+      *move_list++ = make_quiet(from, bitboard::popLS1B(quiet));
       move_counter++;
     }
 
     Bitboard capture = atk_bb & opponent_pieces;
     while (capture)
     {
-      *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
+      *move_list++ = make_capture(from, bitboard::popLS1B(capture));
       move_counter++;
     }
   }
@@ -156,20 +156,20 @@ void generate_sliding_piece_moves(const attackmap::QueenMap &atk_map,
 {
   while (piece_positions)
   {
-    Square from = bitboard::pop_LS1B(piece_positions);
+    Square from = bitboard::popLS1B(piece_positions);
     Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
 
     Bitboard quiet = atk_bb & empty_squares;
     while (quiet)
     {
-      *move_list++ = make_quiet(from, bitboard::pop_LS1B(quiet));
+      *move_list++ = make_quiet(from, bitboard::popLS1B(quiet));
       move_counter++;
     }
 
     Bitboard capture = atk_bb & opponent_pieces;
     while (capture)
     {
-      *move_list++ = make_capture(from, bitboard::pop_LS1B(capture));
+      *move_list++ = make_capture(from, bitboard::popLS1B(capture));
       move_counter++;
     }
   }
@@ -182,13 +182,16 @@ void generate_sliding_piece_moves(const attackmap::QueenMap &atk_map,
 namespace pieces {
 
     PieceColour other_colour(PieceColour colour) {
-        if (colour == PieceColour::WHITE) {
+        if (colour == PieceColour::WHITE)
+        {
             return PieceColour::BLACK;
         }
-        else if (colour == PieceColour::BLACK) {
+        else if (colour == PieceColour::BLACK)
+        {
             return PieceColour::WHITE;
         }
-        else {
+        else
+        {
             return PieceColour::NULL_COLOUR;
         }
     }

@@ -13,10 +13,10 @@ TEST(MoveTest, DoublePawnPushCreatesEpTargetSquare) {
 	auto move = yak::piece::make_double_push(8, 24);
 
 	// Act
-	board.make_move(move);
+  board.makeMove(move);
 
 	// Assert
-	EXPECT_EQ(board.to_fen(), expected);
+	EXPECT_EQ(board.toFen(), expected);
 
 }
 
@@ -29,11 +29,11 @@ TEST(MoveTest, CanMakeEpCapture) {
 	//move.set_en_passant(yak::bitboard::to_yak::bitboard(Square(24)));
 	
 	// Act
-	board.make_move(move);
+  board.makeMove(move);
 
 
 	// Assert
-	EXPECT_EQ(board.to_fen(), expected);
+	EXPECT_EQ(board.toFen(), expected);
 }
 
 /*
@@ -60,8 +60,8 @@ TEST(MoveFactoryTest, CanCreatePawnPushMove) {
 	//Move pawn_push = mf.create_pawn_push(8, 16);
 
 	// Assert
-	board.make_move(pawn_push);
-	EXPECT_EQ(board.to_fen(), expected);
+  board.makeMove(pawn_push);
+	EXPECT_EQ(board.toFen(), expected);
 }
 
 TEST(MoveFactoryTest, CanCreatePawnDoublePushMove) {
@@ -74,8 +74,8 @@ TEST(MoveFactoryTest, CanCreatePawnDoublePushMove) {
 	yak::piece::Move pawn_push = yak::piece::make_double_push(8, 24);
 
 	// Assert
-	board.make_move(pawn_push);
-	EXPECT_EQ(board.to_fen(), expected);
+  board.makeMove(pawn_push);
+	EXPECT_EQ(board.toFen(), expected);
 }
 TEST(BoardTest, BoardCanReturnCorrectPawnPositions) {
 	// Arrange
@@ -345,7 +345,7 @@ TEST(BoardTest, CanReturnEmptySquares) {
 	Bitboard expected = yak::bitboard::RANK_3 | yak::bitboard::RANK_4 | yak::bitboard::RANK_5 | yak::bitboard::RANK_6;
 
 	// Act
-	Bitboard actual = board.empty_squares();
+	Bitboard actual = board.emptySquares();
 
 	// Assert
 	EXPECT_EQ(actual, expected);
@@ -357,7 +357,7 @@ TEST(BoardTest, EpSquareLoads) {
   yak::Board board(fen);
 
 	// Act
-	std::string actual = board.to_fen();
+	std::string actual = board.toFen();
 
 	// Assert
 	EXPECT_EQ(actual, fen);
@@ -369,10 +369,10 @@ TEST(BoardTest, DetectsCastlingRightsFromFenAll) {
   yak::Board board(fen);
 
 	// Assert
-	EXPECT_TRUE(board.can_king_side_castle(PieceColour::BLACK));
-	EXPECT_TRUE(board.can_king_side_castle(PieceColour::WHITE));
-	EXPECT_TRUE(board.can_queen_side_castle(PieceColour::BLACK));
-	EXPECT_TRUE(board.can_queen_side_castle(PieceColour::WHITE));
+	EXPECT_TRUE(board.canKingSideCastle(PieceColour::BLACK));
+	EXPECT_TRUE(board.canKingSideCastle(PieceColour::WHITE));
+	EXPECT_TRUE(board.canQueenSideCastle(PieceColour::BLACK));
+	EXPECT_TRUE(board.canQueenSideCastle(PieceColour::WHITE));
 }
 
 TEST(BoardTest, DetectsCastlingRightsFromFenNoKingSideWhite) {
@@ -381,10 +381,10 @@ TEST(BoardTest, DetectsCastlingRightsFromFenNoKingSideWhite) {
   yak::Board board(fen);
 
 	// Assert
-	EXPECT_TRUE(board.can_king_side_castle(PieceColour::BLACK));
-	EXPECT_FALSE(board.can_king_side_castle(PieceColour::WHITE));
-	EXPECT_TRUE(board.can_queen_side_castle(PieceColour::BLACK));
-	EXPECT_TRUE(board.can_queen_side_castle(PieceColour::WHITE));
+	EXPECT_TRUE(board.canKingSideCastle(PieceColour::BLACK));
+	EXPECT_FALSE(board.canKingSideCastle(PieceColour::WHITE));
+	EXPECT_TRUE(board.canQueenSideCastle(PieceColour::BLACK));
+	EXPECT_TRUE(board.canQueenSideCastle(PieceColour::WHITE));
 }
 
 TEST(BoardTest, CastlingRightsChangeWhenRookIsCaptured) {
@@ -396,9 +396,9 @@ TEST(BoardTest, CastlingRightsChangeWhenRookIsCaptured) {
 	yak::piece::Move move = yak::piece::make_capture(63, 7);
 	//move.set_capture(PieceType::ROOK);
 
-	board.make_move(move);
+  board.makeMove(move);
 
-	std::string actual = board.to_fen();
+	std::string actual = board.toFen();
 
 	// Assert
 	EXPECT_EQ(actual, expected);
@@ -408,16 +408,16 @@ TEST(BoardTest, UndoingMoveRestoresState) {
 	// Arrange
 	std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
   yak::Board board(fen);
-	yak::piece::Move move = yak::piece::make_quiet(yak::bitboard::square_index("e2"), yak::bitboard::square_index("e4"));
-	board.make_move(move);
+	yak::piece::Move move = yak::piece::make_quiet(yak::bitboard::squareIndex("e2"), yak::bitboard::squareIndex("e4"));
+  board.makeMove(move);
 
-	//std::cout << board.to_fen() << std::endl;
+	//std::cout << board.toFen() << std::endl;
 
 	// Act
-	board.undo_move();
+  board.undoMove();
 
 	// Assert
-	EXPECT_EQ(board.to_fen(), fen);
+	EXPECT_EQ(board.toFen(), fen);
 }
 
 TEST(BoardTest, CalculatesAllAttackedSquares) {
@@ -440,35 +440,35 @@ TEST(BoardTest, CalculatesAllAttackedSquares2) {
   yak::Board board(fen);
 		
 		// Pawns
-		Bitboard white_expected = yak::bitboard::to_bitboard("a3");
-		white_expected |= yak::bitboard::to_bitboard("b3");
-		white_expected |= yak::bitboard::to_bitboard("c3");
-		white_expected |= yak::bitboard::to_bitboard("d3");
-		white_expected |= yak::bitboard::to_bitboard("e3");
-		white_expected |= yak::bitboard::to_bitboard("g3");
-		white_expected |= yak::bitboard::to_bitboard("h3");
-		white_expected |= yak::bitboard::to_bitboard("f5");
+		Bitboard white_expected = yak::bitboard::toBitboard("a3");
+		white_expected |= yak::bitboard::toBitboard("b3");
+		white_expected |= yak::bitboard::toBitboard("c3");
+		white_expected |= yak::bitboard::toBitboard("d3");
+		white_expected |= yak::bitboard::toBitboard("e3");
+		white_expected |= yak::bitboard::toBitboard("g3");
+		white_expected |= yak::bitboard::toBitboard("h3");
+		white_expected |= yak::bitboard::toBitboard("f5");
 
 		// Knights
-		white_expected |= yak::bitboard::to_bitboard("d4");
-		white_expected |= yak::bitboard::to_bitboard("e5");
-		white_expected |= yak::bitboard::to_bitboard("g5");
-		white_expected |= yak::bitboard::to_bitboard("h4");
-		white_expected |= yak::bitboard::to_bitboard("g1");
+		white_expected |= yak::bitboard::toBitboard("d4");
+		white_expected |= yak::bitboard::toBitboard("e5");
+		white_expected |= yak::bitboard::toBitboard("g5");
+		white_expected |= yak::bitboard::toBitboard("h4");
+		white_expected |= yak::bitboard::toBitboard("g1");
 
 		// Bishop
-		white_expected |= yak::bitboard::to_bitboard("a6");
-		white_expected |= yak::bitboard::to_bitboard("b5");
-		white_expected |= yak::bitboard::to_bitboard("d3");
-		white_expected |= yak::bitboard::to_bitboard("e2");
-		white_expected |= yak::bitboard::to_bitboard("f1");
-		white_expected |= yak::bitboard::to_bitboard("b3");
-		white_expected |= yak::bitboard::to_bitboard("d5");
-		white_expected |= yak::bitboard::to_bitboard("e6");
-		white_expected |= yak::bitboard::to_bitboard("f7");
+		white_expected |= yak::bitboard::toBitboard("a6");
+		white_expected |= yak::bitboard::toBitboard("b5");
+		white_expected |= yak::bitboard::toBitboard("d3");
+		white_expected |= yak::bitboard::toBitboard("e2");
+		white_expected |= yak::bitboard::toBitboard("f1");
+		white_expected |= yak::bitboard::toBitboard("b3");
+		white_expected |= yak::bitboard::toBitboard("d5");
+		white_expected |= yak::bitboard::toBitboard("e6");
+		white_expected |= yak::bitboard::toBitboard("f7");
 
 		// King
-		white_expected |= yak::bitboard::to_bitboard("e2") | yak::bitboard::to_bitboard("f1");
+		white_expected |= yak::bitboard::toBitboard("e2") | yak::bitboard::toBitboard("f1");
 
 	// Act
 	Bitboard white_actual = board.attacked_by(PieceColour::WHITE);
@@ -485,7 +485,7 @@ TEST(BoardTest, CanDetectCheck) {
   yak::Board board(fen);
 
 	// Act
-	bool actual = board.is_check();
+	bool actual = board.isCheck();
 
 	// Assert
 	EXPECT_TRUE(actual);
@@ -497,7 +497,7 @@ TEST(BoardTest, CanDetectNotCheck) {
   yak::Board board(fen);
 
 	// Act
-	bool actual = board.is_check();
+	bool actual = board.isCheck();
 
 	// Assert
 	EXPECT_FALSE(actual);
@@ -521,7 +521,7 @@ TEST(BoardMoveGenerationTests, DetectsLegalCapturesWithWhitePawns) {
   yak::Board board(fen);
 
 	// Act
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 3);
@@ -545,7 +545,7 @@ TEST(BoardMoveGenerationTests, DetectsLegalCapturesWithBlackPawns) {
   yak::Board board(fen);
 
 	// Act
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 3);
@@ -557,7 +557,7 @@ TEST(BoardMoveGenerationTests, Kiwipete) {
   yak::Board board(fen);
 
 	// Act
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 48);
@@ -572,16 +572,16 @@ TEST(BoardMoveGenerationTests, KiwipeteFast) {
 	yak::piece::SpecialisedRay<Direction::EAST> e_ray;
 	yak::piece::SpecialisedRay<Direction::SOUTH> s_ray;
 	yak::piece::SpecialisedRay<Direction::WEST> w_ray;
-	std::vector<yak::piece::Ray*> rook_atks{&n_ray, & e_ray, & s_ray, & w_ray};
+	std::vector<yak::piece::Ray*> m_rookAtks{&n_ray, & e_ray, & s_ray, & w_ray};
 	int move_counter{ 0 };
 
 	// Act
 	yak::piece::generate_pawn_moves(PieceColour::WHITE, &move_list[0], move_counter,
 		board.get_position(PieceColour::WHITE, PieceType::PAWN),
 		board.empty_squares(), board.get_position(PieceColour::BLACK));
-	yak::piece::generate_sliding_piece_moves(rook_atks, &move_list[0], move_counter,
+	yak::piece::generate_sliding_piece_moves(m_rookAtks, &move_list[0], move_counter,
 		board.get_position(PieceColour::WHITE, PieceType::ROOK),
-		board.empty_squares(), board.get_position(PieceColour::BLACK));
+		board.emptySquares(), board.get_position(PieceColour::BLACK));
 
 	// Assert
 	EXPECT_EQ(move_counter, 13);
@@ -604,19 +604,19 @@ TEST(BoardMoveGenerationTests, CanGenerateAndMakeEpCapture) {
 	std::string expected{ "8/8/8/8/8/pP6/8/8 w - - 0 2" };
   yak::Board board(fen);
 
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Act
 	for (auto move : moves) {
 		if (move.en_passant) {
-			board.make_move(move);
+      board.makeMove(move);
 			break;
 		}
 		
 	}
 
 	// Assert
-	EXPECT_EQ(board.to_fen(), expected);
+	EXPECT_EQ(board.toFen(), expected);
 }
 
 TEST(BoardMoveGenerationTests, CanCastleKingSideWhiteOnlyKingAndRook) {
@@ -625,19 +625,19 @@ TEST(BoardMoveGenerationTests, CanCastleKingSideWhiteOnlyKingAndRook) {
 	std::string expected{ "8/8/8/8/8/8/8/5RK1 b - - 0 1" };
   yak::Board board(fen);
 
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Act
 	for (auto move : moves) {
 		if (move.castle != PieceType::NULL_PIECE) {
-			board.make_move(move);
+      board.makeMove(move);
 			break;
 		}
 
 	}
 
 	// Assert
-	EXPECT_EQ(board.to_fen(), expected);
+	EXPECT_EQ(board.toFen(), expected);
 }
 
 
@@ -647,19 +647,19 @@ TEST(BoardMoveGenerationTests, CanCastleKingSideWhite) {
 	std::string expected{ "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 0 1" };
   yak::Board board(fen);
 
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Act
 	for (auto move : moves) {
 		if (move.castle != PieceType::NULL_PIECE) {
-			board.make_move(move);
+      board.makeMove(move);
 			break;
 		}
 
 	}
 
 	// Assert
-	EXPECT_EQ(board.to_fen(), expected);
+	EXPECT_EQ(board.toFen(), expected);
 }
 
 TEST(BoardMoveGenerationTests, CanCastleKingSideBlack) {
@@ -668,19 +668,19 @@ TEST(BoardMoveGenerationTests, CanCastleKingSideBlack) {
 	std::string expected{ "rnbq1rk1/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 w - - 0 2" };
   yak::Board board = yak::Board(fen);
 
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Act
 	for (auto move : moves) {
 		if (move.castle != PieceType::NULL_PIECE) {
-			board.make_move(move);
+      board.makeMove(move);
 			break;
 		}
 
 	}
 
 	// Assert
-	EXPECT_EQ(board.to_fen(), expected);
+	EXPECT_EQ(board.toFen(), expected);
 }
 
 TEST(BoardMoveGenerationTests, CanCastleQueenSideWhite) {
@@ -689,19 +689,19 @@ TEST(BoardMoveGenerationTests, CanCastleQueenSideWhite) {
 	std::string expected{ "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/2KR2NR b kq - 0 1" };
   yak::Board board = yak::Board(fen);
 
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Act
 	for (auto move : moves) {
 		if (move.castle != PieceType::NULL_PIECE) {
-			board.make_move(move);
+      board.makeMove(move);
 			break;
 		}
 
 	}
 
 	// Assert
-	EXPECT_EQ(board.to_fen(), expected);
+	EXPECT_EQ(board.toFen(), expected);
 }
 
 TEST(BoardMoveGenerationTests, CanCastleQueenSideBlack) {
@@ -710,19 +710,19 @@ TEST(BoardMoveGenerationTests, CanCastleQueenSideBlack) {
 	std::string expected{ "2kr1bnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR w KQ - 0 2" };
   yak::Board board(fen);
 
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Act
 	for (auto& move : moves) {
 		if (move.castle != PieceType::NULL_PIECE) {
-			board.make_move(move);
+      board.makeMove(move);
 			break;
 		}
 
 	}
 
 	// Assert
-	EXPECT_EQ(board.to_fen(), expected);
+	EXPECT_EQ(board.toFen(), expected);
 }
 
 TEST(BoardMoveGenerationTests, PawnCanPromote) {
@@ -730,25 +730,25 @@ TEST(BoardMoveGenerationTests, PawnCanPromote) {
 	std::string fen{ "8/P7/8/8/8/8/8/8 w - - 0 1" };
   yak::Board board(fen);
 
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Act & Assert
-	
-	board.make_move(moves[0]);
-	EXPECT_EQ(board.to_fen(), "N7/8/8/8/8/8/8/8 b - - 0 1");
-	board.undo_move();
 
-	board.make_move(moves[1]);
-	EXPECT_EQ(board.to_fen(), "B7/8/8/8/8/8/8/8 b - - 0 1");
-	board.undo_move();
+  board.makeMove(moves[0]);
+	EXPECT_EQ(board.toFen(), "N7/8/8/8/8/8/8/8 b - - 0 1");
+  board.undoMove();
 
-	board.make_move(moves[2]);
-	EXPECT_EQ(board.to_fen(), "R7/8/8/8/8/8/8/8 b - - 0 1");
-	board.undo_move();
+  board.makeMove(moves[1]);
+	EXPECT_EQ(board.toFen(), "B7/8/8/8/8/8/8/8 b - - 0 1");
+  board.undoMove();
 
-	board.make_move(moves[3]);
-	EXPECT_EQ(board.to_fen(), "Q7/8/8/8/8/8/8/8 b - - 0 1");
-	board.undo_move();
+  board.makeMove(moves[2]);
+	EXPECT_EQ(board.toFen(), "R7/8/8/8/8/8/8/8 b - - 0 1");
+  board.undoMove();
+
+  board.makeMove(moves[3]);
+	EXPECT_EQ(board.toFen(), "Q7/8/8/8/8/8/8/8 b - - 0 1");
+  board.undoMove();
 }
 
 TEST(MoveTest, FirstMoveOfTheGameHas20LegalMoves) {
@@ -757,7 +757,7 @@ TEST(MoveTest, FirstMoveOfTheGameHas20LegalMoves) {
   yak::Board board(fen);
 
 	// Act
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 20);
@@ -780,7 +780,7 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition) {
   yak::Board board(fen);
 
 	// Act
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 27);
@@ -805,7 +805,7 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition2) {
   yak::Board board(fen);
 
 	// Act
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 36);
@@ -830,7 +830,7 @@ TEST(BoardMoveGenerationTests, DetectsAllMovesInPosition3) {
   yak::Board board(fen);
 
 	// Act
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Assert
 	EXPECT_EQ(moves.size(), 41);
@@ -855,7 +855,7 @@ TEST(BoardMoveGenerationTests, DetectsLegalMovesWhenInCheck) {
   yak::Board board(fen);
 
 	// Act
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	for (auto move : moves)
 		std::cout << move.to_algebraic() << std::endl;
@@ -883,7 +883,7 @@ TEST(BoardMoveGenerationTests, DetectsASituationThatIsNOTCheckmate) {
   yak::Board board = yak::Board(fen);
 
 	// Act
-	bool actual = board.is_checkmate();
+	bool actual = board.isCheckmate();
 
 	// Assert
 	EXPECT_FALSE(actual);
@@ -907,7 +907,7 @@ TEST(BoardMoveGenerationTests, DetectsASituationThatIsCheckmate) {
   yak::Board board = yak::Board(fen);
 
 	// Act
-	bool actual = board.is_checkmate();
+	bool actual = board.isCheckmate();
 
 	// Assert
 	EXPECT_TRUE(actual);
@@ -930,7 +930,7 @@ TEST(BoardMoveGenerationTests, CannotCastleOutOfCheck) {
 	std::string fen = "8/8/4r3/8/8/8/8/4K2R w K - 0 1";
   yak::Board board = yak::Board(fen);
 
-	std::vector<yak::piece::Move> moves = board.generate_moves();
+	std::vector<yak::piece::Move> moves = board.generateMoves();
 
 	// Assert
 	for (auto& move : moves) {
@@ -945,10 +945,10 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenAll) {
 	yak::CastlingRights castling_rights(fen);
 
 	// Assert
-	EXPECT_TRUE(castling_rights.king_side(PieceColour::WHITE));
-	EXPECT_TRUE(castling_rights.king_side(PieceColour::BLACK));
-	EXPECT_TRUE(castling_rights.queen_side(PieceColour::WHITE));
-	EXPECT_TRUE(castling_rights.queen_side(PieceColour::BLACK));
+	EXPECT_TRUE(castling_rights.kingSide(PieceColour::WHITE));
+	EXPECT_TRUE(castling_rights.kingSide(PieceColour::BLACK));
+	EXPECT_TRUE(castling_rights.queenSide(PieceColour::WHITE));
+	EXPECT_TRUE(castling_rights.queenSide(PieceColour::BLACK));
 }
 
 TEST(CastlingRightsTests, CanBeCreatedFromFenNone) {
@@ -957,10 +957,10 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenNone) {
 	yak::CastlingRights castling_rights(fen);
 
 	// Assert
-	EXPECT_FALSE(castling_rights.king_side(PieceColour::WHITE));
-	EXPECT_FALSE(castling_rights.king_side(PieceColour::BLACK));
-	EXPECT_FALSE(castling_rights.queen_side(PieceColour::WHITE));
-	EXPECT_FALSE(castling_rights.queen_side(PieceColour::BLACK));
+	EXPECT_FALSE(castling_rights.kingSide(PieceColour::WHITE));
+	EXPECT_FALSE(castling_rights.kingSide(PieceColour::BLACK));
+	EXPECT_FALSE(castling_rights.queenSide(PieceColour::WHITE));
+	EXPECT_FALSE(castling_rights.queenSide(PieceColour::BLACK));
 }
 
 TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyWhite) {
@@ -969,10 +969,10 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyWhite) {
 	yak::CastlingRights castling_rights(fen);
 
 	// Assert
-	EXPECT_TRUE(castling_rights.king_side(PieceColour::WHITE));
-	EXPECT_FALSE(castling_rights.king_side(PieceColour::BLACK));
-	EXPECT_TRUE(castling_rights.queen_side(PieceColour::WHITE));
-	EXPECT_FALSE(castling_rights.queen_side(PieceColour::BLACK));
+	EXPECT_TRUE(castling_rights.kingSide(PieceColour::WHITE));
+	EXPECT_FALSE(castling_rights.kingSide(PieceColour::BLACK));
+	EXPECT_TRUE(castling_rights.queenSide(PieceColour::WHITE));
+	EXPECT_FALSE(castling_rights.queenSide(PieceColour::BLACK));
 }
 
 TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyBlack) {
@@ -981,10 +981,10 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyBlack) {
 	yak::CastlingRights castling_rights(fen);
 
 	// Assert
-	EXPECT_FALSE(castling_rights.king_side(PieceColour::WHITE));
-	EXPECT_TRUE(castling_rights.king_side(PieceColour::BLACK));
-	EXPECT_FALSE(castling_rights.queen_side(PieceColour::WHITE));
-	EXPECT_TRUE(castling_rights.queen_side(PieceColour::BLACK));
+	EXPECT_FALSE(castling_rights.kingSide(PieceColour::WHITE));
+	EXPECT_TRUE(castling_rights.kingSide(PieceColour::BLACK));
+	EXPECT_FALSE(castling_rights.queenSide(PieceColour::WHITE));
+	EXPECT_TRUE(castling_rights.queenSide(PieceColour::BLACK));
 }
 
 TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyKings) {
@@ -993,10 +993,10 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyKings) {
 	yak::CastlingRights castling_rights(fen);
 
 	// Assert
-	EXPECT_TRUE(castling_rights.king_side(PieceColour::WHITE));
-	EXPECT_TRUE(castling_rights.king_side(PieceColour::BLACK));
-	EXPECT_FALSE(castling_rights.queen_side(PieceColour::WHITE));
-	EXPECT_FALSE(castling_rights.queen_side(PieceColour::BLACK));
+	EXPECT_TRUE(castling_rights.kingSide(PieceColour::WHITE));
+	EXPECT_TRUE(castling_rights.kingSide(PieceColour::BLACK));
+	EXPECT_FALSE(castling_rights.queenSide(PieceColour::WHITE));
+	EXPECT_FALSE(castling_rights.queenSide(PieceColour::BLACK));
 }
 
 TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyQueens) {
@@ -1005,10 +1005,10 @@ TEST(CastlingRightsTests, CanBeCreatedFromFenOnlyQueens) {
 	yak::CastlingRights castling_rights(fen);
 
 	// Assert
-	EXPECT_FALSE(castling_rights.king_side(PieceColour::WHITE));
-	EXPECT_FALSE(castling_rights.king_side(PieceColour::BLACK));
-	EXPECT_TRUE(castling_rights.queen_side(PieceColour::WHITE));
-	EXPECT_TRUE(castling_rights.queen_side(PieceColour::BLACK));
+	EXPECT_FALSE(castling_rights.kingSide(PieceColour::WHITE));
+	EXPECT_FALSE(castling_rights.kingSide(PieceColour::BLACK));
+	EXPECT_TRUE(castling_rights.queenSide(PieceColour::WHITE));
+	EXPECT_TRUE(castling_rights.queenSide(PieceColour::BLACK));
 }
 
 TEST(CastlingRightsTests, KingMoveRemovesRightToCastleForWhite) {
@@ -1041,7 +1041,7 @@ TEST(CastlingRightsTests, H1RookMoveRemovesRightToCastleForWhite) {
 	// Arrange
 	std::string fen = "KQkq";
 	yak::CastlingRights castling_rights(fen);
-	yak::piece::Move move = yak::piece::make_quiet(yak::bitboard::square_index("h1"), yak::bitboard::square_index("e1"));
+	yak::piece::Move move = yak::piece::make_quiet(yak::bitboard::squareIndex("h1"), yak::bitboard::squareIndex("e1"));
 
 	// Act
 	castling_rights.update(move, PieceColour::WHITE);
@@ -1054,7 +1054,7 @@ TEST(CastlingRightsTests, A8RookMoveRemovesRightToCastleForBlack) {
 	// Arrange
 	std::string fen = "KQkq";
 	yak::CastlingRights castling_rights(fen);
-	yak::piece::Move move = yak::piece::make_quiet(yak::bitboard::square_index("a8"), yak::bitboard::square_index("e1"));
+	yak::piece::Move move = yak::piece::make_quiet(yak::bitboard::squareIndex("a8"), yak::bitboard::squareIndex("e1"));
 
 	// Act
 	castling_rights.update(move, PieceColour::BLACK);

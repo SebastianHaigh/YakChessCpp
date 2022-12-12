@@ -5,68 +5,71 @@ namespace yak {
 
 namespace bitboard {
 
-Square pop_LS1B(Bitboard &board)
+Square popLS1B(Bitboard &board)
 {
   Square idx = LS1B(board);
   board &= board - 1;
   return idx;
 }
 
-Square pop_MS1B(Bitboard &board)
+Square popMS1B(Bitboard &board)
 {
   Square idx = MS1B(board);
   board &= ~(Bitboard{1} << idx);
   return idx;
 }
 
-void set_square(Bitboard &board, Square square)
+void setSquare(Bitboard& board, const Square& square)
 {
-  Bitboard piece_to_set{1};
-  board |= piece_to_set << square;
+  Bitboard pieceToSet{1};
+  board |= pieceToSet << square;
 }
 
-void set_square(Bitboard &board, Rank rank, File file)
+void setSquare(Bitboard &board, const Rank& rank, const File& file)
 {
-  set_square(board, square_index(file, rank));
+  setSquare(board, squareIndex(file, rank));
 }
 
-std::vector<Square> scan_backward(Bitboard board)
+std::vector<Square> scanBackward(Bitboard board)
 {
-  std::vector<Square> serialised_board;
+  std::vector<Square> serialisedBoard;
 
-  while (board)
-    serialised_board.push_back(pop_MS1B(board));
-
-  return serialised_board;
-}
-
-std::vector<Square> scan_forward(Bitboard board)
-{
-  std::vector<Square> serialised_board;
   while (board)
   {
-    serialised_board.push_back(pop_LS1B(board));
+    serialisedBoard.push_back(popMS1B(board));
   }
-  return serialised_board;
+
+  return serialisedBoard;
 }
 
-Square first_occupied_square(Bitboard board)
+std::vector<Square> scanForward(Bitboard board)
+{
+  std::vector<Square> serialisedBoard;
+  while (board)
+  {
+    serialisedBoard.push_back(popLS1B(board));
+  }
+  return serialisedBoard;
+}
+
+Square firstOccupiedSquare(const Bitboard& board)
 {
   for (Square square = 0; square < 64; square++)
   {
-    if (board & to_bitboard(square))
+    if (board & toBitboard(square))
     {
       return square;
     }
   }
+
   return Square(64);
 }
 
-File file_index(Square square_index)
+File fileIndex(const Square& squareIndex)
 {
-  if (square_index >= 0 && square_index <= 63)
+  if (squareIndex >= 0 && squareIndex <= 63)
   {
-    return square_index & 7;
+    return squareIndex & 7;
   }
   else
   {
@@ -74,21 +77,21 @@ File file_index(Square square_index)
   }
 }
 
-File file_index(char algebraic_file)
+File fileIndex(char algebraicFile)
 {
-  return toupper(algebraic_file) - 'A';
+  return toupper(algebraicFile) - 'A';
 }
 
 File file_index(std::string algebraic_square)
 {
-  return file_index(algebraic_square[0]);
+  return fileIndex(algebraic_square[0]);
 }
 
-Rank rank_index(Square square_index)
+Rank rankIndex(const Square& squareIndex)
 {
-  if (square_index >= 0 && square_index <= 63)
+  if (squareIndex >= 0 && squareIndex <= 63)
   {
-    return square_index >> 3;
+    return squareIndex >> 3;
   }
   else
   {
@@ -96,58 +99,57 @@ Rank rank_index(Square square_index)
   }
 }
 
-Rank rank_index(char algebraic_rank)
+Rank rankIndex(char algebraicRank)
 {
-  return algebraic_rank - '1';
+  return algebraicRank - '1';
 }
 
-Rank rank_index(std::string algebraic_square)
+Rank rankIndex(const std::string& algebraicSquare)
 {
-  return file_index(algebraic_square[1]);
+  return fileIndex(algebraicSquare[1]);
 }
 
-Square square_index(File file_index, Rank rank_index)
+Square squareIndex(File fileIndex, Rank rankIndex)
 {
-  return (8 * rank_index) + file_index;
+  return (8 * rankIndex) + fileIndex;
 }
 
-Square square_index(std::string square)
+Square squareIndex(const std::string& square)
 {
-  File file = file_index(square[0]);
-  Rank rank = rank_index(square[1]);
-  return square_index(file, rank);
+  File file = fileIndex(square[0]);
+  Rank rank = rankIndex(square[1]);
+  return squareIndex(file, rank);
 }
 
-Bitboard to_bitboard(Square square)
+Bitboard toBitboard(const Square& square)
 {
   return Bitboard(1) << square;
 }
 
-Bitboard to_bitboard(File file, Rank rank)
+Bitboard toBitboard(const File& file, const Rank& rank)
 {
-  return to_bitboard(square_index(file, rank));
+  return toBitboard(squareIndex(file, rank));
 };
 
-Bitboard to_bitboard(std::string square)
+Bitboard toBitboard(const std::string& square)
 {
-  return Bitboard(1) << square_index(square);
+  return Bitboard(1) << squareIndex(square);
 }
 
 void print_board(Bitboard board)
 {
-  std::vector<std::vector<bool>> board_vector(8, std::vector<bool>(8, false));
+  std::vector<std::vector<bool>> boardVector(8, std::vector<bool>(8, false));
 
   for (Rank rank = 0; rank < 8; rank++)
   {
     for (File file = 0; file < 8; file++)
     {
-      board_vector[rank][file] = (board & to_bitboard(file, rank)) > 0;
+      boardVector[rank][file] = (board & toBitboard(file, rank)) > 0;
     }
   }
 
-  for (auto rit = board_vector.rbegin(); rit != board_vector.rend(); ++rit)
+  for (auto rit = boardVector.rbegin(); rit != boardVector.rend(); ++rit)
   {
-    //for (File file = 0; file < 8; file++)
     for (auto file : *rit)
     {
       if (file)
@@ -168,7 +170,7 @@ void print_board(Bitboard board)
 std::string to_algebraic(Square square)
 {
   std::string files{"abcdefgh"};
-  return files[file_index(square)] + std::to_string(rank_index(square) + 1);
+  return files[fileIndex(square)] + std::to_string(rankIndex(square) + 1);
 }
 
 std::string to_algebraic(File file_index, Rank rank_index)

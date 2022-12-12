@@ -30,23 +30,23 @@ public:
   CastlingRights(std::string fen);
 
   /*
-   * \brief Check if a side can castle in the king side.
-   * \param[in] colour - the colour of the side to check the rights for.
+   * \brief Check if a m_side can castle in the king m_side.
+   * \param[in] colour - the colour of the m_side to check the rights for.
    * \return true if colour can castle, false otherwise.
    */
-  bool king_side(PieceColour colour);
+  bool kingSide(PieceColour colour);
 
   /*
-   * \brief Check if a side can castle in the queen side.
-   * \param[in] colour - the colour of the side to check the rights for.
+   * \brief Check if a m_side can castle in the queen m_side.
+   * \param[in] colour - the colour of the m_side to check the rights for.
    * \return true if colour can castle, false otherwise.
    */
-  bool queen_side(PieceColour colour);
+  bool queenSide(PieceColour colour);
 
   /*
    * \brief Update castling rights based on a move.
    * \param[in] move - a move that may update the rights.
-   * \param[in] side - the side that is making the move.
+   * \param[in] m_side - the m_side that is making the move.
    */
   void update(const piece::Move &move, PieceColour side);
 
@@ -62,34 +62,21 @@ public:
  */
 class GameState
 {
-private:
-  CastlingRights castling_rights;
-  PieceColour side;
-  int move_clock = 1;
-  bool has_ep_target = false;
-  Square ep_square = 0;
-  void parse_fen(std::string fen);
-
 public:
   /* \brief Default constructor */
-  GameState() : side(PieceColour::WHITE)
-  {
-  }
+  GameState();
 
   /*
    * \brief Construct from fen.
    * \param[in] fen - the fen string of the game state to be initialised.
    */
-  GameState(std::string fen)
-  {
-    parse_fen(fen);
-  }
+  explicit GameState(const std::string& fen);
 
   /*
    * \brief Return the current game state in FEN notation.
    * \return std::string in FEN notation.
    */
-  std::string to_fen();
+  std::string toFen();
 
   /*
    * \brief Update the game state based on a given move.
@@ -100,55 +87,56 @@ public:
   void update(const piece::Move &move);
 
   /*
-   * \brief Check if a side can castle on the king side.
-   * \param[in] colour - The colour of the side to check.
-   * \return true if the side can castle on the king side, false otherwise.
+   * \brief Check if a m_side can castle on the king m_side.
+   * \param[in] colour - The colour of the m_side to check.
+   * \return true if the m_side can castle on the king m_side, false otherwise.
    */
-  bool can_king_side_castle(PieceColour colour);
+  bool canKingSideCastle(PieceColour colour);
 
   /*
-   * \brief Check if the current side to move can king side castle.
-   * \return true if the side to move can king side castle, false otherwise.
+   * \brief Check if the current m_side to move can king m_side castle.
+   * \return true if the m_side to move can king m_side castle, false otherwise.
    */
-  bool can_king_side_castle();
+  bool canKingSideCastle();
 
   /*
-   * \brief Check if a side can castle on the queen side.
-   * \param[in] colour - The colour of the side to check.
-   * \return true if the side can castle on the queen side, false otherwise.
+   * \brief Check if a m_side can castle on the queen m_side.
+   * \param[in] colour - The colour of the m_side to check.
+   * \return true if the m_side can castle on the queen m_side, false otherwise.
    */
-  bool can_queen_side_castle(PieceColour colour);
+  bool canQueenSideCastle(PieceColour colour);
 
   /*
-   * \brief Check if the current side to move can queen side castle.
-   * \return true if the side to move can queen side castle, false otherwise.
+   * \brief Check if the current m_side to move can queen m_side castle.
+   * \return true if the m_side to move can queen m_side castle, false otherwise.
    */
-  bool can_queen_side_castle();
+  bool canQueenSideCastle();
 
   template<PieceType T>
   bool can_castle()
   {
-    return (T == PieceType::KING) ? can_king_side_castle() :
-           (T == PieceType::QUEEN) ? can_queen_side_castle() : false;
+    return (T == PieceType::KING) ? canKingSideCastle() :
+           (T == PieceType::QUEEN) ? canQueenSideCastle() : false;
   }
 
-  /* \brief Change the side to move. */
-  void toggle_side_to_move();
+  /* \brief Change the m_side to move. */
+  void toggleSideToMove();
 
-  inline PieceColour side_to_move() const
-  {
-    return side;
-  }
-  PieceColour side_not_to_move()
-  {
-    return pieces::other_colour(side);
-  }
-  Square ep_target_square()
-  {
-    return ep_square;
-  }
-  Bitboard ep_target();
+  inline PieceColour side_to_move() const;
 
+  PieceColour side_not_to_move();
+
+  Square ep_target_square();
+
+  Bitboard epTarget();
+
+private:
+  CastlingRights m_castlingRights;
+  PieceColour m_side;
+  int m_moveClock = 1;
+  bool m_hasEpTarget = false;
+  Square m_epSquare = 0;
+  void parseFen(const std::string& fen);
 };
 
 template<PieceType T, PieceColour C>
@@ -250,52 +238,52 @@ class Board
 
 private:
 
-  Bitboard piece_type_bitboard[6];
-  Bitboard colour_bitboard[2];
+  Bitboard m_pieceTypeBitboard[6];
+  Bitboard m_colourBitboard[2];
 
   /* \brief The current GameState */
-  GameState current_state;
+  GameState m_currentState;
 
   /* \brief A record of the GameState before the last move, for undoing moves. */
-  GameState previous_state;
+  GameState m_previousState;
 
-  attackmap::RookMap rook_atks;      /* \brief Attack map for Rooks */
-  attackmap::BishopMap bishop_atks;    /* \brief Attack map for Bishops */
-  attackmap::QueenMap queen_atks;    /* \brief Attack map for Queens */
+  attackmap::RookMap m_rookAtks;      /* \brief Attack map for Rooks */
+  attackmap::BishopMap m_bishopAtks;    /* \brief Attack map for Bishops */
+  attackmap::QueenMap m_queenAtks;    /* \brief Attack map for Queens */
 
   /* \brief The last move to have been made on this board. */
-  piece::Move previous_move_f;
+  piece::Move m_previousMoveF;
 
   /* \brief The piece captured on the last move, NULL_PIECE if last move was not a capture. */
-  PieceType previous_captured_piece = PieceType::NULL_PIECE;
+  PieceType m_previousCapturedPiece = PieceType::NULL_PIECE;
 
   /*
    * \brief Executes a move on the underlying board representation.
-   * \tparam C - Colour of the side on which to execute the move.
+   * \tparam C - Colour of the m_side on which to execute the move.
    * \param[in] move - The move to be executed.
    * \param[in] undo - If true this will process an undo move.
    */
   template<PieceColour C>
-  void process_move(const piece::Move &move, bool undo);
+  void processMove(const piece::Move &move, bool undo);
 
   /*
    * \brief Executes a castling move on the underlying board representation.
-   * \tparam C - Colour of the side on which to execute the move.
-   * \tparam T - The side of the board on which to castle.
+   * \tparam C - Colour of the m_side on which to execute the move.
+   * \tparam T - The m_side of the board on which to castle.
    * \param[in] move - The move to be executed.
    */
   template<PieceType T, PieceColour C>
-  void process_castle(const piece::Move &move);
+  void processCastle(const piece::Move &move);
 
   template<PieceColour C>
-  void process_ep(const piece::Move &move);
+  void processEp(const piece::Move &move);
 
   /*
    * \brief Returns all of the squares attacked by pawns of a given colour.
    * \param[in] colour - The coloyr of the pawns.
    * \return The bitboard of all the attacked squares.
    */
-  Bitboard pawn_attacks(PieceColour colour);
+  Bitboard pawnAttacks(PieceColour colour);
 
   /*
    * \brief Returns all of the squares attacked by a particular type of piece.
@@ -303,71 +291,71 @@ private:
    * \param[in] colour - The colour of the piece.
    * \return A bitboard of all the attacked squares.
    */
-  Bitboard piece_attacks(PieceType type, PieceColour colour);
+  Bitboard pieceAttacks(PieceType type, PieceColour colour);
 
   /*
-   * \brief Returns all of the squares attacked by a single side.
-   * \param[in] colour - The colour of the side.
+   * \brief Returns all of the squares attacked by a single m_side.
+   * \param[in] colour - The colour of the m_side.
    * \return A bitboard of all the attacked squares.
    */
-  Bitboard all_attacks(PieceColour colour);
+  Bitboard allAttacks(PieceColour colour);
 
-  std::vector<piece::Move> generate_castling_moves(std::vector<piece::Move> moves);
-  void parse_fen(const std::string &fen);
-  std::string rank_to_fen(Rank rank);
+  std::vector<piece::Move> generateCastlingMoves(std::vector<piece::Move> moves);
+  void parseFen(const std::string &fen);
+  std::string rankToFen(Rank rank);
 
 public:
-  Board() : piece_type_bitboard{0}, colour_bitboard{0}, previous_move_f(piece::Move())
+  Board() : m_pieceTypeBitboard{ 0}, m_colourBitboard{ 0}, m_previousMoveF(piece::Move())
   {
   }
-  Board(const std::string &fen) : piece_type_bitboard{0}, colour_bitboard{0}, previous_move_f(piece::Move())
+  Board(const std::string &fen) : m_pieceTypeBitboard{ 0}, m_colourBitboard{ 0}, m_previousMoveF(piece::Move())
   {
-    parse_fen(fen);
+    parseFen(fen);
   }
 
-  PieceType get_piece_type_on(Square square);
-  PieceColour get_piece_colour_on(Square square);
+  PieceType getPieceTypeOn(Square square);
+  PieceColour getPieceColourOn(Square square);
 
-  Bitboard occupied_squares();
-  Bitboard empty_squares();
+  Bitboard occupiedSquares();
+  Bitboard emptySquares();
 
-  std::vector<piece::Move> generate_moves();
-  void make_move(PieceType type, PieceColour colour, Square from, Square to);
-  //void make_move(Move move);
-  void make_move(const piece::Move &move);
-  void undo_move();
+  std::vector<piece::Move> generateMoves();
+  void makeMove(PieceType type, PieceColour colour, Square from, Square to);
+  //void makeMove(Move move);
+  void makeMove(const piece::Move &move);
+  void undoMove();
 
   /**
-   * \brief Check if the king of the current side to move is in check/
+   * \brief Check if the king of the current m_side to move is in check/
    * \return true if the king is in check, false otherwise.
    */
-  bool is_check();
-  bool is_check(PieceColour colour);
-  bool is_checkmate();
+  bool isCheck();
+  bool isCheck(PieceColour colour);
+  bool isCheckmate();
 
-  std::string to_fen();
+  std::string toFen();
 
   Bitboard ep_target()
   {
-    return current_state.ep_target();
+    return m_currentState.epTarget();
   }
   Square ep_target_square()
   {
-    return current_state.ep_target_square();
+    return m_currentState.ep_target_square();
   }
 
   PieceColour to_move()
   {
-    return current_state.side_to_move();
+    return m_currentState.side_to_move();
   }
 
   Bitboard attacked_by(PieceColour colour)
   {
-    return all_attacks(colour);
+    return allAttacks(colour);
   }
 
-  bool can_king_side_castle(PieceColour colour);
-  bool can_queen_side_castle(PieceColour colour);
+  bool canKingSideCastle(PieceColour colour);
+  bool canQueenSideCastle(PieceColour colour);
 
   /**
    * \brief Get the bitboard for a particular piece type (both colours).
@@ -376,22 +364,22 @@ public:
    */
   Bitboard get_position(PieceType type)
   {
-    return piece_type_bitboard[static_cast<int>(type)];
+    return m_pieceTypeBitboard[static_cast<int>(type)];
   }
 
   /**
    * \brief Get the bitboard for a particular colour.
-   * \param[in] colour - The colour of the side.
+   * \param[in] colour - The colour of the m_side.
    * \return A bitboard containing the piece positions.
    */
   Bitboard get_position(PieceColour colour)
   {
-    return colour_bitboard[static_cast<int>(colour)];
+    return m_colourBitboard[static_cast<int>(colour)];
   }
 
   /**
    * \brief Get the bitboard for a particular colour and piece type.
-   * \param[in] colour - The colour of the side.
+   * \param[in] colour - The colour of the m_side.
    * \param[in] type - The type of piece.
    * \return A bitboard containing the piece positions.
    */
@@ -403,27 +391,27 @@ public:
 };
 
 template<PieceColour C>
-void Board::process_move(const piece::Move &move, bool undo)
+void Board::processMove(const piece::Move &move, bool undo)
 {
 
   // If the move to be processed is a castle then we can handle this here and then exit.
   if (move.castle == PieceType::KING)
-    return process_castle<PieceType::KING, C>(move);
+    return processCastle<PieceType::KING, C>(move);
   else if (move.castle == PieceType::QUEEN)
-    return process_castle<PieceType::QUEEN, C>(move);
+    return processCastle<PieceType::QUEEN, C>(move);
 
   if (move.en_passant)
-    return process_ep<C>(move);
+    return processEp<C>(move);
 
   // Bitboards that will be used to update the board representation
-  Bitboard to_bitboard = bitboard::to_bitboard(move.to);
-  Bitboard from_bitboard = bitboard::to_bitboard(move.from);
+  Bitboard to_bitboard = bitboard::toBitboard(move.to);
+  Bitboard from_bitboard = bitboard::toBitboard(move.from);
   Bitboard from_to_bitboard = to_bitboard ^ from_bitboard;
 
   // Determine the piece type that is to be moved.
   int piece_to_move = 0;
   Bitboard piece_check_bb = undo ? to_bitboard : from_bitboard;
-  while (!(piece_check_bb & piece_type_bitboard[piece_to_move]))
+  while (!(piece_check_bb & m_pieceTypeBitboard[piece_to_move]))
     piece_to_move++;
 
   // Determine the piece type to be captured
@@ -431,82 +419,82 @@ void Board::process_move(const piece::Move &move, bool undo)
   if (move.capture && !undo)
   {
     // If this is a make rather than unmake we need to determine the type of the piece to capture.
-    while (!(to_bitboard & piece_type_bitboard[piece_to_capture]))
+    while (!(to_bitboard & m_pieceTypeBitboard[piece_to_capture]))
       piece_to_capture++;
-    previous_captured_piece = PieceType(piece_to_capture);
+    m_previousCapturedPiece = PieceType(piece_to_capture);
   }
   else if (move.capture && undo)
   {
-    piece_to_capture = static_cast<int>(previous_captured_piece);
+    piece_to_capture = static_cast<int>(m_previousCapturedPiece);
   }
 
   int colour_to_move = static_cast<int>(C);
   int opposing_colour = static_cast<int>(OppositeColour<C>::value);
 
   // Make the basic move.
-  piece_type_bitboard[piece_to_move] ^= from_to_bitboard;
-  colour_bitboard[colour_to_move] ^= from_to_bitboard;
+  m_pieceTypeBitboard[piece_to_move] ^= from_to_bitboard;
+  m_colourBitboard[colour_to_move] ^= from_to_bitboard;
 
   // If the move is a capture, remove the captured piece.
   if (move.capture)
   {
     Bitboard capture_square = to_bitboard;
     if (move.en_passant)
-      capture_square = current_state.ep_target();
+      capture_square = m_currentState.epTarget();
 
-    piece_type_bitboard[piece_to_capture] ^= capture_square;
-    colour_bitboard[opposing_colour] ^= capture_square;
+    m_pieceTypeBitboard[piece_to_capture] ^= capture_square;
+    m_colourBitboard[opposing_colour] ^= capture_square;
   }
 
   // If the move is a promotion, swap the moved piece for a piece of the promoted type.
   if (move.promotion != PieceType::NULL_PIECE)
   {
-    piece_type_bitboard[static_cast<int>(PieceType::PAWN)] ^= to_bitboard;
-    colour_bitboard[colour_to_move] ^= to_bitboard;
-    piece_type_bitboard[static_cast<int>(move.promotion)] ^= to_bitboard;
-    colour_bitboard[colour_to_move] ^= to_bitboard;
+    m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= to_bitboard;
+    m_colourBitboard[colour_to_move] ^= to_bitboard;
+    m_pieceTypeBitboard[static_cast<int>(move.promotion)] ^= to_bitboard;
+    m_colourBitboard[colour_to_move] ^= to_bitboard;
   }
 
   if (undo)
   {
-    previous_captured_piece = PieceType::NULL_PIECE;
+    m_previousCapturedPiece = PieceType::NULL_PIECE;
   }
 
 }
 
 template<PieceColour C>
-void Board::process_ep(const piece::Move &move)
+void Board::processEp(const piece::Move &move)
 {
-  Bitboard to_bitboard = bitboard::to_bitboard(move.to);
-  Bitboard from_bitboard = bitboard::to_bitboard(move.from);
+  Bitboard to_bitboard = bitboard::toBitboard(move.to);
+  Bitboard from_bitboard = bitboard::toBitboard(move.from);
   Bitboard from_to_bitboard = to_bitboard ^ from_bitboard;
-  piece_type_bitboard[static_cast<int>(PieceType::PAWN)] ^= from_to_bitboard;
-  colour_bitboard[static_cast<int>(C)] ^= from_to_bitboard;
+  m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= from_to_bitboard;
+  m_colourBitboard[static_cast<int>(C)] ^= from_to_bitboard;
 
   // get the ep target square from move.to square.
-  // This is better than using the Boards ep_square because
+  // This is better than using the Boards m_epSquare because
   // it will give the same result when the move is undo'd.
   Bitboard capture_square = piece::pawn_single_push_source<C>(to_bitboard);
-  piece_type_bitboard[static_cast<int>(PieceType::PAWN)] ^= capture_square;
-  colour_bitboard[static_cast<int>(OppositeColour<C>::value)] ^= capture_square;
+  m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= capture_square;
+  m_colourBitboard[static_cast<int>(OppositeColour<C>::value)] ^= capture_square;
 
 }
 
 template<PieceType T, PieceColour C>
-void Board::process_castle(const piece::Move &move)
+void Board::processCastle(const piece::Move &move)
 {
 
-  if (current_state.can_castle<T>())
+  if (m_currentState.can_castle<T>())
   {
     // Move the king
     Bitboard from_to_bitboard = get_position(C, PieceType::KING) ^ KingCastleTarget<T, C>::value;
-    piece_type_bitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
-    colour_bitboard[static_cast<int>(C)] ^= from_to_bitboard;
+    m_pieceTypeBitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
+    m_colourBitboard[static_cast<int>(C)] ^= from_to_bitboard;
 
     // Move the rook
     from_to_bitboard = RookCastleSource<T, C>::value ^ RookCastleTarget<T, C>::value;
-    piece_type_bitboard[static_cast<int>(PieceType::ROOK)] ^= from_to_bitboard;
-    colour_bitboard[static_cast<int>(C)] ^= from_to_bitboard;
+    m_pieceTypeBitboard[static_cast<int>(PieceType::ROOK)] ^= from_to_bitboard;
+    m_colourBitboard[static_cast<int>(C)] ^= from_to_bitboard;
   }
 }
 

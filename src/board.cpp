@@ -36,7 +36,7 @@ std::string Move::to_algebraic() {
 
 namespace yak {
 
-void Board::parse_fen(const std::string &fen)
+void Board::parseFen(const std::string &fen)
 {
   auto end_of_piece_placement = fen.find_first_of(" ");
 
@@ -59,20 +59,20 @@ void Board::parse_fen(const std::string &fen)
       PieceType piece_type = pieces::fen_char_to_piece_type(fen[i]);
       PieceColour piece_colour = pieces::fen_char_to_piece_colour(fen[i]);
 
-      bitboard::set_square(piece_type_bitboard[static_cast<int>(piece_type)], current_square);
-      bitboard::set_square(colour_bitboard[static_cast<int>(piece_colour)], current_square);
+      bitboard::setSquare(m_pieceTypeBitboard[static_cast<int>(piece_type)], current_square);
+      bitboard::setSquare(m_colourBitboard[static_cast<int>(piece_colour)], current_square);
       current_square++;
     }
   }
-  current_state = GameState(fen.substr(end_of_piece_placement + 1));
+  m_currentState = GameState(fen.substr(end_of_piece_placement + 1));
 }
 
-PieceType Board::get_piece_type_on(Square square)
+PieceType Board::getPieceTypeOn(Square square)
 {
-  Bitboard square_bb = bitboard::to_bitboard(square);
+  Bitboard square_bb = bitboard::toBitboard(square);
   for (int i = 0; i < 6; i++)
   {
-    if ((square_bb & piece_type_bitboard[i]) > 0)
+    if ((square_bb & m_pieceTypeBitboard[i]) > 0)
     {
       return static_cast<PieceType>(i);
     }
@@ -80,12 +80,12 @@ PieceType Board::get_piece_type_on(Square square)
   return PieceType::NULL_PIECE;
 }
 
-PieceColour Board::get_piece_colour_on(Square square)
+PieceColour Board::getPieceColourOn(Square square)
 {
-  Bitboard square_bb = bitboard::to_bitboard(square);
+  Bitboard square_bb = bitboard::toBitboard(square);
   for (int i = 0; i < 2; i++)
   {
-    if ((square_bb & colour_bitboard[i]) > 0)
+    if ((square_bb & m_colourBitboard[i]) > 0)
     {
       return static_cast<PieceColour>(i);
     }
@@ -93,32 +93,32 @@ PieceColour Board::get_piece_colour_on(Square square)
   return PieceColour::NULL_COLOUR;
 }
 
-Bitboard Board::occupied_squares()
+Bitboard Board::occupiedSquares()
 {
-  return colour_bitboard[0] | colour_bitboard[1];
+  return m_colourBitboard[0] | m_colourBitboard[1];
 }
 
-Bitboard Board::empty_squares()
+Bitboard Board::emptySquares()
 {
-  return ~occupied_squares();
+  return ~occupiedSquares();
 }
 
-std::vector<piece::Move> Board::generate_moves()
+std::vector<piece::Move> Board::generateMoves()
 {
   piece::Move psuedo_legal_move_list[330];
   piece::Move en_passant_move;
   int move_counter{0};
 
-  PieceColour this_side = current_state.side_to_move();
-  PieceColour other_side = current_state.side_not_to_move();
+  PieceColour this_side = m_currentState.side_to_move();
+  PieceColour other_side = m_currentState.side_not_to_move();
 
   if (this_side == PieceColour::WHITE)
   {
     piece::generate_pawn_moves<PieceColour::WHITE>(&psuedo_legal_move_list[move_counter],
-                                                    move_counter,
-                                                    get_position(this_side, PieceType::PAWN),
-                                                    empty_squares(),
-                                                    get_position(other_side));
+                                                   move_counter,
+                                                   get_position(this_side, PieceType::PAWN),
+                                                   emptySquares(),
+                                                   get_position(other_side));
 
     piece::generate_ep_captures<PieceColour::WHITE>(&en_passant_move, move_counter,
                                                      get_position(this_side, PieceType::PAWN), ep_target());
@@ -126,84 +126,82 @@ std::vector<piece::Move> Board::generate_moves()
   else
   {
     piece::generate_pawn_moves<PieceColour::BLACK>(&psuedo_legal_move_list[move_counter],
-                                                    move_counter,
-                                                    get_position(this_side, PieceType::PAWN),
-                                                    empty_squares(),
-                                                    get_position(other_side));
+                                                   move_counter,
+                                                   get_position(this_side, PieceType::PAWN),
+                                                   emptySquares(),
+                                                   get_position(other_side));
 
     piece::generate_ep_captures<PieceColour::BLACK>(&psuedo_legal_move_list[move_counter], move_counter,
                                                      get_position(this_side, PieceType::PAWN), ep_target());
   }
 
   piece::generate_piece_moves<PieceType::KNIGHT>(&psuedo_legal_move_list[move_counter],
-                                                  move_counter,
-                                                  get_position(this_side, PieceType::KNIGHT),
-                                                  empty_squares(),
-                                                  get_position(other_side));
+                                                 move_counter,
+                                                 get_position(this_side, PieceType::KNIGHT),
+                                                 emptySquares(),
+                                                 get_position(other_side));
 
   piece::generate_piece_moves<PieceType::KING>(&psuedo_legal_move_list[move_counter],
-                                                move_counter,
-                                                get_position(this_side, PieceType::KING),
-                                                empty_squares(),
-                                                get_position(other_side));
+                                               move_counter,
+                                               get_position(this_side, PieceType::KING),
+                                               emptySquares(),
+                                               get_position(other_side));
 
   piece::generate_piece_moves<PieceType::BISHOP>(&psuedo_legal_move_list[move_counter],
-                                                  move_counter,
-                                                  get_position(this_side, PieceType::BISHOP),
-                                                  empty_squares(),
-                                                  get_position(other_side));
+                                                 move_counter,
+                                                 get_position(this_side, PieceType::BISHOP),
+                                                 emptySquares(),
+                                                 get_position(other_side));
 
   piece::generate_piece_moves<PieceType::ROOK>(&psuedo_legal_move_list[move_counter],
-                                                move_counter,
-                                                get_position(this_side, PieceType::ROOK),
-                                                empty_squares(),
-                                                get_position(other_side));
+                                               move_counter,
+                                               get_position(this_side, PieceType::ROOK),
+                                               emptySquares(),
+                                               get_position(other_side));
 
   piece::generate_piece_moves<PieceType::QUEEN>(&psuedo_legal_move_list[move_counter],
-                                                 move_counter,
-                                                 get_position(this_side, PieceType::QUEEN),
-                                                 empty_squares(),
-                                                 get_position(other_side));
+                                                move_counter,
+                                                get_position(this_side, PieceType::QUEEN),
+                                                emptySquares(),
+                                                get_position(other_side));
 
   std::vector<piece::Move> legal_moves;
   for (int i = 0; i < move_counter; i++)
   {
-
-    make_move(psuedo_legal_move_list[i]);
-    if (!is_check(previous_state.side_to_move()))
+    makeMove(psuedo_legal_move_list[i]);
+    if (!isCheck(m_previousState.side_to_move()))
     {
       legal_moves.push_back(psuedo_legal_move_list[i]);
     }
-    undo_move();
+    undoMove();
   }
 
-  legal_moves = generate_castling_moves(legal_moves);
+  legal_moves = generateCastlingMoves(legal_moves);
 
   return legal_moves;
 }
 
-std::vector<piece::Move> Board::generate_castling_moves(std::vector<piece::Move> moves)
+std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> moves)
 {
 
-  Bitboard squares_attacked_by_enemy = attacked_by(current_state.side_not_to_move());
+  Bitboard squares_attacked_by_enemy = attacked_by(m_currentState.side_not_to_move());
 
-  Bitboard king = get_position(current_state.side_to_move(), PieceType::KING);
+  Bitboard king = get_position(m_currentState.side_to_move(), PieceType::KING);
 
-  if (current_state.can_king_side_castle() && !is_check())
+  if (m_currentState.canKingSideCastle() && !isCheck())
   {
     Bitboard king_path = bitboard::east_one(king) | bitboard::east_one(bitboard::east_one(king));
-    if ((king_path & occupied_squares()) == 0 && (king_path & squares_attacked_by_enemy) == 0)
+    if ((king_path & occupiedSquares()) == 0 && (king_path & squares_attacked_by_enemy) == 0)
     {
       moves.push_back(piece::make_kingside_castle());
-
     }
   }
 
-  if (current_state.can_queen_side_castle() && !is_check())
+  if (m_currentState.canQueenSideCastle() && !isCheck())
   {
     Bitboard king_path = bitboard::west_one(king) | bitboard::west_one(bitboard::west_one(king));
     Bitboard rook_path = king_path | bitboard::west_one(king_path);
-    if ((rook_path & occupied_squares()) == 0 && (king_path & squares_attacked_by_enemy) == 0)
+    if ((rook_path & occupiedSquares()) == 0 && (king_path & squares_attacked_by_enemy) == 0)
     {
       moves.push_back(piece::make_queenside_castle());
     }
@@ -212,69 +210,77 @@ std::vector<piece::Move> Board::generate_castling_moves(std::vector<piece::Move>
   return moves;
 }
 
-void Board::make_move(PieceType type, PieceColour colour, Square from, Square to)
+void Board::makeMove(PieceType type, PieceColour colour, Square from, Square to)
 {
-  Bitboard from_to_bitboard = bitboard::to_bitboard(from) ^ bitboard::to_bitboard(to);
-  piece_type_bitboard[static_cast<int>(type)] ^= from_to_bitboard;
-  colour_bitboard[static_cast<int>(colour)] ^= from_to_bitboard;
+  Bitboard from_to_bitboard = bitboard::toBitboard(from) ^ bitboard::toBitboard(to);
+  m_pieceTypeBitboard[static_cast<int>(type)] ^= from_to_bitboard;
+  m_colourBitboard[static_cast<int>(colour)] ^= from_to_bitboard;
 }
 
 /*
-void Board::make_move(Move move) {
-	process_move(move);
+void Board::makeMove(Move move) {
+	processMove(move);
 	
-	previous_state = current_state;
-	current_state.update(move);
-	current_state.toggle_side_to_move();
+	m_previousState = m_currentState;
+	m_currentState.update(move);
+	m_currentState.toggle_side_to_move();
 	previous_move = move;
 
 }
 */
-void Board::make_move(const piece::Move &move)
+void Board::makeMove(const piece::Move &move)
 {
-  if (current_state.side_to_move() == PieceColour::WHITE)
-    process_move<PieceColour::WHITE>(move, false);
+  if (m_currentState.side_to_move() == PieceColour::WHITE)
+  {
+    processMove<PieceColour::WHITE>(move, false);
+  }
   else
-    process_move<PieceColour::BLACK>(move, false);
+  {
+    processMove<PieceColour::BLACK>(move, false);
+  }
 
-  previous_state = current_state;
-  current_state.update(move);
-  current_state.toggle_side_to_move();
-  previous_move_f = move;
+  m_previousState = m_currentState;
+  m_currentState.update(move);
+  m_currentState.toggleSideToMove();
+  m_previousMoveF = move;
 }
 
-void Board::undo_move()
+void Board::undoMove()
 {
-  if (previous_move_f.from != previous_move_f.to)
+  if (m_previousMoveF.from != m_previousMoveF.to)
   {
-    current_state.toggle_side_to_move();
-    if (current_state.side_to_move() == PieceColour::WHITE)
-      process_move<PieceColour::WHITE>(previous_move_f, true);
+    m_currentState.toggleSideToMove();
+    if (m_currentState.side_to_move() == PieceColour::WHITE)
+    {
+      processMove<PieceColour::WHITE>(m_previousMoveF, true);
+    }
     else
-      process_move<PieceColour::BLACK>(previous_move_f, true);
-    current_state = previous_state;
+    {
+      processMove<PieceColour::BLACK>(m_previousMoveF, true);
+    }
+    m_currentState = m_previousState;
   }
 }
 
-bool Board::is_check()
+bool Board::isCheck()
 {
-  Bitboard king = get_position(current_state.side_to_move(), PieceType::KING);
-  Bitboard attackers = attacked_by(pieces::other_colour(current_state.side_to_move()));
+  Bitboard king = get_position(m_currentState.side_to_move(), PieceType::KING);
+  Bitboard attackers = attacked_by(pieces::other_colour(m_currentState.side_to_move()));
   return (king & attackers) > 0;
 }
 
-bool Board::is_check(PieceColour colour)
+bool Board::isCheck(PieceColour colour)
 {
   Bitboard king = get_position(colour, PieceType::KING);
   Bitboard attackers = attacked_by(pieces::other_colour(colour));
   return (king & attackers) > 0;
 }
 
-bool Board::is_checkmate()
+bool Board::isCheckmate()
 {
-  if (is_check())
+  if (isCheck())
   {
-    std::vector<piece::Move> moves = generate_moves();
+    std::vector<piece::Move> moves = generateMoves();
     if (moves.empty())
     {
       return true;
@@ -288,83 +294,83 @@ bool Board::is_checkmate()
 }
 
 /*
-void Board::process_move(Move move) {
+void Board::processMove(Move move) {
 	// Process capture or quiet move
 	if (move.is_capture() && move.is_en_passant()) {
 		// reset the half move counter
 		Bitboard from_to_bitboard = move.from_bitboard() ^ move.to_bitboard();
-		piece_type_bitboard[static_cast<int>(move.get_moved_piece())] ^= from_to_bitboard;
-		colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
-		piece_type_bitboard[static_cast<int>(move.get_moved_piece())] ^= move.ep_capture_square_bb();
-		colour_bitboard[static_cast<int>(pieces::other_colour(current_state.side_to_move()))] ^= move.ep_capture_square_bb();
+		m_pieceTypeBitboard[static_cast<int>(move.get_moved_piece())] ^= from_to_bitboard;
+		m_colourBitboard[static_cast<int>(m_currentState.side_to_move())] ^= from_to_bitboard;
+		m_pieceTypeBitboard[static_cast<int>(move.get_moved_piece())] ^= move.ep_capture_square_bb();
+		m_colourBitboard[static_cast<int>(pieces::other_colour(m_currentState.side_to_move()))] ^= move.ep_capture_square_bb();
 	}
 	else if (move.is_capture() && !move.is_en_passant()) {
 		//reset the half move counter
 		Bitboard from_to_bitboard = move.from_bitboard() ^ move.to_bitboard();
-		piece_type_bitboard[static_cast<int>(move.get_moved_piece())] ^= from_to_bitboard;
-		colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
-		piece_type_bitboard[static_cast<int>(move.get_captured_piece())] ^= move.to_bitboard();
-		colour_bitboard[static_cast<int>(pieces::other_colour(current_state.side_to_move()))] ^= move.to_bitboard();
+		m_pieceTypeBitboard[static_cast<int>(move.get_moved_piece())] ^= from_to_bitboard;
+		m_colourBitboard[static_cast<int>(m_currentState.side_to_move())] ^= from_to_bitboard;
+		m_pieceTypeBitboard[static_cast<int>(move.get_captured_piece())] ^= move.to_bitboard();
+		m_colourBitboard[static_cast<int>(pieces::other_colour(m_currentState.side_to_move()))] ^= move.to_bitboard();
 
 	}
 	else if (move.is_castle()) {
-		if (move.get_castle_side() == PieceType::KING && current_state.can_king_side_castle()) {
-			Bitboard from_bitboard = get_position(current_state.side_to_move(), PieceType::KING);
+		if (move.get_castle_side() == PieceType::KING && m_currentState.canKingSideCastle()) {
+			Bitboard from_bitboard = get_position(m_currentState.side_to_move(), PieceType::KING);
 			Bitboard to_bitboard = bitboard::east_one(bitboard::east_one(from_bitboard));
 			Bitboard from_to_bitboard = from_bitboard ^ to_bitboard;
 			bitboard::print_board(from_to_bitboard);
-			piece_type_bitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
-			colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+			m_pieceTypeBitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
+			m_colourBitboard[static_cast<int>(m_currentState.side_to_move())] ^= from_to_bitboard;
 
-			from_bitboard = bitboard::FILE_H & get_position(current_state.side_to_move(), PieceType::ROOK);
+			from_bitboard = bitboard::FILE_H & get_position(m_currentState.side_to_move(), PieceType::ROOK);
 			to_bitboard = bitboard::west_one(bitboard::west_one(from_bitboard));
 			from_to_bitboard = from_bitboard ^ to_bitboard;
-			piece_type_bitboard[static_cast<int>(PieceType::ROOK)] ^= from_to_bitboard;
-			colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+			m_pieceTypeBitboard[static_cast<int>(PieceType::ROOK)] ^= from_to_bitboard;
+			m_colourBitboard[static_cast<int>(m_currentState.side_to_move())] ^= from_to_bitboard;
 		}
-		else if (move.get_castle_side() == PieceType::QUEEN && current_state.can_queen_side_castle()) {
-			Bitboard from_bitboard = get_position(current_state.side_to_move(), PieceType::KING);
+		else if (move.get_castle_side() == PieceType::QUEEN && m_currentState.can_queen_side_castle()) {
+			Bitboard from_bitboard = get_position(m_currentState.side_to_move(), PieceType::KING);
 			Bitboard to_bitboard = bitboard::west_one(bitboard::west_one(from_bitboard));
 			Bitboard from_to_bitboard = from_bitboard ^ to_bitboard;
 			bitboard::print_board(from_to_bitboard);
-			piece_type_bitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
-			colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+			m_pieceTypeBitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
+			m_colourBitboard[static_cast<int>(m_currentState.side_to_move())] ^= from_to_bitboard;
 
-			from_bitboard = bitboard::FILE_A & get_position(current_state.side_to_move(), PieceType::ROOK);
+			from_bitboard = bitboard::FILE_A & get_position(m_currentState.side_to_move(), PieceType::ROOK);
 			to_bitboard = bitboard::east_one(bitboard::east_one(bitboard::east_one(from_bitboard)));
 			from_to_bitboard = from_bitboard ^ to_bitboard;
-			piece_type_bitboard[static_cast<int>(PieceType::ROOK)] ^= from_to_bitboard;
-			colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+			m_pieceTypeBitboard[static_cast<int>(PieceType::ROOK)] ^= from_to_bitboard;
+			m_colourBitboard[static_cast<int>(m_currentState.side_to_move())] ^= from_to_bitboard;
 		}
 	}
 	else {
 		// must be quiet move
 		Bitboard from_to_bitboard = move.from_bitboard() ^ move.to_bitboard();
-		piece_type_bitboard[static_cast<int>(move.get_moved_piece())] ^= from_to_bitboard;
-		colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= from_to_bitboard;
+		m_pieceTypeBitboard[static_cast<int>(move.get_moved_piece())] ^= from_to_bitboard;
+		m_colourBitboard[static_cast<int>(m_currentState.side_to_move())] ^= from_to_bitboard;
 	}
 
 	if (move.is_promotion()) {
-		piece_type_bitboard[static_cast<int>(PieceType::PAWN)] ^= move.to_bitboard();
-		colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= move.to_bitboard();
-		piece_type_bitboard[static_cast<int>(move.get_promotion_piece())] ^= move.to_bitboard();
-		colour_bitboard[static_cast<int>(current_state.side_to_move())] ^= move.to_bitboard();
+		m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= move.to_bitboard();
+		m_colourBitboard[static_cast<int>(m_currentState.side_to_move())] ^= move.to_bitboard();
+		m_pieceTypeBitboard[static_cast<int>(move.get_promotion_piece())] ^= move.to_bitboard();
+		m_colourBitboard[static_cast<int>(m_currentState.side_to_move())] ^= move.to_bitboard();
 
 	}
 }
 */
 
 //void Board::set_ep_target(Square square) {
-//	ep_square = square;
-//	has_ep_target = true;
+//	m_epSquare = square;
+//	m_hasEpTarget = true;
 //}
 
-std::string Board::to_fen()
+std::string Board::toFen()
 {
   std::string fen{""};
   for (int iRank = 7; iRank >= 0; iRank--)
   {
-    fen += rank_to_fen((Rank) iRank);
+    fen += rankToFen((Rank) iRank);
     if (iRank != 0)
     {
       // No slash after last rank
@@ -372,30 +378,30 @@ std::string Board::to_fen()
     }
   }
   fen += " ";
-  fen += current_state.to_fen();
+  fen += m_currentState.toFen();
   return fen;
 }
 
-bool Board::can_king_side_castle(PieceColour colour)
+bool Board::canKingSideCastle(PieceColour colour)
 {
-  return current_state.can_king_side_castle(colour);
+  return m_currentState.canKingSideCastle(colour);
 }
 
-bool Board::can_queen_side_castle(PieceColour colour)
+bool Board::canQueenSideCastle(PieceColour colour)
 {
-  return current_state.can_queen_side_castle(colour);
+  return m_currentState.canQueenSideCastle(colour);
 }
 
-std::string Board::rank_to_fen(Rank rank)
+std::string Board::rankToFen(Rank rank)
 {
   std::string fen{""};
   int empty_sum = 0;
   for (File iFile = 0; iFile < 8; iFile++)
   {
-    PieceType type = get_piece_type_on(bitboard::square_index(iFile, rank));
+    PieceType type = getPieceTypeOn(bitboard::squareIndex(iFile, rank));
     if (type != PieceType::NULL_PIECE)
     {
-      PieceColour colour = get_piece_colour_on(bitboard::square_index(iFile, rank));
+      PieceColour colour = getPieceColourOn(bitboard::squareIndex(iFile, rank));
       if (empty_sum != 0)
       {
         fen += std::to_string(empty_sum);
@@ -416,7 +422,7 @@ std::string Board::rank_to_fen(Rank rank)
   return fen;
 }
 
-Bitboard Board::pawn_attacks(PieceColour colour)
+Bitboard Board::pawnAttacks(PieceColour colour)
 {
   //std::unique_ptr<pieces::Pawns> pawns = factory.make_pawns(colour);
   Bitboard pawns_bitboard = get_position(colour, PieceType::PAWN);
@@ -425,91 +431,106 @@ Bitboard Board::pawn_attacks(PieceColour colour)
                                         : piece::pawn_attacks<PieceColour::WHITE>(pawns_bitboard);
 }
 
-Bitboard Board::piece_attacks(PieceType type, PieceColour colour)
+Bitboard Board::pieceAttacks(PieceType type, PieceColour colour)
 {
   //std::unique_ptr<pieces::Piece> piece = factory.make_piece(type);
   //Bitboard piece_bitboard = get_position(colour, type);
   switch (type)
   {
     case PieceType::PAWN:
-      return pawn_attacks(colour);
+      return pawnAttacks(colour);
 
     case PieceType::KNIGHT:
-      return piece::piece_attacks<PieceType::KNIGHT>(get_position(colour, type), occupied_squares());
+      return piece::piece_attacks<PieceType::KNIGHT>(get_position(colour, type), occupiedSquares());
 
     case PieceType::BISHOP:
-      return piece::piece_attacks<PieceType::BISHOP>(get_position(colour, type), occupied_squares());
+      return piece::piece_attacks<PieceType::BISHOP>(get_position(colour, type), occupiedSquares());
 
     case PieceType::ROOK:
-      return piece::piece_attacks<PieceType::ROOK>(get_position(colour, type), occupied_squares());
+      return piece::piece_attacks<PieceType::ROOK>(get_position(colour, type), occupiedSquares());
 
     case PieceType::QUEEN:
-      return piece::piece_attacks<PieceType::QUEEN>(get_position(colour, type), occupied_squares());
+      return piece::piece_attacks<PieceType::QUEEN>(get_position(colour, type), occupiedSquares());
 
     case PieceType::KING:
-      return piece::piece_attacks<PieceType::KING>(get_position(colour, type), occupied_squares());
+      return piece::piece_attacks<PieceType::KING>(get_position(colour, type), occupiedSquares());
 
-    default:
-      return Bitboard{0};
   }
 }
 
-Bitboard Board::all_attacks(PieceColour colour)
+Bitboard Board::allAttacks(PieceColour colour)
 {
   Bitboard attacked_squares{0};
   Bitboard friendly_pieces = get_position(colour);
-  attacked_squares |= (pawn_attacks(colour) & ~friendly_pieces);
-  attacked_squares |= (piece_attacks(PieceType::KNIGHT, colour) & ~friendly_pieces);
-  attacked_squares |= (piece_attacks(PieceType::BISHOP, colour) & ~friendly_pieces);
-  attacked_squares |= (piece_attacks(PieceType::ROOK, colour) & ~friendly_pieces);
-  attacked_squares |= (piece_attacks(PieceType::QUEEN, colour) & ~friendly_pieces);
-  attacked_squares |= (piece_attacks(PieceType::KING, colour) & ~friendly_pieces);
+  attacked_squares |= (pawnAttacks(colour) & ~friendly_pieces);
+  attacked_squares |= (pieceAttacks(PieceType::KNIGHT, colour) & ~friendly_pieces);
+  attacked_squares |= (pieceAttacks(PieceType::BISHOP, colour) & ~friendly_pieces);
+  attacked_squares |= (pieceAttacks(PieceType::ROOK, colour) & ~friendly_pieces);
+  attacked_squares |= (pieceAttacks(PieceType::QUEEN, colour) & ~friendly_pieces);
+  attacked_squares |= (pieceAttacks(PieceType::KING, colour) & ~friendly_pieces);
   return attacked_squares;
 }
 
 CastlingRights::CastlingRights(std::string fen)
 {
   if (fen.empty() || (fen.size() == 1 && fen[0] == '-'))
+  {
     return;
-
+  }
   else
   {
     for (auto character : fen)
     {
       switch (character)
       {
-        case 'K': white[0] = true;
+        case 'K':
+        {
+          white[0] = true;
           break;
-        case 'Q': white[1] = true;
+        }
+        case 'Q':
+        {
+          white[1] = true;
           break;
-        case 'k': black[0] = true;
+        }
+        case 'k':
+        {
+          black[0] = true;
           break;
-        case 'q': black[1] = true;
+        }
+        case 'q':
+        {
+          black[1] = true;
           break;
+        }
       }
     }
 
   }
 }
 
-bool CastlingRights::king_side(PieceColour colour)
+bool CastlingRights::kingSide(PieceColour colour)
 {
   if (colour == PieceColour::BLACK)
+  {
     return black[0];
-
+  }
   else
+  {
     return white[0];
-
+  }
 }
 
-bool CastlingRights::queen_side(PieceColour colour)
+bool CastlingRights::queenSide(PieceColour colour)
 {
   if (colour == PieceColour::BLACK)
+  {
     return black[1];
-
+  }
   else
+  {
     return white[1];
-
+  }
 }
 
 void CastlingRights::update(const piece::Move &move, PieceColour side)
@@ -549,64 +570,86 @@ std::string CastlingRights::fen()
   return fen_string;
 }
 
-void GameState::parse_fen(std::string fen)
+GameState::GameState() : m_side(PieceColour::WHITE)
 {
-  auto start_of_castling_rights = fen.find_first_of(" ");
-  auto start_of_ep_target = fen.find_first_of(" ", start_of_castling_rights + 1);
-  auto start_of_move_number = fen.find_first_of(" ", start_of_ep_target + 1);
+}
+
+GameState::GameState(const std::string& fen)
+{
+  parseFen(fen);
+}
+
+void GameState::parseFen(const std::string& fen)
+{
+  auto startOfCastlingRights = fen.find_first_of(" ");
+  auto startOfEpTarget = fen.find_first_of(" ", startOfCastlingRights + 1);
+  auto startOfMoveNumber = fen.find_first_of(" ", startOfEpTarget + 1);
   if (fen[0] == 'w')
-    side = PieceColour::WHITE;
-
+  {
+    m_side = PieceColour::WHITE;
+  }
   else if (fen[0] == 'b')
-    side = PieceColour::BLACK;
-
-  if (fen[start_of_ep_target + 1] == '-')
-    has_ep_target = false;
-
+  {
+    m_side = PieceColour::BLACK;
+  }
   else
   {
-    has_ep_target = true;
-    ep_square = bitboard::square_index(fen.substr(start_of_ep_target + 1, 2));
+    // TODO Throw an exception for this
   }
-  int length_castling_rights = start_of_ep_target - start_of_castling_rights;
-  castling_rights = CastlingRights(fen.substr(start_of_castling_rights + 1, length_castling_rights));
+
+  if (fen[startOfEpTarget + 1] == '-')
+  {
+    m_hasEpTarget = false;
+  }
+  else
+  {
+    m_hasEpTarget = true;
+    m_epSquare = bitboard::squareIndex(fen.substr(startOfEpTarget + 1, 2));
+  }
+
+  int lengthCastlingRights = startOfEpTarget - startOfCastlingRights;
+  m_castlingRights = CastlingRights(fen.substr(startOfCastlingRights + 1, lengthCastlingRights));
 }
 
-std::string GameState::to_fen()
+std::string GameState::toFen()
 {
   std::string fen = "";
-  if (side == PieceColour::WHITE)
+
+  if (m_side == PieceColour::WHITE)
+  {
     fen += 'w';
-
+  }
   else
+  {
     fen += 'b';
+  }
 
-  fen += " " + castling_rights.fen() + " ";
-
-  fen += has_ep_target ? bitboard::to_algebraic(ep_square) : "-";
-
+  fen += " " + m_castlingRights.fen() + " ";
+  fen += m_hasEpTarget ? bitboard::to_algebraic(m_epSquare) : "-";
   fen += " 0 ";
-  fen += std::to_string(move_clock);
+  fen += std::to_string(m_moveClock);
+
   return fen;
 }
+
 /*
 void GameState::update(Move move) {
 	if (move.is_double_push()) {
-		has_ep_target = true;
-		if (side == PieceColour::WHITE) {
-			ep_square = move.to_square() - 8;
+		m_hasEpTarget = true;
+		if (m_side == PieceColour::WHITE) {
+			m_epSquare = move.to_square() - 8;
 		}
 		else {
-			ep_square = move.to_square() + 8;
+			m_epSquare = move.to_square() + 8;
 		}
 	}
 	else {
-		has_ep_target = false;
+		m_hasEpTarget = false;
 	}
 
-	castling_rights.update(move, side);
-	if (side == PieceColour::BLACK) {
-		move_clock++;
+	m_castlingRights.update(move, m_side);
+	if (m_side == PieceColour::BLACK) {
+		m_moveClock++;
 	}
 }
 */
@@ -615,62 +658,85 @@ void GameState::update(const piece::Move &move)
 {
   if (move.double_push)
   {
-    has_ep_target = true;
-    if (side == PieceColour::WHITE)
-      ep_square = move.to - 8;
-
+    m_hasEpTarget = true;
+    if (m_side == PieceColour::WHITE)
+    {
+      m_epSquare = move.to - 8;
+    }
     else
-      ep_square = move.to + 8;
-
+    {
+      m_epSquare = move.to + 8;
+    }
   }
   else
-    has_ep_target = false;
+  {
+    m_hasEpTarget = false;
+  }
 
-  castling_rights.update(move, side);
+  m_castlingRights.update(move, m_side);
 
-  if (side == PieceColour::BLACK)
-    move_clock++;
-
+  if (m_side == PieceColour::BLACK)
+  {
+    m_moveClock++;
+  }
 }
 
-bool GameState::can_king_side_castle(PieceColour colour)
+bool GameState::canKingSideCastle(PieceColour colour)
 {
-  return castling_rights.king_side(colour);
+  return m_castlingRights.kingSide(colour);
 }
 
-bool GameState::can_king_side_castle()
+bool GameState::canKingSideCastle()
 {
-  return castling_rights.king_side(side);
+  return m_castlingRights.kingSide(m_side);
 }
 
-bool GameState::can_queen_side_castle(PieceColour colour)
+bool GameState::canQueenSideCastle(PieceColour colour)
 {
-  return castling_rights.queen_side(colour);
+  return m_castlingRights.queenSide(colour);
 }
 
-bool GameState::can_queen_side_castle()
+bool GameState::canQueenSideCastle()
 {
-  return castling_rights.queen_side(side);
+  return m_castlingRights.queenSide(m_side);
 }
 
-void GameState::toggle_side_to_move()
+void GameState::toggleSideToMove()
 {
-  if (side == PieceColour::BLACK)
-    side = PieceColour::WHITE;
-
+  if (m_side == PieceColour::BLACK)
+  {
+    m_side = PieceColour::WHITE;
+  }
   else
-    side = PieceColour::BLACK;
-
+  {
+    m_side = PieceColour::BLACK;
+  }
 }
 
-Bitboard GameState::ep_target()
+Bitboard GameState::epTarget()
 {
-  if (has_ep_target)
-    return bitboard::to_bitboard(ep_square);
-
+  if (m_hasEpTarget)
+  {
+    return bitboard::toBitboard(m_epSquare);
+  }
   else
+  {
     return Bitboard(0);
+  }
+}
 
+Square GameState::ep_target_square()
+{
+  return m_epSquare;
+}
+
+PieceColour GameState::side_not_to_move()
+{
+  return pieces::other_colour(m_side);
+}
+PieceColour GameState::side_to_move() const
+{
+  return m_side;
 }
 
 } // namespace yak

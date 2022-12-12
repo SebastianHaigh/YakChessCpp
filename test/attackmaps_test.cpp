@@ -20,7 +20,7 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
 }
 
@@ -43,7 +43,7 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 4);
     EXPECT_EQ(serialised_ray[0], 24);
 }
@@ -67,7 +67,7 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
     EXPECT_EQ(serialised_ray[0], 61);
 }
@@ -115,7 +115,7 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
 }
 
@@ -138,7 +138,7 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 4);
     EXPECT_EQ(serialised_ray[0], 8);
 }
@@ -162,7 +162,7 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
     EXPECT_EQ(serialised_ray[0], 45);
 }
@@ -209,7 +209,7 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::EAST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 7);
 }
 
@@ -232,7 +232,7 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::EAST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
     EXPECT_EQ(serialised_ray[0], 41);
 }
@@ -256,7 +256,7 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::EAST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
     EXPECT_EQ(serialised_ray[0], 54);
 }
@@ -299,7 +299,7 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::WEST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 7);
 }
 
@@ -322,7 +322,7 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::WEST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
     EXPECT_EQ(serialised_ray[0], 42);
 }
@@ -346,7 +346,7 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::WEST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
     EXPECT_EQ(serialised_ray[0], 52);
 }
@@ -393,7 +393,7 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 4);
 }
 
@@ -416,7 +416,7 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 3);
     EXPECT_EQ(serialised_ray[0], 35);
 }
@@ -440,7 +440,7 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
     EXPECT_EQ(serialised_ray[0], 62);
 }
@@ -487,7 +487,7 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 3);
 }
 
@@ -510,7 +510,7 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 2);
     EXPECT_EQ(serialised_ray[0], 12);
 }
@@ -534,7 +534,7 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH_EAST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
     EXPECT_EQ(serialised_ray[0], 46);
 }
@@ -582,7 +582,7 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
 }
 
@@ -605,7 +605,7 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 3);
     EXPECT_EQ(serialised_ray[0], 28);
 }
@@ -629,7 +629,7 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
     EXPECT_EQ(serialised_ray[0], 60);
 }
@@ -678,7 +678,7 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 5);
 }
 
@@ -701,7 +701,7 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 3);
     EXPECT_EQ(serialised_ray[0], 26);
 }
@@ -725,7 +725,7 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH_WEST>(serialised_piece, occupied_squares);
 
     // Assert
-    std::vector<Square> serialised_ray = yak::bitboard::scan_forward(attack_ray);
+    std::vector<Square> serialised_ray = yak::bitboard::scanForward(attack_ray);
     EXPECT_EQ(serialised_ray.size(), 1);
     EXPECT_EQ(serialised_ray[0], 44);
 }

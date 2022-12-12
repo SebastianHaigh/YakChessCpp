@@ -18,7 +18,7 @@ void PAWN_MOVE_GENERATION() {
     std::cout << "---------------------------" << std::endl;
     Timer timer;
     for (int i = 0; i < 1000; i++) {
-      board.generate_moves();
+      board.generateMoves();
     }
 
   }
@@ -31,7 +31,7 @@ void PAWN_MOVE_GENERATION() {
     std::cout << "---------------------------" << std::endl;
     Timer timer;
     for (int i = 0; i < 1000; i++) {
-      board.generate_moves();
+      board.generateMoves();
     }
 
   }
