@@ -7,7 +7,6 @@
 #include <array>
 
 namespace yak {
-
 namespace attackmap {
 
 //template<Direction D>
@@ -65,40 +64,40 @@ struct ray<D, S, 0>
  * Usage: ray_map<Direction::NORTH>::value[42];
  */
 template<Direction D, Square S = 0, Bitboard... B>
-struct ray_map : ray_map<D, S + 1, B..., ray<D, S>::value>
+struct rayMap : rayMap<D, S + 1, B..., ray<D, S>::value>
 {
 };
 
 template<Direction D, Bitboard... B>
-struct ray_map<D, 63, B...>
+struct rayMap<D, 63, B...>
 {
   static constexpr std::array<Bitboard, 64> value = {B...};
 };
 
-template<Direction D> struct is_positive_ray : std::true_type {};
-template<> struct is_positive_ray<Direction::SOUTH> : std::false_type {};
-template<> struct is_positive_ray<Direction::WEST> : std::false_type {};
-template<> struct is_positive_ray<Direction::SOUTH_EAST> : std::false_type {};
-template<> struct is_positive_ray<Direction::SOUTH_WEST> : std::false_type {};
+template<Direction D> struct isPositiveRay : std::true_type {};
+template<> struct isPositiveRay<Direction::SOUTH> : std::false_type {};
+template<> struct isPositiveRay<Direction::WEST> : std::false_type {};
+template<> struct isPositiveRay<Direction::SOUTH_EAST> : std::false_type {};
+template<> struct isPositiveRay<Direction::SOUTH_WEST> : std::false_type {};
 
 template<Direction D>
 Bitboard blocked_ray(Square square, Bitboard occupied)
 {
-  constexpr std::array<Bitboard, 64> rayMap = ray_map<D>::value;
+  constexpr std::array<Bitboard, 64> thisDirectionRayMap = rayMap<D>::value;
 
-  Bitboard pieces_in_ray = rayMap[square] & occupied;
+  Bitboard piecesInRay = thisDirectionRayMap[square] & occupied;
 
-  if (pieces_in_ray == 0)
-    return rayMap[square];
+  if (piecesInRay == 0)
+    return thisDirectionRayMap[square];
 
-  Square blocker_square{0};
+  Square blockerSquare{ 0};
 
-  if (is_positive_ray<D>::value)
-    blocker_square = bitboard::LS1B(pieces_in_ray);
+  if (isPositiveRay<D>::value)
+    blockerSquare = bitboard::LS1B(piecesInRay);
   else
-    blocker_square = bitboard::MS1B(pieces_in_ray);
+    blockerSquare = bitboard::MS1B(piecesInRay);
 
-  return rayMap[square] ^ rayMap[blocker_square];
+  return thisDirectionRayMap[square] ^ thisDirectionRayMap[blockerSquare];
 }
 
 /**
@@ -110,25 +109,25 @@ public:
   /**
    * \brief Calculates all squares attacked by a single rook.
    * \param[in] square - the index of the square that the rook is on.
-   * \param[in] occupied_squares - a Bitboard of every occupied square.
+   * \param[in] occupiedSquares - a Bitboard of every occupied square.
    * \return A Bitboard of all squares attacked by the rook.
    *
    * \summary The returned bitboard will included as attacked squares
    * all blocking pieces, whether they are friendly or not.
    */
-  static Bitboard attacks(Square square, Bitboard occupied_squares);
+  static Bitboard attacks(Square square, Bitboard occupiedSquares);
 };
 
 class BishopMap
 {
 public:
-  static Bitboard attacks(Square square, Bitboard occupied_squares);
+  static Bitboard attacks(Square square, Bitboard occupiedSquares);
 };
 
 class QueenMap
 {
 public:
-  static Bitboard attacks(Square square, Bitboard occupied_squares);
+  static Bitboard attacks(Square square, Bitboard occupiedSquares);
 };
 
 /**

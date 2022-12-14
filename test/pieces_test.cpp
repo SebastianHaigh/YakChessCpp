@@ -469,7 +469,7 @@ TEST(FunctionTests, FenCharToPieceTypeTestForBlackPieces) {
 
     // Act
     for (int i = 0; i < 7; i++) {
-        actual[i] = pieces::fen_char_to_piece_type(fen_chars[i]);
+        actual[i] = pieces::fenCharToPieceType(fen_chars[i]);
     }
 
     // Assert
@@ -486,7 +486,7 @@ TEST(FunctionTests, FenCharToPieceTypeTestForWhitePieces) {
 
     // Act
     for (int i = 0; i < 7; i++) {
-        actual[i] = pieces::fen_char_to_piece_type(fen_chars[i]);
+        actual[i] = pieces::fenCharToPieceType(fen_chars[i]);
     }
 
     // Assert
@@ -504,7 +504,7 @@ TEST(FunctionTests, FenCharToPieceColourTestForBlackPieces) {
 
     // Act
     for (int i = 0; i < 7; i++) {
-        actual[i] = pieces::fen_char_to_piece_colour(fen_chars[i]);
+        actual[i] = pieces::fenCharToPieceColour(fen_chars[i]);
     }
 
     // Assert
@@ -522,7 +522,7 @@ TEST(FunctionTests, FenCharToPieceColourTestForWhitePieces) {
 
     // Act
     for (int i = 0; i < 7; i++) {
-        actual[i] = pieces::fen_char_to_piece_colour(fen_chars[i]);
+        actual[i] = pieces::fenCharToPieceColour(fen_chars[i]);
     }
 
     // Assert

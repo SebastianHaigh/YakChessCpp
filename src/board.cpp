@@ -56,8 +56,8 @@ void Board::parseFen(const std::string &fen)
     }
     else
     {
-      PieceType piece_type = pieces::fen_char_to_piece_type(fen[i]);
-      PieceColour piece_colour = pieces::fen_char_to_piece_colour(fen[i]);
+      PieceType piece_type = pieces::fenCharToPieceType(fen[i]);
+      PieceColour piece_colour = pieces::fenCharToPieceColour(fen[i]);
 
       bitboard::setSquare(m_pieceTypeBitboard[static_cast<int>(piece_type)], current_square);
       bitboard::setSquare(m_colourBitboard[static_cast<int>(piece_colour)], current_square);
@@ -109,8 +109,8 @@ std::vector<piece::Move> Board::generateMoves()
   piece::Move en_passant_move;
   int move_counter{0};
 
-  PieceColour this_side = m_currentState.side_to_move();
-  PieceColour other_side = m_currentState.side_not_to_move();
+  PieceColour this_side = m_currentState.sideToMove();
+  PieceColour other_side = m_currentState.sideNotToMove();
 
   if (this_side == PieceColour::WHITE)
   {
@@ -121,7 +121,7 @@ std::vector<piece::Move> Board::generateMoves()
                                                    get_position(other_side));
 
     piece::generate_ep_captures<PieceColour::WHITE>(&en_passant_move, move_counter,
-                                                     get_position(this_side, PieceType::PAWN), ep_target());
+                                                    get_position(this_side, PieceType::PAWN), epTarget());
   }
   else
   {
@@ -132,7 +132,7 @@ std::vector<piece::Move> Board::generateMoves()
                                                    get_position(other_side));
 
     piece::generate_ep_captures<PieceColour::BLACK>(&psuedo_legal_move_list[move_counter], move_counter,
-                                                     get_position(this_side, PieceType::PAWN), ep_target());
+                                                    get_position(this_side, PieceType::PAWN), epTarget());
   }
 
   piece::generate_piece_moves<PieceType::KNIGHT>(&psuedo_legal_move_list[move_counter],
@@ -169,7 +169,7 @@ std::vector<piece::Move> Board::generateMoves()
   for (int i = 0; i < move_counter; i++)
   {
     makeMove(psuedo_legal_move_list[i]);
-    if (!isCheck(m_previousState.side_to_move()))
+    if (!isCheck(m_previousState.sideToMove()))
     {
       legal_moves.push_back(psuedo_legal_move_list[i]);
     }
@@ -184,9 +184,9 @@ std::vector<piece::Move> Board::generateMoves()
 std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> moves)
 {
 
-  Bitboard squares_attacked_by_enemy = attacked_by(m_currentState.side_not_to_move());
+  Bitboard squares_attacked_by_enemy = attacked_by(m_currentState.sideNotToMove());
 
-  Bitboard king = get_position(m_currentState.side_to_move(), PieceType::KING);
+  Bitboard king = get_position(m_currentState.sideToMove(), PieceType::KING);
 
   if (m_currentState.canKingSideCastle() && !isCheck())
   {
@@ -230,7 +230,7 @@ void Board::makeMove(Move move) {
 */
 void Board::makeMove(const piece::Move &move)
 {
-  if (m_currentState.side_to_move() == PieceColour::WHITE)
+  if (m_currentState.sideToMove() == PieceColour::WHITE)
   {
     processMove<PieceColour::WHITE>(move, false);
   }
@@ -250,7 +250,7 @@ void Board::undoMove()
   if (m_previousMoveF.from != m_previousMoveF.to)
   {
     m_currentState.toggleSideToMove();
-    if (m_currentState.side_to_move() == PieceColour::WHITE)
+    if (m_currentState.sideToMove() == PieceColour::WHITE)
     {
       processMove<PieceColour::WHITE>(m_previousMoveF, true);
     }
@@ -264,15 +264,15 @@ void Board::undoMove()
 
 bool Board::isCheck()
 {
-  Bitboard king = get_position(m_currentState.side_to_move(), PieceType::KING);
-  Bitboard attackers = attacked_by(pieces::other_colour(m_currentState.side_to_move()));
+  Bitboard king = get_position(m_currentState.sideToMove(), PieceType::KING);
+  Bitboard attackers = attacked_by(pieces::otherColour(m_currentState.sideToMove()));
   return (king & attackers) > 0;
 }
 
 bool Board::isCheck(PieceColour colour)
 {
   Bitboard king = get_position(colour, PieceType::KING);
-  Bitboard attackers = attacked_by(pieces::other_colour(colour));
+  Bitboard attackers = attacked_by(pieces::otherColour(colour));
   return (king & attackers) > 0;
 }
 
@@ -407,7 +407,7 @@ std::string Board::rankToFen(Rank rank)
         fen += std::to_string(empty_sum);
         empty_sum = 0;
       }
-      fen += pieces::piece_to_fen_char(type, colour);
+      fen += pieces::pieceToFenChar(type, colour);
     }
     else
     {
@@ -713,7 +713,7 @@ void GameState::toggleSideToMove()
   }
 }
 
-Bitboard GameState::epTarget()
+Bitboard GameState::epTarget() const
 {
   if (m_hasEpTarget)
   {
@@ -725,16 +725,16 @@ Bitboard GameState::epTarget()
   }
 }
 
-Square GameState::ep_target_square()
+Square GameState::epTargetSquare() const
 {
   return m_epSquare;
 }
 
-PieceColour GameState::side_not_to_move()
+PieceColour GameState::sideNotToMove() const
 {
-  return pieces::other_colour(m_side);
+  return pieces::otherColour(m_side);
 }
-PieceColour GameState::side_to_move() const
+PieceColour GameState::sideToMove() const
 {
   return m_side;
 }

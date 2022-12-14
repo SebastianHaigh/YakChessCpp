@@ -200,7 +200,7 @@ struct Move
  * \param[in] to - The square to move to.
  * \return The constructed quiet move.
  */
-inline Move make_quiet(Square from, Square to)
+inline Move makeQuiet(Square from, Square to)
 {
   Move move;
   move.from = from;
@@ -315,7 +315,7 @@ inline void generate_pawn_single_pushes(Move *move_list,
   Bitboard targets = pawn_single_push_target<C>(sources);
   while (sources && !PROMOTIONS)
   {
-    *move_list++ = make_quiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *move_list++ = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -450,19 +450,19 @@ void generate_sliding_piece_moves(const attackmap::RookMap &,
                                   Bitboard empty_squares,
                                   Bitboard opponent_pieces);
 
-void generate_sliding_piece_moves(const attackmap::BishopMap &,
-                                  Move *move_list,
-                                  int &move_counter,
-                                  Bitboard piece_positions,
-                                  Bitboard empty_squares,
-                                  Bitboard opponent_pieces);
+void generateSlidingPieceMoves(const attackmap::BishopMap &,
+                               Move *moveList,
+                               int &moveCounter,
+                               Bitboard piecePositions,
+                               Bitboard emptySquares,
+                               Bitboard opponentPieces);
 
-void generate_sliding_piece_moves(const attackmap::QueenMap &,
-                                  Move *move_list,
-                                  int &move_counter,
-                                  Bitboard piece_positions,
-                                  Bitboard empty_squares,
-                                  Bitboard opponent_pieces);
+void generateSlidingPieceMoves(const attackmap::QueenMap &,
+                               Move *moveList,
+                               int &moveCounter,
+                               Bitboard piecePositions,
+                               Bitboard emptySquares,
+                               Bitboard opponentPieces);
 
 template<PieceType T>
 void generate_piece_moves(Move *move_list,
@@ -484,7 +484,7 @@ void generate_piece_moves(Move *move_list,
     Bitboard quiet = atk_bb & empty_squares;
     while (quiet)
     {
-      *move_list++ = make_quiet(from, bitboard::popLS1B(quiet));
+      *move_list++ = makeQuiet(from, bitboard::popLS1B(quiet));
       move_counter++;
     }
 
@@ -549,12 +549,12 @@ Bitboard piece_attacks(Bitboard piece_positions, Bitboard occupied_squares)
 
 namespace pieces {
 
-PieceColour other_colour(PieceColour colour);
-PieceType fen_char_to_piece_type(const char fen_char);
-PieceColour fen_char_to_piece_colour(const char fen_char);
-char piece_to_fen_char(const PieceType type, const PieceColour colour);
-char black_piece_type_to_fen_char(const PieceType type);
-char white_piece_type_to_fen_char(const PieceType type);
+PieceColour otherColour(PieceColour colour);
+PieceType fenCharToPieceType(const char fenChar);
+PieceColour fenCharToPieceColour(const char fenChar);
+char pieceToFenChar(const PieceType& type, const PieceColour& colour);
+char blackPieceTypeToFenChar(const PieceType& type);
+char whitePieceTypeToFenChar(const PieceType& type);
 
 class PawnTargets {
   // PawnTargets store pawn move target bitboards and their source bitboards.

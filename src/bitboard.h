@@ -178,22 +178,14 @@ inline Bitboard south_west_one(Bitboard board)
 template<Direction D>
 constexpr Bitboard shift(Bitboard board)
 {
-  if (D == Direction::NORTH)
-    return board << 8;
-  if (D == Direction::SOUTH)
-    return board >> 8;
-  if (D == Direction::EAST)
-    return (board << 1) & bitboard::NOT_FILE_A;
-  if (D == Direction::WEST)
-    return (board >> 1) & bitboard::NOT_FILE_H;
-  if (D == Direction::NORTH_EAST)
-    return (board << 9) & bitboard::NOT_FILE_A;
-  if (D == Direction::SOUTH_EAST)
-    return (board >> 7) & bitboard::NOT_FILE_A;
-  if (D == Direction::NORTH_WEST)
-    return (board << 7) & bitboard::NOT_FILE_H;
-  if (D == Direction::SOUTH_WEST)
-    return (board >> 9) & bitboard::NOT_FILE_H;
+  if (D == Direction::NORTH) return board << 8;
+  if (D == Direction::SOUTH) return board >> 8;
+  if (D == Direction::EAST) return (board << 1) & bitboard::NOT_FILE_A;
+  if (D == Direction::WEST) return (board >> 1) & bitboard::NOT_FILE_H;
+  if (D == Direction::NORTH_EAST) return (board << 9) & bitboard::NOT_FILE_A;
+  if (D == Direction::SOUTH_EAST) return (board >> 7) & bitboard::NOT_FILE_A;
+  if (D == Direction::NORTH_WEST) return (board << 7) & bitboard::NOT_FILE_H;
+  if (D == Direction::SOUTH_WEST) return (board >> 9) & bitboard::NOT_FILE_H;
   return board;
 };
 
@@ -209,10 +201,10 @@ inline Square MS1B(Bitboard board)
   return static_cast<Square>(63 - idx);
 #elif defined _MSC_VER
   unsigned long idx;
-        _BitScanReverse64(&idx, board);
-        return static_cast<Square>(idx);
+  _BitScanReverse64(&idx, board);
+  return static_cast<Square>(idx);
 #else
-        return 0;
+  return 0;
 #endif
 }
 
@@ -228,10 +220,10 @@ inline Square LS1B(Bitboard board)
   return static_cast<Square>(idx);
 #elif defined _MSC_VER
   unsigned long idx;
-        _BitScanForward64(&idx, board);
-        return static_cast<Square>(idx);
+  _BitScanForward64(&idx, board);
+  return static_cast<Square>(idx);
 #else
-        return 0;
+  return 0;
 #endif
 }
 

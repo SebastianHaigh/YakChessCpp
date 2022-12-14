@@ -79,7 +79,7 @@ TEST(NorthRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheEightRank) {
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
-    constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::ray_map<Direction::NORTH>::value;
+    constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::NORTH>::value;
     // Act
     for (int i = 0; i < 8; i++) {
         attack_ray[i] = rayMap[serialised_pieces[i]];
@@ -173,7 +173,7 @@ TEST(SouthRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheFirstRank) {
     Square serialised_pieces[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::ray_map<Direction::SOUTH>::value;
+  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::SOUTH>::value;
     // Act
     for (int i = 0; i < 8; i++) {
         attack_ray[i] = rayMap[serialised_pieces[i]];
@@ -267,7 +267,7 @@ TEST(EastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
     Square serialised_pieces[8] = {7, 15, 23, 31, 39, 47, 55, 63}; // H1, ..., H8
     Bitboard occupied_squares = 0;
     std::vector<Bitboard>attack_ray(8, 0);
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::ray_map<Direction::EAST>::value;
+  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::EAST>::value;
 
     // Act
     for (int i = 0; i < 8; i++) {
@@ -357,7 +357,7 @@ TEST(WestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
     Square serialised_pieces[8] = {0, 8, 16, 24, 32, 40, 48, 56}; // A1, ..., A8
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::ray_map<Direction::WEST>::value;
+  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::WEST>::value;
     // Act
     for (int i = 0; i < 8; i++) {
         attack_ray[i] = rayMap[serialised_pieces[i]];
@@ -451,7 +451,7 @@ TEST(NorthEastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
     Square serialised_pieces[8] = {7, 15, 23, 31, 39, 47, 55, 63}; // H1, ..., H8
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::ray_map<Direction::NORTH_EAST>::value;
+  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::NORTH_EAST>::value;
   // Act
   for (int i = 0; i < 8; i++) {
     attack_ray[i] = rayMap[serialised_pieces[i]];
@@ -546,7 +546,7 @@ TEST(SouthEastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::ray_map<Direction::SOUTH_EAST>::value;
+  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::SOUTH_EAST>::value;
   // Act
   for (int i = 0; i < 8; i++) {
     attack_ray[i] = rayMap[serialised_pieces[i]];
@@ -641,7 +641,7 @@ TEST(NorthWestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::ray_map<Direction::NORTH_WEST>::value;
+  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::NORTH_WEST>::value;
   // Act
   for (int i = 0; i < 8; i++) {
     attack_ray[i] = rayMap[serialised_pieces[i]];
@@ -737,12 +737,11 @@ TEST(SouthWestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
     Bitboard occupied_squares = 0;
     Bitboard attack_ray[8];
 
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::ray_map<Direction::SOUTH_WEST>::value;
+  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::SOUTH_WEST>::value;
   // Act
   for (int i = 0; i < 8; i++) {
     attack_ray[i] = rayMap[serialised_pieces[i]];
   }
-
 
   // Assert
     EXPECT_EQ(attack_ray[0], 0);

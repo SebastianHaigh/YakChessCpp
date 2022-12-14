@@ -21,7 +21,7 @@ void generate_pawn_moves(PieceColour colour,
   Bitboard targets = colour == PieceColour::BLACK ? bitboard::south_one(sources) : bitboard::north_one(sources);
   while (sources)
   {
-    *move_list++ = make_quiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *move_list++ = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -106,7 +106,7 @@ void generate_sliding_piece_moves(const attackmap::RookMap &atk_map,
     Bitboard quiet = atk_bb & empty_squares;
     while (quiet)
     {
-      *move_list++ = make_quiet(from, bitboard::popLS1B(quiet));
+      *move_list++ = makeQuiet(from, bitboard::popLS1B(quiet));
       move_counter++;
     }
 
@@ -119,58 +119,58 @@ void generate_sliding_piece_moves(const attackmap::RookMap &atk_map,
   }
 }
 
-void generate_sliding_piece_moves(const attackmap::BishopMap &atk_map,
-                                  Move *move_list,
-                                  int &move_counter,
-                                  Bitboard piece_positions,
-                                  Bitboard empty_squares,
-                                  Bitboard opponent_pieces)
+void generateSlidingPieceMoves(const attackmap::BishopMap &attackMap,
+                               Move *moveList,
+                               int &moveCounter,
+                               Bitboard piecePositions,
+                               Bitboard emptySquares,
+                               Bitboard opponentPieces)
 {
-  while (piece_positions)
+  while (piecePositions)
   {
-    Square from = bitboard::popLS1B(piece_positions);
-    Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
+    Square from = bitboard::popLS1B(piecePositions);
+    Bitboard attackBitboard = attackMap.attacks(from, ~emptySquares);
 
-    Bitboard quiet = atk_bb & empty_squares;
+    Bitboard quiet = attackBitboard & emptySquares;
     while (quiet)
     {
-      *move_list++ = make_quiet(from, bitboard::popLS1B(quiet));
-      move_counter++;
+      *moveList++ = makeQuiet(from, bitboard::popLS1B(quiet));
+      moveCounter++;
     }
 
-    Bitboard capture = atk_bb & opponent_pieces;
+    Bitboard capture = attackBitboard & opponentPieces;
     while (capture)
     {
-      *move_list++ = make_capture(from, bitboard::popLS1B(capture));
-      move_counter++;
+      *moveList++ = make_capture(from, bitboard::popLS1B(capture));
+      moveCounter++;
     }
   }
 }
 
-void generate_sliding_piece_moves(const attackmap::QueenMap &atk_map,
-                                  Move *move_list,
-                                  int &move_counter,
-                                  Bitboard piece_positions,
-                                  Bitboard empty_squares,
-                                  Bitboard opponent_pieces)
+void generateSlidingPieceMoves(const attackmap::QueenMap &attackMap,
+                               Move *moveList,
+                               int &moveCounter,
+                               Bitboard piecePositions,
+                               Bitboard emptySquares,
+                               Bitboard opponentPieces)
 {
-  while (piece_positions)
+  while (piecePositions)
   {
-    Square from = bitboard::popLS1B(piece_positions);
-    Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
+    Square from = bitboard::popLS1B(piecePositions);
+    Bitboard attackBitboard = attackMap.attacks(from, ~emptySquares);
 
-    Bitboard quiet = atk_bb & empty_squares;
+    Bitboard quiet = attackBitboard & emptySquares;
     while (quiet)
     {
-      *move_list++ = make_quiet(from, bitboard::popLS1B(quiet));
-      move_counter++;
+      *moveList++ = makeQuiet(from, bitboard::popLS1B(quiet));
+      moveCounter++;
     }
 
-    Bitboard capture = atk_bb & opponent_pieces;
+    Bitboard capture = attackBitboard & opponentPieces;
     while (capture)
     {
-      *move_list++ = make_capture(from, bitboard::popLS1B(capture));
-      move_counter++;
+      *moveList++ = make_capture(from, bitboard::popLS1B(capture));
+      moveCounter++;
     }
   }
 }
@@ -181,113 +181,100 @@ void generate_sliding_piece_moves(const attackmap::QueenMap &atk_map,
 
 namespace pieces {
 
-    PieceColour other_colour(PieceColour colour) {
-        if (colour == PieceColour::WHITE)
-        {
-            return PieceColour::BLACK;
-        }
-        else if (colour == PieceColour::BLACK)
-        {
-            return PieceColour::WHITE;
-        }
-        else
-        {
-            return PieceColour::NULL_COLOUR;
-        }
-    }
+PieceColour otherColour(PieceColour colour) {
+  if (colour == PieceColour::WHITE)
+  {
+    return PieceColour::BLACK;
+  }
+  else if (colour == PieceColour::BLACK)
+  {
+    return PieceColour::WHITE;
+  }
+  else
+  {
+    return PieceColour::NULL_COLOUR;
+  }
+}
 
-    PieceType fen_char_to_piece_type(const char fen_char) {
-        switch (fen_char) {
-        case 'p':
-        case 'P':
-            return PieceType::PAWN;
-        case 'n':
-        case 'N':
-            return PieceType::KNIGHT;
-        case 'b':
-        case 'B':
-            return PieceType::BISHOP;
-        case 'r':
-        case 'R':
-            return PieceType::ROOK;
-        case 'q':
-        case 'Q':
-            return PieceType::QUEEN;
-        case 'k':
-        case 'K':
-            return PieceType::KING;
-        default:
-            return PieceType::NULL_PIECE;
-        }
-    }
+PieceType fenCharToPieceType(const char fenChar) {
+  switch (fenChar) {
+    case 'p':
+    case 'P':
+      return PieceType::PAWN;
+    case 'n':
+    case 'N':
+      return PieceType::KNIGHT;
+    case 'b':
+    case 'B':
+      return PieceType::BISHOP;
+    case 'r':
+    case 'R':
+      return PieceType::ROOK;
+    case 'q':
+    case 'Q':
+      return PieceType::QUEEN;
+    case 'k':
+    case 'K':
+      return PieceType::KING;
+    default:
+      return PieceType::NULL_PIECE;
+  }
+}
 
-    PieceColour fen_char_to_piece_colour(const char fen_char) {
-        switch (fen_char) {
-        case 'p':
-        case 'n':
-        case 'b':
-        case 'r':
-        case 'q':
-        case 'k':
-            return PieceColour::BLACK;
-        case 'P':
-        case 'N':
-        case 'B':
-        case 'R':
-        case 'Q':
-        case 'K':
-            return PieceColour::WHITE;
-        default:
-            return PieceColour::NULL_COLOUR;
-        }
-    }
+PieceColour fenCharToPieceColour(const char fenChar) {
+  switch (fenChar) {
+    case 'p':
+    case 'n':
+    case 'b':
+    case 'r':
+    case 'q':
+    case 'k':
+      return PieceColour::BLACK;
+    case 'P':
+    case 'N':
+    case 'B':
+    case 'R':
+    case 'Q':
+    case 'K':
+      return PieceColour::WHITE;
+    default:
+      return PieceColour::NULL_COLOUR;
+  }
+}
 
-    char piece_to_fen_char(const PieceType type, const PieceColour colour) {
-        if (colour == PieceColour::WHITE) {
-            return white_piece_type_to_fen_char(type);
-        }
-        else {
-            return black_piece_type_to_fen_char(type);
-        }
-    }
+char pieceToFenChar(const PieceType& type, const PieceColour& colour) {
+  if (colour == PieceColour::WHITE)
+  {
+    return whitePieceTypeToFenChar(type);
+  }
+  else
+  {
+    return blackPieceTypeToFenChar(type);
+  }
+}
 
-    char black_piece_type_to_fen_char(const PieceType type) {
-        switch (type) {
-            case PieceType::PAWN:
-                return 'p';
-            case PieceType::KNIGHT:
-                return 'n';
-            case PieceType::BISHOP:
-                return 'b';
-            case PieceType::ROOK:
-                return 'r';
-            case PieceType::QUEEN:
-                return 'q';
-            case PieceType::KING:
-                return 'k';
-            default:
-                return 'x'; // ERROR CASE, should never run
-        }
-    }
+char blackPieceTypeToFenChar(const PieceType& type) {
+  switch (type) {
+    case PieceType::PAWN:   return 'p';
+    case PieceType::KNIGHT: return 'n';
+    case PieceType::BISHOP: return 'b';
+    case PieceType::ROOK:   return 'r';
+    case PieceType::QUEEN:  return 'q';
+    case PieceType::KING:   return 'k';
+    default:                return 'x'; // ERROR CASE, should never run
+  }
+}
 
-    char white_piece_type_to_fen_char(const PieceType type) {
-        switch (type) {
-            case PieceType::PAWN:
-                return 'P';
-            case PieceType::KNIGHT:
-                return 'N';
-            case PieceType::BISHOP:
-                return 'B';
-            case PieceType::ROOK:
-                return 'R';
-            case PieceType::QUEEN:
-                return 'Q';
-            case PieceType::KING:
-                return 'K';
-            default:
-                return 'X'; // ERROR CASE, should never run
-        }
-    }
-
+char whitePieceTypeToFenChar(const PieceType& type) {
+  switch (type) {
+    case PieceType::PAWN:   return 'P';
+    case PieceType::KNIGHT: return 'N';
+    case PieceType::BISHOP: return 'B';
+    case PieceType::ROOK:   return 'R';
+    case PieceType::QUEEN:  return 'Q';
+    case PieceType::KING:   return 'K';
+    default:                return 'X'; // ERROR CASE, should never run
+  }
+}
 
 } // namespace pieces

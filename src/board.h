@@ -23,92 +23,90 @@ public:
   {
   };
 
-  /*
+  /*!
    * \brief Construct castling rights from fen.
-   * \param[in] fen - std::string containing the catling rights in fen format
+   * \param[in] fen - std::string containing the castling rights in fen format
    */
   CastlingRights(std::string fen);
 
-  /*
-   * \brief Check if a m_side can castle in the king m_side.
-   * \param[in] colour - the colour of the m_side to check the rights for.
+  /*!
+   * \brief Check if a side can castle in the king m_side.
+   * \param[in] colour - the colour of the side to check the rights for.
    * \return true if colour can castle, false otherwise.
    */
   bool kingSide(PieceColour colour);
 
-  /*
-   * \brief Check if a m_side can castle in the queen m_side.
+  /*!
+   * \brief Check if a side can castle in the queen m_side.
    * \param[in] colour - the colour of the m_side to check the rights for.
    * \return true if colour can castle, false otherwise.
    */
   bool queenSide(PieceColour colour);
 
-  /*
+  /*!
    * \brief Update castling rights based on a move.
    * \param[in] move - a move that may update the rights.
-   * \param[in] m_side - the m_side that is making the move.
+   * \param[in] side - the side that is making the move.
    */
   void update(const piece::Move &move, PieceColour side);
 
-  /*
+  /*!
    * \brief Get the current castling rights in fen format.
    * \return std::string containing the fen of the current castling rights.
-     */
+   */
   std::string fen();
 };
 
-/*
- * \brief Holds all of the games state execpt for piece postions.
+/*!
+ * \brief Holds all of the games state except for piece positions.
  */
 class GameState
 {
 public:
-  /* \brief Default constructor */
+  /*! \brief Default constructor */
   GameState();
 
-  /*
+  /*!
    * \brief Construct from fen.
    * \param[in] fen - the fen string of the game state to be initialised.
    */
   explicit GameState(const std::string& fen);
 
-  /*
+  /*!
    * \brief Return the current game state in FEN notation.
    * \return std::string in FEN notation.
    */
   std::string toFen();
 
-  /*
+  /*!
    * \brief Update the game state based on a given move.
    * \param[in] move - The move to be made.
    */
-  //void update(Move move);
-
   void update(const piece::Move &move);
 
-  /*
-   * \brief Check if a m_side can castle on the king m_side.
-   * \param[in] colour - The colour of the m_side to check.
-   * \return true if the m_side can castle on the king m_side, false otherwise.
+  /*!
+   * \brief Check if a side can castle on the king m_side.
+   * \param[in] colour - The colour of the side to check.
+   * \return true if the m_side can castle on the king side, false otherwise.
    */
   bool canKingSideCastle(PieceColour colour);
 
-  /*
-   * \brief Check if the current m_side to move can king m_side castle.
-   * \return true if the m_side to move can king m_side castle, false otherwise.
+  /*!
+   * \brief Check if the current side to move can king side castle.
+   * \return true if the side to move can king side castle, false otherwise.
    */
   bool canKingSideCastle();
 
-  /*
-   * \brief Check if a m_side can castle on the queen m_side.
-   * \param[in] colour - The colour of the m_side to check.
-   * \return true if the m_side can castle on the queen m_side, false otherwise.
+  /*!
+   * \brief Check if a side can castle on the queen side.
+   * \param[in] colour - The colour of the side to check.
+   * \return true if the side can castle on the queen side, false otherwise.
    */
   bool canQueenSideCastle(PieceColour colour);
 
-  /*
-   * \brief Check if the current m_side to move can queen m_side castle.
-   * \return true if the m_side to move can queen m_side castle, false otherwise.
+  /*!
+   * \brief Check if the current side to move can queen side castle.
+   * \return true if the side to move can queen side castle, false otherwise.
    */
   bool canQueenSideCastle();
 
@@ -119,16 +117,16 @@ public:
            (T == PieceType::QUEEN) ? canQueenSideCastle() : false;
   }
 
-  /* \brief Change the m_side to move. */
+  /*! \brief Change the side to move. */
   void toggleSideToMove();
 
-  inline PieceColour side_to_move() const;
+  inline PieceColour sideToMove() const;
 
-  PieceColour side_not_to_move();
+  PieceColour sideNotToMove() const;
 
-  Square ep_target_square();
+  Square epTargetSquare() const;
 
-  Bitboard epTarget();
+  Bitboard epTarget() const;
 
 private:
   CastlingRights m_castlingRights;
@@ -144,21 +142,25 @@ struct KingCastleTarget
 {
   static constexpr Bitboard value{0};
 };
+
 template<>
 struct KingCastleTarget<PieceType::KING, PieceColour::WHITE>
 {
   static constexpr Bitboard value = bitboard::static_bitboard<6>::value;
 };
+
 template<>
 struct KingCastleTarget<PieceType::KING, PieceColour::BLACK>
 {
   static constexpr Bitboard value = bitboard::static_bitboard<62>::value;
 };
+
 template<>
 struct KingCastleTarget<PieceType::QUEEN, PieceColour::WHITE>
 {
   static constexpr Bitboard value = bitboard::static_bitboard<2>::value;
 };
+
 template<>
 struct KingCastleTarget<PieceType::QUEEN, PieceColour::BLACK>
 {
@@ -170,21 +172,25 @@ struct RookCastleSource
 {
   static constexpr Bitboard value{0};
 };
+
 template<>
 struct RookCastleSource<PieceType::KING, PieceColour::WHITE>
 {
   static constexpr Bitboard value = bitboard::static_bitboard<7>::value;
 };
+
 template<>
 struct RookCastleSource<PieceType::KING, PieceColour::BLACK>
 {
   static constexpr Bitboard value = bitboard::static_bitboard<63>::value;
 };
+
 template<>
 struct RookCastleSource<PieceType::QUEEN, PieceColour::WHITE>
 {
   static constexpr Bitboard value = bitboard::static_bitboard<0>::value;
 };
+
 template<>
 struct RookCastleSource<PieceType::QUEEN, PieceColour::BLACK>
 {
@@ -196,21 +202,25 @@ struct RookCastleTarget
 {
   static constexpr Bitboard value{0};
 };
+
 template<>
 struct RookCastleTarget<PieceType::KING, PieceColour::WHITE>
 {
   static constexpr Bitboard value = bitboard::static_bitboard<5>::value;
 };
+
 template<>
 struct RookCastleTarget<PieceType::KING, PieceColour::BLACK>
 {
   static constexpr Bitboard value = bitboard::static_bitboard<61>::value;
 };
+
 template<>
 struct RookCastleTarget<PieceType::QUEEN, PieceColour::WHITE>
 {
   static constexpr Bitboard value = bitboard::static_bitboard<3>::value;
 };
+
 template<>
 struct RookCastleTarget<PieceType::QUEEN, PieceColour::BLACK>
 {
@@ -222,11 +232,13 @@ struct OppositeColour
 {
   static constexpr PieceColour value = PieceColour::NULL_COLOUR;
 };
+
 template<>
 struct OppositeColour<PieceColour::WHITE>
 {
   static constexpr PieceColour value = PieceColour::BLACK;
 };
+
 template<>
 struct OppositeColour<PieceColour::BLACK>
 {
@@ -235,75 +247,6 @@ struct OppositeColour<PieceColour::BLACK>
 
 class Board
 {
-
-private:
-
-  Bitboard m_pieceTypeBitboard[6];
-  Bitboard m_colourBitboard[2];
-
-  /* \brief The current GameState */
-  GameState m_currentState;
-
-  /* \brief A record of the GameState before the last move, for undoing moves. */
-  GameState m_previousState;
-
-  attackmap::RookMap m_rookAtks;      /* \brief Attack map for Rooks */
-  attackmap::BishopMap m_bishopAtks;    /* \brief Attack map for Bishops */
-  attackmap::QueenMap m_queenAtks;    /* \brief Attack map for Queens */
-
-  /* \brief The last move to have been made on this board. */
-  piece::Move m_previousMoveF;
-
-  /* \brief The piece captured on the last move, NULL_PIECE if last move was not a capture. */
-  PieceType m_previousCapturedPiece = PieceType::NULL_PIECE;
-
-  /*
-   * \brief Executes a move on the underlying board representation.
-   * \tparam C - Colour of the m_side on which to execute the move.
-   * \param[in] move - The move to be executed.
-   * \param[in] undo - If true this will process an undo move.
-   */
-  template<PieceColour C>
-  void processMove(const piece::Move &move, bool undo);
-
-  /*
-   * \brief Executes a castling move on the underlying board representation.
-   * \tparam C - Colour of the m_side on which to execute the move.
-   * \tparam T - The m_side of the board on which to castle.
-   * \param[in] move - The move to be executed.
-   */
-  template<PieceType T, PieceColour C>
-  void processCastle(const piece::Move &move);
-
-  template<PieceColour C>
-  void processEp(const piece::Move &move);
-
-  /*
-   * \brief Returns all of the squares attacked by pawns of a given colour.
-   * \param[in] colour - The coloyr of the pawns.
-   * \return The bitboard of all the attacked squares.
-   */
-  Bitboard pawnAttacks(PieceColour colour);
-
-  /*
-   * \brief Returns all of the squares attacked by a particular type of piece.
-   * \param[in] type - The type of piece.
-   * \param[in] colour - The colour of the piece.
-   * \return A bitboard of all the attacked squares.
-   */
-  Bitboard pieceAttacks(PieceType type, PieceColour colour);
-
-  /*
-   * \brief Returns all of the squares attacked by a single m_side.
-   * \param[in] colour - The colour of the m_side.
-   * \return A bitboard of all the attacked squares.
-   */
-  Bitboard allAttacks(PieceColour colour);
-
-  std::vector<piece::Move> generateCastlingMoves(std::vector<piece::Move> moves);
-  void parseFen(const std::string &fen);
-  std::string rankToFen(Rank rank);
-
 public:
   Board() : m_pieceTypeBitboard{ 0}, m_colourBitboard{ 0}, m_previousMoveF(piece::Move())
   {
@@ -335,18 +278,19 @@ public:
 
   std::string toFen();
 
-  Bitboard ep_target()
+  Bitboard epTarget()
   {
     return m_currentState.epTarget();
   }
+
   Square ep_target_square()
   {
-    return m_currentState.ep_target_square();
+    return m_currentState.epTargetSquare();
   }
 
   PieceColour to_move()
   {
-    return m_currentState.side_to_move();
+    return m_currentState.sideToMove();
   }
 
   Bitboard attacked_by(PieceColour colour)
@@ -387,6 +331,76 @@ public:
   {
     return get_position(type) & get_position(colour);
   }
+
+private:
+
+  Bitboard m_pieceTypeBitboard[6];
+  Bitboard m_colourBitboard[2];
+
+  /* \brief The current GameState */
+  GameState m_currentState;
+
+  /* \brief A record of the GameState before the last move, for undoing moves. */
+  GameState m_previousState;
+
+  attackmap::RookMap m_rookAtks;      /* \brief Attack map for Rooks */
+  attackmap::BishopMap m_bishopAtks;    /* \brief Attack map for Bishops */
+  attackmap::QueenMap m_queenAtks;    /* \brief Attack map for Queens */
+
+  /* \brief The last move to have been made on this board. */
+  piece::Move m_previousMoveF;
+
+  /* \brief The piece captured on the last move, NULL_PIECE if last move was not a capture. */
+  PieceType m_previousCapturedPiece = PieceType::NULL_PIECE;
+
+  /*!
+   * \brief Executes a move on the underlying board representation.
+   * \tparam C - Colour of the m_side on which to execute the move.
+   * \param[in] move - The move to be executed.
+   * \param[in] undo - If true this will process an undo move.
+   */
+  template<PieceColour C>
+  void processMove(const piece::Move &move, bool undo);
+
+  /*!
+   * \brief Executes a castling move on the underlying board representation.
+   * \tparam C - Colour of the m_side on which to execute the move.
+   * \tparam T - The m_side of the board on which to castle.
+   * \param[in] move - The move to be executed.
+   */
+  template<PieceType T, PieceColour C>
+  void processCastle(const piece::Move &move);
+
+  template<PieceColour C>
+  void processEp(const piece::Move &move);
+
+  /*!
+   * \brief Returns all of the squares attacked by pawns of a given colour.
+   * \param[in] colour - The coloyr of the pawns.
+   * \return The bitboard of all the attacked squares.
+   */
+  Bitboard pawnAttacks(PieceColour colour);
+
+  /*!
+   * \brief Returns all of the squares attacked by a particular type of piece.
+   * \param[in] type - The type of piece.
+   * \param[in] colour - The colour of the piece.
+   * \return A bitboard of all the attacked squares.
+   */
+  Bitboard pieceAttacks(PieceType type, PieceColour colour);
+
+  /*!
+   * \brief Returns all of the squares attacked by a single m_side.
+   * \param[in] colour - The colour of the m_side.
+   * \return A bitboard of all the attacked squares.
+   */
+  Bitboard allAttacks(PieceColour colour);
+
+  std::vector<piece::Move> generateCastlingMoves(std::vector<piece::Move> moves);
+  void parseFen(const std::string &fen);
+  std::string rankToFen(Rank rank);
+
+
 
 };
 
