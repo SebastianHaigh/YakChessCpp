@@ -323,13 +323,13 @@ public:
 
   /**
    * \brief Get the bitboard for a particular colour and piece type.
-   * \param[in] colour - The colour of the m_side.
-   * \param[in] type - The type of piece.
+   * \param[in] pieceColour - The colour of the m_side.
+   * \param[in] pieceType - The type of piece.
    * \return A bitboard containing the piece positions.
    */
-  Bitboard get_position(PieceColour colour, PieceType type)
+  Bitboard getPosition(PieceColour pieceColour, PieceType pieceType)
   {
-    return get_position(type) & get_position(colour);
+    return get_position(pieceType) & get_position(pieceColour);
   }
 
 private:
@@ -383,11 +383,11 @@ private:
 
   /*!
    * \brief Returns all of the squares attacked by a particular type of piece.
-   * \param[in] type - The type of piece.
-   * \param[in] colour - The colour of the piece.
+   * \param[in] pieceType - The type of piece.
+   * \param[in] pieceColour - The colour of the piece.
    * \return A bitboard of all the attacked squares.
    */
-  Bitboard pieceAttacks(PieceType type, PieceColour colour);
+  Bitboard pieceAttacks(PieceType pieceType, PieceColour pieceColour);
 
   /*!
    * \brief Returns all of the squares attacked by a single m_side.
@@ -488,7 +488,7 @@ void Board::processEp(const piece::Move &move)
   // get the ep target square from move.to square.
   // This is better than using the Boards m_epSquare because
   // it will give the same result when the move is undo'd.
-  Bitboard capture_square = piece::pawn_single_push_source<C>(to_bitboard);
+  Bitboard capture_square = piece::pawnSinglePushSource<C>(to_bitboard);
   m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= capture_square;
   m_colourBitboard[static_cast<int>(OppositeColour<C>::value)] ^= capture_square;
 
@@ -501,7 +501,7 @@ void Board::processCastle(const piece::Move &move)
   if (m_currentState.can_castle<T>())
   {
     // Move the king
-    Bitboard from_to_bitboard = get_position(C, PieceType::KING) ^ KingCastleTarget<T, C>::value;
+    Bitboard from_to_bitboard = getPosition(C, PieceType::KING) ^ KingCastleTarget<T, C>::value;
     m_pieceTypeBitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
     m_colourBitboard[static_cast<int>(C)] ^= from_to_bitboard;
 

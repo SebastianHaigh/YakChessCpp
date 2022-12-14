@@ -1,7 +1,6 @@
 #include "pieces.h"
 
 namespace yak {
-
 namespace piece {
 
 void generate_pawn_moves(PieceColour colour,
@@ -30,7 +29,7 @@ void generate_pawn_moves(PieceColour colour,
   sources = (colour == PieceColour::BLACK) ? bitboard::shift<Direction::NORTH>(sources) : bitboard::shift<Direction::SOUTH>(sources) & not_promotable;
   while (sources)
   {
-    *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *move_list++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -38,7 +37,7 @@ void generate_pawn_moves(PieceColour colour,
   targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_EAST>(sources) : bitboard::shift<Direction::NORTH_EAST>(sources);
   while (sources)
   {
-    *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *move_list++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -46,7 +45,7 @@ void generate_pawn_moves(PieceColour colour,
   targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_WEST>(sources) : bitboard::shift<Direction::NORTH_WEST>(sources);
   while (sources)
   {
-    *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *move_list++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
@@ -57,10 +56,10 @@ void generate_pawn_moves(PieceColour colour,
   {
     Square from = bitboard::popLS1B(sources);
     Square to = bitboard::popLS1B(targets);
-    *move_list++ = make_quiet_promotion(from, to, PieceType::KNIGHT);
-    *move_list++ = make_quiet_promotion(from, to, PieceType::BISHOP);
-    *move_list++ = make_quiet_promotion(from, to, PieceType::ROOK);
-    *move_list++ = make_quiet_promotion(from, to, PieceType::QUEEN);
+    *move_list++ = makeQuietPromotion(from, to, PieceType::KNIGHT);
+    *move_list++ = makeQuietPromotion(from, to, PieceType::BISHOP);
+    *move_list++ = makeQuietPromotion(from, to, PieceType::ROOK);
+    *move_list++ = makeQuietPromotion(from, to, PieceType::QUEEN);
     move_counter += 4;
   }
 
@@ -70,10 +69,10 @@ void generate_pawn_moves(PieceColour colour,
   {
     Square from = bitboard::popLS1B(sources);
     Square to = bitboard::popLS1B(targets);
-    *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
-    *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
-    *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
-    *move_list++ = make_capture_promotion(from, to, PieceType::QUEEN);
+    *move_list++ = makeCapturePromotion(from, to, PieceType::KNIGHT);
+    *move_list++ = makeCapturePromotion(from, to, PieceType::BISHOP);
+    *move_list++ = makeCapturePromotion(from, to, PieceType::ROOK);
+    *move_list++ = makeCapturePromotion(from, to, PieceType::QUEEN);
     move_counter += 4;
   }
 
@@ -83,10 +82,10 @@ void generate_pawn_moves(PieceColour colour,
   {
     Square from = bitboard::popLS1B(sources);
     Square to = bitboard::popLS1B(targets);
-    *move_list++ = make_capture_promotion(from, to, PieceType::KNIGHT);
-    *move_list++ = make_capture_promotion(from, to, PieceType::BISHOP);
-    *move_list++ = make_capture_promotion(from, to, PieceType::ROOK);
-    *move_list++ = make_capture_promotion(from, to, PieceType::QUEEN);
+    *move_list++ = makeCapturePromotion(from, to, PieceType::KNIGHT);
+    *move_list++ = makeCapturePromotion(from, to, PieceType::BISHOP);
+    *move_list++ = makeCapturePromotion(from, to, PieceType::ROOK);
+    *move_list++ = makeCapturePromotion(from, to, PieceType::QUEEN);
     move_counter += 4;
   }
 }
@@ -113,7 +112,7 @@ void generate_sliding_piece_moves(const attackmap::RookMap &atk_map,
     Bitboard capture = atk_bb & opponent_pieces;
     while (capture)
     {
-      *move_list++ = make_capture(from, bitboard::popLS1B(capture));
+      *move_list++ = makeCapture(from, bitboard::popLS1B(capture));
       move_counter++;
     }
   }
@@ -141,7 +140,7 @@ void generateSlidingPieceMoves(const attackmap::BishopMap &attackMap,
     Bitboard capture = attackBitboard & opponentPieces;
     while (capture)
     {
-      *moveList++ = make_capture(from, bitboard::popLS1B(capture));
+      *moveList++ = makeCapture(from, bitboard::popLS1B(capture));
       moveCounter++;
     }
   }
@@ -169,7 +168,7 @@ void generateSlidingPieceMoves(const attackmap::QueenMap &attackMap,
     Bitboard capture = attackBitboard & opponentPieces;
     while (capture)
     {
-      *moveList++ = make_capture(from, bitboard::popLS1B(capture));
+      *moveList++ = makeCapture(from, bitboard::popLS1B(capture));
       moveCounter++;
     }
   }

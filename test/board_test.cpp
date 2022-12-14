@@ -10,7 +10,7 @@ TEST(MoveTest, DoublePawnPushCreatesEpTargetSquare) {
   std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
   std::string expected{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1" };
   yak::Board board(fen);
-  auto move = yak::piece::make_double_push(8, 24);
+  auto move = yak::piece::makeDoublePush(8, 24);
 
   // Act
   board.makeMove(move);
@@ -71,7 +71,7 @@ TEST(MoveFactoryTest, CanCreatePawnDoublePushMove) {
   yak::Board board(fen);
 
   // Act
-  yak::piece::Move pawn_push = yak::piece::make_double_push(8, 24);
+  yak::piece::Move pawn_push = yak::piece::makeDoublePush(8, 24);
 
   // Assert
   board.makeMove(pawn_push);
@@ -189,7 +189,7 @@ TEST(BoardTest, BoardCanReturnCorrectWhitePawnPositions) {
   Bitboard expected = yak::bitboard::RANK_2;
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::PAWN);
+  Bitboard actual = board.getPosition(PieceColour::WHITE, PieceType::PAWN);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -202,7 +202,7 @@ TEST(BoardTest, BoardCanReturnCorrectBlackPawnPositions) {
   Bitboard expected = yak::bitboard::RANK_7;
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::PAWN);
+  Bitboard actual = board.getPosition(PieceColour::BLACK, PieceType::PAWN);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -215,7 +215,7 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteKnightPositions) {
   Bitboard expected = yak::bitboard::RANK_1 & (yak::bitboard::FILE_B | yak::bitboard::FILE_G);
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::KNIGHT);
+  Bitboard actual = board.getPosition(PieceColour::WHITE, PieceType::KNIGHT);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -228,7 +228,7 @@ TEST(BoardTest, BoardCanReturnCorrectBlackKnightPositions) {
   Bitboard expected = yak::bitboard::RANK_8 & (yak::bitboard::FILE_B | yak::bitboard::FILE_G);
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::KNIGHT);
+  Bitboard actual = board.getPosition(PieceColour::BLACK, PieceType::KNIGHT);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -241,7 +241,7 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteBishopPositions) {
   Bitboard expected = yak::bitboard::RANK_1 & (yak::bitboard::FILE_C | yak::bitboard::FILE_F);
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::BISHOP);
+  Bitboard actual = board.getPosition(PieceColour::WHITE, PieceType::BISHOP);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -254,7 +254,7 @@ TEST(BoardTest, BoardCanReturnCorrectBlackBishopPositions) {
   Bitboard expected = yak::bitboard::RANK_8 & (yak::bitboard::FILE_C | yak::bitboard::FILE_F);
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::BISHOP);
+  Bitboard actual = board.getPosition(PieceColour::BLACK, PieceType::BISHOP);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -267,7 +267,7 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteRookPositions) {
   Bitboard expected = yak::bitboard::RANK_1 & (yak::bitboard::FILE_A | yak::bitboard::FILE_H);
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::ROOK);
+  Bitboard actual = board.getPosition(PieceColour::WHITE, PieceType::ROOK);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -280,7 +280,7 @@ TEST(BoardTest, BoardCanReturnCorrectBlackRookPositions) {
   Bitboard expected = yak::bitboard::RANK_8 & (yak::bitboard::FILE_A | yak::bitboard::FILE_H);
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::ROOK);
+  Bitboard actual = board.getPosition(PieceColour::BLACK, PieceType::ROOK);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -293,7 +293,7 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteQueenPositions) {
   Bitboard expected = yak::bitboard::RANK_1 & yak::bitboard::FILE_D;
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::QUEEN);
+  Bitboard actual = board.getPosition(PieceColour::WHITE, PieceType::QUEEN);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -306,7 +306,7 @@ TEST(BoardTest, BoardCanReturnCorrectBlackQueenPositions) {
   Bitboard expected = yak::bitboard::RANK_8 & yak::bitboard::FILE_D;
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::QUEEN);
+  Bitboard actual = board.getPosition(PieceColour::BLACK, PieceType::QUEEN);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -319,7 +319,7 @@ TEST(BoardTest, BoardCanReturnCorrectWhiteKingPositions) {
   Bitboard expected = yak::bitboard::RANK_1 & yak::bitboard::FILE_E;
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::WHITE, PieceType::KING);
+  Bitboard actual = board.getPosition(PieceColour::WHITE, PieceType::KING);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -332,7 +332,7 @@ TEST(BoardTest, BoardCanReturnCorrectBlackKingPositions) {
   Bitboard expected = yak::bitboard::RANK_8 & yak::bitboard::FILE_E;
 
   // Act
-  Bitboard actual = board.get_position(PieceColour::BLACK, PieceType::KING);
+  Bitboard actual = board.getPosition(PieceColour::BLACK, PieceType::KING);
 
   // Assert
   EXPECT_EQ(actual, expected);
@@ -393,7 +393,7 @@ TEST(BoardTest, CastlingRightsChangeWhenRookIsCaptured) {
   std::string expected{ "rnbqkbn1/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNr w Qq - 0 2" };
   yak::Board board(fen);
 
-  yak::piece::Move move = yak::piece::make_capture(63, 7);
+  yak::piece::Move move = yak::piece::makeCapture(63, 7);
   //move.set_capture(PieceType::ROOK);
 
   board.makeMove(move);
