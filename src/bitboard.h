@@ -110,66 +110,6 @@ const Bitboard UNIVERSAL = 0xffffffffffffffff;
 const Bitboard EMPTY = 0x0000000000000000;
 
 /**
-* Shifts a Bitboard south by one rank.
-*
-* @param The Bitbaord to be shifted.
-* @returns The shifted Bitboard.
-*/
-inline Bitboard south_one(Bitboard board)
-{
-  return board >> 8;
-}
-
-/**
-* Shifts a Bitboard north by one rank.
-*
-* @param The Bitbaord to be shifted.
-* @returns The shifted Bitboard.
-*/
-inline Bitboard north_one(Bitboard board)
-{
-  return board << 8;
-}
-
-/**
-* Shifts a Bitboard east by one file.
-*
-* @param The Bitbaord to be shifted.
-* @returns The shifted Bitboard.
-*/
-inline Bitboard east_one(Bitboard board)
-{
-  return (board << 1) & NOT_FILE_A;
-}
-
-/**
-* Shifts a Bitboard west by one file.
-*
-* @param The Bitbaord to be shifted.
-* @returns The shifted Bitboard.
-*/
-inline Bitboard west_one(Bitboard board)
-{
-  return (board >> 1) & NOT_FILE_H;
-}
-inline Bitboard north_east_one(Bitboard board)
-{
-  return (board << 9) & NOT_FILE_A;
-}
-inline Bitboard south_east_one(Bitboard board)
-{
-  return (board >> 7) & NOT_FILE_A;
-}
-inline Bitboard north_west_one(Bitboard board)
-{
-  return (board << 7) & NOT_FILE_H;
-}
-inline Bitboard south_west_one(Bitboard board)
-{
-  return (board >> 9) & NOT_FILE_H;
-}
-
-/**
  * \brief Shifts a Bitboard by one square in a specified direction.
  * \tparam D - The direction in which to shift.
  * \param[in] board - The bitboard to be shifted.

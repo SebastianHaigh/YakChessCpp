@@ -8,7 +8,7 @@ TEST(BitboardTest, SouthOne) {
     Bitboard expected_bitboard = 0x00000000000000ff; // RANK 1
     // Act
 
-    shifted_bitboard = yak::bitboard::south_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::SOUTH>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -20,7 +20,7 @@ TEST(BitboardTest, SouthOneFromRank1) {
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0; // EMPTY BOARD
     // Act
-    shifted_bitboard = yak::bitboard::south_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::SOUTH>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -34,7 +34,7 @@ TEST(BitboardTest, NorthOne) {
     Bitboard expected_bitboard = 0x0000000000ff0000; // RANK 3
     
     // Act
-    shifted_bitboard = yak::bitboard::north_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::NORTH>(initial_bitboard);
     
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -47,7 +47,7 @@ TEST(BitboardTest, NorthOneFromRank8) {
     Bitboard expected_bitboard = 0; // EMPTY BOARD
     
     // Act
-    shifted_bitboard = yak::bitboard::north_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::NORTH>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -60,7 +60,7 @@ TEST(BitboardTest, EastOne) {
     Bitboard expected_bitboard = 0x0404040404040404; // C FILE
 
     // Act
-    shifted_bitboard = yak::bitboard::east_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::EAST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -73,7 +73,7 @@ TEST(BitboardTest, EastOneFromHFile) {
     Bitboard expected_bitboard = 0; // EMPTY BOARD
     
     // Act
-    shifted_bitboard = yak::bitboard::east_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::EAST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -85,7 +85,7 @@ TEST(BitboardTest, WestOne) {
     Bitboard expected_bitboard = yak::bitboard::FILE_A;
   
     // Act
-    Bitboard shifted_bitboard = yak::bitboard::west_one(initial_bitboard);
+    Bitboard shifted_bitboard = yak::bitboard::shift<Direction::WEST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -97,7 +97,7 @@ TEST(BitboardTest, WestOneFromAFile) {
     Bitboard expected_bitboard = yak::bitboard::EMPTY; // EMPTY BOARD
 
     // Act
-    Bitboard shifted_bitboard = yak::bitboard::west_one(initial_bitboard);
+    Bitboard shifted_bitboard = yak::bitboard::shift<Direction::WEST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -109,7 +109,7 @@ TEST(BitboardTest, NorthEastOneFromMiddleOfBoard) {
     Bitboard expected_bitboard = yak::bitboard::static_bitboard<B3>::value; // A2 should go to B3 (square 17)
   
     // Act
-    Bitboard shifted_bitboard = yak::bitboard::north_east_one(initial_bitboard);
+    Bitboard shifted_bitboard = yak::bitboard::shift<Direction::NORTH_EAST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -121,7 +121,7 @@ TEST(BitboardTest, SouthEastOneFromMiddleOfBoard) {
     Bitboard expected = yak::bitboard::static_bitboard<B1>::value; // A2 should go to B1 (square 1)
 
     // Act
-    Bitboard actual =  yak::bitboard::south_east_one(initial);
+    Bitboard actual =  yak::bitboard::shift<Direction::SOUTH_EAST>(initial);
 
     // Assert
     EXPECT_EQ(actual, expected);
@@ -134,7 +134,7 @@ TEST(BitboardTest, NorthWestOneFromMiddleOfBoard) {
     Bitboard expected_bitboard = 0; // EMPTY BOARD
 
     //Act
-    shifted_bitboard = yak::bitboard::north_west_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::NORTH_WEST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -147,7 +147,7 @@ TEST(BitboardTest, SouthWestOneFromMiddleOfBoard) {
     Bitboard expected_bitboard = 0; // EMPTY BOARD
 
     // Act
-    shifted_bitboard = yak::bitboard::south_west_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::SOUTH_WEST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);

@@ -190,7 +190,7 @@ std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> m
 
   if (m_currentState.canKingSideCastle() && !isCheck())
   {
-    Bitboard king_path = bitboard::east_one(king) | bitboard::east_one(bitboard::east_one(king));
+    Bitboard king_path = bitboard::shift<Direction::EAST>(king) | bitboard::shift<Direction::EAST>(bitboard::shift<Direction::EAST>(king));
     if ((king_path & occupiedSquares()) == 0 && (king_path & squares_attacked_by_enemy) == 0)
     {
       moves.push_back(piece::make_kingside_castle());
@@ -199,8 +199,8 @@ std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> m
 
   if (m_currentState.canQueenSideCastle() && !isCheck())
   {
-    Bitboard king_path = bitboard::west_one(king) | bitboard::west_one(bitboard::west_one(king));
-    Bitboard rook_path = king_path | bitboard::west_one(king_path);
+    Bitboard king_path = bitboard::shift<Direction::WEST>(king) | bitboard::shift<Direction::WEST>(bitboard::shift<Direction::WEST>(king));
+    Bitboard rook_path = king_path | bitboard::shift<Direction::WEST>(king_path);
     if ((rook_path & occupiedSquares()) == 0 && (king_path & squares_attacked_by_enemy) == 0)
     {
       moves.push_back(piece::make_queenside_castle());

@@ -17,8 +17,8 @@ void generate_pawn_moves(PieceColour colour,
 
   /* NOT PROMOTIONS              */
   /* --------------------------- */
-  Bitboard sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH>(empty_squares) : bitboard::south_one(empty_squares)) & not_promotable;
-  Bitboard targets = colour == PieceColour::BLACK ? bitboard::south_one(sources) : bitboard::north_one(sources);
+  Bitboard sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH>(empty_squares) : bitboard::shift<Direction::SOUTH>(empty_squares)) & not_promotable;
+  Bitboard targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH>(sources) : bitboard::shift<Direction::NORTH>(sources);
   while (sources)
   {
     *move_list++ = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
@@ -26,24 +26,24 @@ void generate_pawn_moves(PieceColour colour,
   }
 
   targets = ((colour == PieceColour::BLACK) ? bitboard::RANK_5 : bitboard::RANK_4) & empty_squares;
-  sources = (colour == PieceColour::BLACK) ? bitboard::north_one(targets) : bitboard::south_one(targets) & empty_squares;
-  sources = (colour == PieceColour::BLACK) ? bitboard::north_one(sources) : bitboard::south_one(sources) & not_promotable;
+  sources = (colour == PieceColour::BLACK) ? bitboard::shift<Direction::NORTH>(targets) : bitboard::shift<Direction::SOUTH>(targets) & empty_squares;
+  sources = (colour == PieceColour::BLACK) ? bitboard::shift<Direction::NORTH>(sources) : bitboard::shift<Direction::SOUTH>(sources) & not_promotable;
   while (sources)
   {
     *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
-  sources = (colour == PieceColour::BLACK ? bitboard::north_west_one(opponent_pieces) : bitboard::south_west_one(opponent_pieces)) & not_promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::south_east_one(sources) : bitboard::north_east_one(sources);
+  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_WEST>(opponent_pieces) : bitboard::shift<Direction::SOUTH_WEST>(opponent_pieces)) & not_promotable;
+  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_EAST>(sources) : bitboard::shift<Direction::NORTH_EAST>(sources);
   while (sources)
   {
     *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     move_counter++;
   }
 
-  sources = (colour == PieceColour::BLACK ? bitboard::north_east_one(opponent_pieces) : bitboard::south_east_one(opponent_pieces)) & not_promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::south_west_one(sources) : bitboard::north_west_one(sources);
+  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_EAST>(opponent_pieces) : bitboard::shift<Direction::SOUTH_EAST>(opponent_pieces)) & not_promotable;
+  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_WEST>(sources) : bitboard::shift<Direction::NORTH_WEST>(sources);
   while (sources)
   {
     *move_list++ = make_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
@@ -51,8 +51,8 @@ void generate_pawn_moves(PieceColour colour,
   }
 
   // PROMOTIONS
-  sources = (colour == PieceColour::BLACK ? bitboard::north_one(empty_squares) : bitboard::south_one(empty_squares)) & promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::south_one(sources) : bitboard::north_one(sources);
+  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH>(empty_squares) : bitboard::shift<Direction::SOUTH>(empty_squares)) & promotable;
+  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH>(sources) : bitboard::shift<Direction::NORTH>(sources);
   while (sources)
   {
     Square from = bitboard::popLS1B(sources);
@@ -64,8 +64,8 @@ void generate_pawn_moves(PieceColour colour,
     move_counter += 4;
   }
 
-  sources = (colour == PieceColour::BLACK ? bitboard::north_west_one(opponent_pieces) : bitboard::south_west_one(opponent_pieces)) & promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::south_east_one(sources) : bitboard::north_east_one(sources);
+  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_WEST>(opponent_pieces) : bitboard::shift<Direction::SOUTH_WEST>(opponent_pieces)) & promotable;
+  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_EAST>(sources) : bitboard::shift<Direction::NORTH_EAST>(sources);
   while (sources)
   {
     Square from = bitboard::popLS1B(sources);
@@ -77,8 +77,8 @@ void generate_pawn_moves(PieceColour colour,
     move_counter += 4;
   }
 
-  sources = (colour == PieceColour::BLACK ? bitboard::north_east_one(empty_squares) : bitboard::south_east_one(empty_squares)) & promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::south_west_one(sources) : bitboard::north_west_one(sources);
+  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_EAST>(empty_squares) : bitboard::shift<Direction::SOUTH_EAST>(empty_squares)) & promotable;
+  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_WEST>(sources) : bitboard::shift<Direction::NORTH_WEST>(sources);
   while (sources)
   {
     Square from = bitboard::popLS1B(sources);
