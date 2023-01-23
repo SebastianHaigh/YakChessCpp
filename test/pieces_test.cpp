@@ -18,7 +18,6 @@ TEST(BlackPawnsTest, CanGenerateSinglePushesFromUnobstructedStartingPosition) {
     yak::piece::generate_pawn_single_pushes<PieceColour::BLACK, false>(&move_list[move_counter], move_counter, pawns, ~pawns);
 
     // Assert
-
     EXPECT_EQ(move_counter, 8);
 }
 
@@ -32,7 +31,6 @@ TEST(BlackPawnsTest, DoublePushTargetIsRank5) {
     // Assert
     EXPECT_EQ(actual, expected);
 }
-
 
 TEST(BlackPawnsTest, DoublePushOnlyAllowedFromRank7) {
     // Assemble
@@ -347,7 +345,7 @@ TEST(KnightTests, KnightOnA1AttacksTheCorrectSquares) {
     Bitboard opponent_pieces = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generate_piece_moves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty_squares, opponent_pieces);
+    yak::piece::generatePieceMoves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty_squares, opponent_pieces);
   
     // Assert
     EXPECT_EQ(move_counter, 2);
@@ -364,7 +362,7 @@ TEST(KnightTests, KnightOnD4AttacksTheCorrectSquares) {
     Bitboard opponent_pieces = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generate_piece_moves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty_squares, opponent_pieces);
+    yak::piece::generatePieceMoves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty_squares, opponent_pieces);
 
     // Assert
     EXPECT_EQ(move_counter, 8);
@@ -378,8 +376,6 @@ TEST(KnightTests, KnightOnD4AttacksTheCorrectSquares) {
     EXPECT_EQ(move_list[7].to, E6);
 }
 
-
-
 TEST(KingTests, KnightOnA1AttacksTheCorrectSquares) {
     // Arrange
     Square starting_square{ A1 };
@@ -389,7 +385,7 @@ TEST(KingTests, KnightOnA1AttacksTheCorrectSquares) {
     Bitboard opponent_pieces = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter,
+    yak::piece::generatePieceMoves<PieceType::KING>(&move_list[0], move_counter,
                                                       yak::bitboard::toBitboard(starting_square), empty_squares, opponent_pieces);
 
     // Assert
@@ -408,8 +404,11 @@ TEST(KingTests, KnightOnD4AttacksTheCorrectSquares) {
     Bitboard opponent_pieces = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter,
-                                                      yak::bitboard::toBitboard(starting_square), empty_squares, opponent_pieces);
+    yak::piece::generatePieceMoves<PieceType::KING>(&move_list[0],
+                                                    move_counter,
+                                                    yak::bitboard::toBitboard(starting_square),
+                                                    empty_squares,
+                                                    opponent_pieces);
 
     // Assert
     EXPECT_EQ(move_counter, 8);
@@ -429,10 +428,15 @@ TEST(RookTests, RookAttacksProperly) {
     yak::piece::Move list[100];
     int move_counter{ 0 };
     Bitboard rook_bb = yak::bitboard::static_bitboard<A1>::value;
-    Bitboard obstruction = yak::bitboard::static_bitboard<A5>::value;
+    Bitboard opponentPieces = yak::bitboard::static_bitboard<A5>::value;
+    auto emptySquares = ~(rook_bb | opponentPieces);
 
     // Act
-    yak::piece::generate_sliding_piece_moves(atk_map, &list[0], move_counter, rook_bb, ~obstruction, obstruction);
+    yak::piece::generatePieceMoves<PieceType::ROOK>(&list[0],
+                                                    move_counter,
+                                                    rook_bb,
+                                                    emptySquares,
+                                                    opponentPieces);
 
     // Assert
     EXPECT_EQ(move_counter, 11);

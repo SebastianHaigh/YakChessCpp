@@ -7,29 +7,8 @@
 #include <array>
 
 namespace yak {
-namespace attackmap {
 
-//template<Direction D>
-//constexpr Bitboard shifta(Bitboard board)
-//{
-//  if (D == Direction::NORTH)
-//    return board << 8;
-//  if (D == Direction::SOUTH)
-//    return board >> 8;
-//  if (D == Direction::EAST)
-//    return (board << 1) & bitboard::NOT_FILE_A;
-//  if (D == Direction::WEST)
-//    return (board >> 1) & bitboard::NOT_FILE_H;
-//  if (D == Direction::NORTH_EAST)
-//    return (board << 9) & bitboard::NOT_FILE_A;
-//  if (D == Direction::SOUTH_EAST)
-//    return (board >> 7) & bitboard::NOT_FILE_A;
-//  if (D == Direction::NORTH_WEST)
-//    return (board << 7) & bitboard::NOT_FILE_H;
-//  if (D == Direction::SOUTH_WEST)
-//    return (board >> 9) & bitboard::NOT_FILE_H;
-//  return board;
-//};
+namespace attackmap {
 
 /* ------------------------------------------------------------------ */
 /* GENERATE STATIC TABLE FOR RAY MAP LOOKUP                           */

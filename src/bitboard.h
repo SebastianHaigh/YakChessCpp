@@ -227,6 +227,7 @@ struct static_bitboard<S, Sp...>
 {
   static constexpr Bitboard value = (Bitboard{1} << S) | static_bitboard<Sp...>::value;
 };
+
 template<Square S1, Square S2>
 struct static_bitboard<S1, S2>
 {

@@ -402,43 +402,46 @@ inline void generate_pawn_east_captures(Move *move_list,
 }
 
 template<PieceColour C>
-void generate_pawn_moves(Move *move_list,
-                         int &move_counter,
-                         Bitboard pawn_positions,
-                         Bitboard empty_squares,
-                         Bitboard opponent_pieces)
+void generate_pawn_moves(Move *moveList,
+                       int &moveCounter,
+                       Bitboard pawnPositions,
+                       Bitboard emptySquares,
+                       Bitboard opponentPieces)
 {
   /* NOT PROMOTIONS             */
   /* ----------------------------- */
-  generate_pawn_single_pushes<C, false>(&move_list[move_counter], move_counter, pawn_positions, empty_squares);
-  generatePawnDoublePushes<C, false>(&move_list[move_counter], move_counter, pawn_positions, empty_squares);
-  generatePawnWestCaptures<C, false>(&move_list[move_counter], move_counter, pawn_positions, opponent_pieces);
-  generate_pawn_east_captures<C, false>(&move_list[move_counter], move_counter, pawn_positions, opponent_pieces);
+  generate_pawn_single_pushes<C, false>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
+  generatePawnDoublePushes<C, false>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
+  generatePawnWestCaptures<C, false>(&moveList[moveCounter], moveCounter, pawnPositions, opponentPieces);
+  generate_pawn_east_captures<C, false>(&moveList[moveCounter], moveCounter, pawnPositions, opponentPieces);
 
   /* PROMOTIONS                    */
   /* ----------------------------- */
-  generate_pawn_single_pushes<C, true>(&move_list[move_counter], move_counter, pawn_positions, empty_squares);
-  generatePawnWestCaptures<C, true>(&move_list[move_counter], move_counter, pawn_positions, opponent_pieces);
-  generate_pawn_east_captures<C, true>(&move_list[move_counter], move_counter, pawn_positions, opponent_pieces);
+  generate_pawn_single_pushes<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
+  generatePawnWestCaptures<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, opponentPieces);
+  generate_pawn_east_captures<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, opponentPieces);
 };
 
 template<PieceColour C>
-void generate_ep_captures(Move *move_list, int &move_counter, Bitboard pawn_positions, Bitboard ep_target)
+void generateEpCaptures(Move *moveList,
+                        int &moveCounter,
+                        Bitboard pawnPositions,
+                        Bitboard epTarget)
 {
-  Bitboard sources = pawnWestAttackSource<C>(ep_target) & pawn_positions;
+  Bitboard sources = pawnWestAttackSource<C>(epTarget) & pawnPositions;
   Bitboard targets = pawnWestAttackTarget<C>(sources);
   while (sources)
   {
-    *move_list++ = make_ep_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
-    move_counter++;
+    *moveList++ = make_ep_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    moveCounter++;
   }
 
-  sources = pawn_east_attack_source<C>(ep_target) & pawn_positions;
+  sources = pawn_east_attack_source<C>(epTarget) & pawnPositions;
   targets = pawn_east_attack_target<C>(sources);
   while (sources)
   {
-    *move_list++ = make_ep_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
-    move_counter++;
+    *moveList++ = make_ep_capture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    moveCounter++;
   }
 };
 
@@ -464,34 +467,34 @@ void generateSlidingPieceMoves(const attackmap::QueenMap &,
                                Bitboard opponentPieces);
 
 template<PieceType T>
-void generate_piece_moves(Move *move_list,
-                          int &move_counter,
-                          Bitboard piece_positions,
-                          Bitboard empty_squares,
-                          Bitboard opponent_pieces)
+void generatePieceMoves(Move *moveList,
+                        int &moveCounter,
+                        Bitboard piecePositions,
+                        Bitboard emptySquares,
+                        Bitboard opponentPieces)
 {
 
-  while (piece_positions)
+  while (piecePositions)
   {
-    Square from = bitboard::popLS1B(piece_positions);
+    Square from = bitboard::popLS1B(piecePositions);
     Bitboard atk_bb = (T == PieceType::KNIGHT) ? KnightMap::attacks(from) :
-                      (T == PieceType::BISHOP) ? attackmap::BishopMap::attacks(from, ~empty_squares) :
-                      (T == PieceType::ROOK) ? attackmap::RookMap::attacks(from, ~empty_squares) :
-                      (T == PieceType::QUEEN) ? attackmap::QueenMap::attacks(from, ~empty_squares) :
+                      (T == PieceType::BISHOP) ? attackmap::BishopMap::attacks(from, ~emptySquares) :
+                      (T == PieceType::ROOK) ? attackmap::RookMap::attacks(from, ~emptySquares) :
+                      (T == PieceType::QUEEN) ? attackmap::QueenMap::attacks(from, ~emptySquares) :
                       (T == PieceType::KING) ? KingMap::attacks(from) : Bitboard{0};
 
-    Bitboard quiet = atk_bb & empty_squares;
+    Bitboard quiet = atk_bb & emptySquares;
     while (quiet)
     {
-      *move_list++ = makeQuiet(from, bitboard::popLS1B(quiet));
-      move_counter++;
+      *moveList++ = makeQuiet(from, bitboard::popLS1B(quiet));
+      moveCounter++;
     }
 
-    Bitboard capture = atk_bb & opponent_pieces;
+    Bitboard capture = atk_bb & opponentPieces;
     while (capture)
     {
-      *move_list++ = makeCapture(from, bitboard::popLS1B(capture));
-      move_counter++;
+      *moveList++ = makeCapture(from, bitboard::popLS1B(capture));
+      moveCounter++;
     }
   }
 }

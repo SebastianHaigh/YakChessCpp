@@ -3,92 +3,92 @@
 namespace yak {
 namespace piece {
 
-void generate_pawn_moves(PieceColour colour,
-                         Move *move_list,
-                         int &move_counter,
-                         Bitboard pawn_positions,
-                         Bitboard empty_squares,
-                         Bitboard opponent_pieces)
-{
-
-  Bitboard promotable = (colour == PieceColour::BLACK ? bitboard::RANK_2 : bitboard::RANK_7) & pawn_positions;
-  Bitboard not_promotable = pawn_positions & ~promotable;
-
-  /* NOT PROMOTIONS              */
-  /* --------------------------- */
-  Bitboard sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH>(empty_squares) : bitboard::shift<Direction::SOUTH>(empty_squares)) & not_promotable;
-  Bitboard targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH>(sources) : bitboard::shift<Direction::NORTH>(sources);
-  while (sources)
-  {
-    *move_list++ = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
-    move_counter++;
-  }
-
-  targets = ((colour == PieceColour::BLACK) ? bitboard::RANK_5 : bitboard::RANK_4) & empty_squares;
-  sources = (colour == PieceColour::BLACK) ? bitboard::shift<Direction::NORTH>(targets) : bitboard::shift<Direction::SOUTH>(targets) & empty_squares;
-  sources = (colour == PieceColour::BLACK) ? bitboard::shift<Direction::NORTH>(sources) : bitboard::shift<Direction::SOUTH>(sources) & not_promotable;
-  while (sources)
-  {
-    *move_list++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
-    move_counter++;
-  }
-
-  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_WEST>(opponent_pieces) : bitboard::shift<Direction::SOUTH_WEST>(opponent_pieces)) & not_promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_EAST>(sources) : bitboard::shift<Direction::NORTH_EAST>(sources);
-  while (sources)
-  {
-    *move_list++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
-    move_counter++;
-  }
-
-  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_EAST>(opponent_pieces) : bitboard::shift<Direction::SOUTH_EAST>(opponent_pieces)) & not_promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_WEST>(sources) : bitboard::shift<Direction::NORTH_WEST>(sources);
-  while (sources)
-  {
-    *move_list++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
-    move_counter++;
-  }
-
-  // PROMOTIONS
-  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH>(empty_squares) : bitboard::shift<Direction::SOUTH>(empty_squares)) & promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH>(sources) : bitboard::shift<Direction::NORTH>(sources);
-  while (sources)
-  {
-    Square from = bitboard::popLS1B(sources);
-    Square to = bitboard::popLS1B(targets);
-    *move_list++ = makeQuietPromotion(from, to, PieceType::KNIGHT);
-    *move_list++ = makeQuietPromotion(from, to, PieceType::BISHOP);
-    *move_list++ = makeQuietPromotion(from, to, PieceType::ROOK);
-    *move_list++ = makeQuietPromotion(from, to, PieceType::QUEEN);
-    move_counter += 4;
-  }
-
-  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_WEST>(opponent_pieces) : bitboard::shift<Direction::SOUTH_WEST>(opponent_pieces)) & promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_EAST>(sources) : bitboard::shift<Direction::NORTH_EAST>(sources);
-  while (sources)
-  {
-    Square from = bitboard::popLS1B(sources);
-    Square to = bitboard::popLS1B(targets);
-    *move_list++ = makeCapturePromotion(from, to, PieceType::KNIGHT);
-    *move_list++ = makeCapturePromotion(from, to, PieceType::BISHOP);
-    *move_list++ = makeCapturePromotion(from, to, PieceType::ROOK);
-    *move_list++ = makeCapturePromotion(from, to, PieceType::QUEEN);
-    move_counter += 4;
-  }
-
-  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_EAST>(empty_squares) : bitboard::shift<Direction::SOUTH_EAST>(empty_squares)) & promotable;
-  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_WEST>(sources) : bitboard::shift<Direction::NORTH_WEST>(sources);
-  while (sources)
-  {
-    Square from = bitboard::popLS1B(sources);
-    Square to = bitboard::popLS1B(targets);
-    *move_list++ = makeCapturePromotion(from, to, PieceType::KNIGHT);
-    *move_list++ = makeCapturePromotion(from, to, PieceType::BISHOP);
-    *move_list++ = makeCapturePromotion(from, to, PieceType::ROOK);
-    *move_list++ = makeCapturePromotion(from, to, PieceType::QUEEN);
-    move_counter += 4;
-  }
-}
+//void generatePawnMoves(PieceColour colour,
+//                       Move *moveList,
+//                       int &moveCounter,
+//                       Bitboard pawnPositions,
+//                       Bitboard emptySquares,
+//                       Bitboard opponentPieces)
+//{
+//
+//  Bitboard promotable = (colour == PieceColour::BLACK ? bitboard::RANK_2 : bitboard::RANK_7) & pawnPositions;
+//  Bitboard not_promotable = pawnPositions & ~promotable;
+//
+//  /* NOT PROMOTIONS              */
+//  /* --------------------------- */
+//  Bitboard sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH>(emptySquares) : bitboard::shift<Direction::SOUTH>(emptySquares)) & not_promotable;
+//  Bitboard targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH>(sources) : bitboard::shift<Direction::NORTH>(sources);
+//  while (sources)
+//  {
+//    *moveList++ = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+//    moveCounter++;
+//  }
+//
+//  targets = ((colour == PieceColour::BLACK) ? bitboard::RANK_5 : bitboard::RANK_4) & emptySquares;
+//  sources = (colour == PieceColour::BLACK) ? bitboard::shift<Direction::NORTH>(targets) : bitboard::shift<Direction::SOUTH>(targets) & emptySquares;
+//  sources = (colour == PieceColour::BLACK) ? bitboard::shift<Direction::NORTH>(sources) : bitboard::shift<Direction::SOUTH>(sources) & not_promotable;
+//  while (sources)
+//  {
+//    *moveList++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+//    moveCounter++;
+//  }
+//
+//  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_WEST>(opponentPieces) : bitboard::shift<Direction::SOUTH_WEST>(opponentPieces)) & not_promotable;
+//  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_EAST>(sources) : bitboard::shift<Direction::NORTH_EAST>(sources);
+//  while (sources)
+//  {
+//    *moveList++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+//    moveCounter++;
+//  }
+//
+//  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_EAST>(opponentPieces) : bitboard::shift<Direction::SOUTH_EAST>(opponentPieces)) & not_promotable;
+//  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_WEST>(sources) : bitboard::shift<Direction::NORTH_WEST>(sources);
+//  while (sources)
+//  {
+//    *moveList++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+//    moveCounter++;
+//  }
+//
+//  // PROMOTIONS
+//  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH>(emptySquares) : bitboard::shift<Direction::SOUTH>(emptySquares)) & promotable;
+//  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH>(sources) : bitboard::shift<Direction::NORTH>(sources);
+//  while (sources)
+//  {
+//    Square from = bitboard::popLS1B(sources);
+//    Square to = bitboard::popLS1B(targets);
+//    *moveList++ = makeQuietPromotion(from, to, PieceType::KNIGHT);
+//    *moveList++ = makeQuietPromotion(from, to, PieceType::BISHOP);
+//    *moveList++ = makeQuietPromotion(from, to, PieceType::ROOK);
+//    *moveList++ = makeQuietPromotion(from, to, PieceType::QUEEN);
+//    moveCounter += 4;
+//  }
+//
+//  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_WEST>(opponentPieces) : bitboard::shift<Direction::SOUTH_WEST>(opponentPieces)) & promotable;
+//  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_EAST>(sources) : bitboard::shift<Direction::NORTH_EAST>(sources);
+//  while (sources)
+//  {
+//    Square from = bitboard::popLS1B(sources);
+//    Square to = bitboard::popLS1B(targets);
+//    *moveList++ = makeCapturePromotion(from, to, PieceType::KNIGHT);
+//    *moveList++ = makeCapturePromotion(from, to, PieceType::BISHOP);
+//    *moveList++ = makeCapturePromotion(from, to, PieceType::ROOK);
+//    *moveList++ = makeCapturePromotion(from, to, PieceType::QUEEN);
+//    moveCounter += 4;
+//  }
+//
+//  sources = (colour == PieceColour::BLACK ? bitboard::shift<Direction::NORTH_EAST>(emptySquares) : bitboard::shift<Direction::SOUTH_EAST>(emptySquares)) & promotable;
+//  targets = colour == PieceColour::BLACK ? bitboard::shift<Direction::SOUTH_WEST>(sources) : bitboard::shift<Direction::NORTH_WEST>(sources);
+//  while (sources)
+//  {
+//    Square from = bitboard::popLS1B(sources);
+//    Square to = bitboard::popLS1B(targets);
+//    *moveList++ = makeCapturePromotion(from, to, PieceType::KNIGHT);
+//    *moveList++ = makeCapturePromotion(from, to, PieceType::BISHOP);
+//    *moveList++ = makeCapturePromotion(from, to, PieceType::ROOK);
+//    *moveList++ = makeCapturePromotion(from, to, PieceType::QUEEN);
+//    moveCounter += 4;
+//  }
+//}
 
 void generate_sliding_piece_moves(const attackmap::RookMap &atk_map,
                                   Move *move_list,
@@ -117,62 +117,62 @@ void generate_sliding_piece_moves(const attackmap::RookMap &atk_map,
     }
   }
 }
+//
+//void generateSlidingPieceMoves(const attackmap::BishopMap &attackMap,
+//                               Move *moveList,
+//                               int &moveCounter,
+//                               Bitboard piecePositions,
+//                               Bitboard emptySquares,
+//                               Bitboard opponentPieces)
+//{
+//  while (piecePositions)
+//  {
+//    Square from = bitboard::popLS1B(piecePositions);
+//    Bitboard attackBitboard = attackMap.attacks(from, ~emptySquares);
+//
+//    Bitboard quiet = attackBitboard & emptySquares;
+//    while (quiet)
+//    {
+//      *moveList++ = makeQuiet(from, bitboard::popLS1B(quiet));
+//      moveCounter++;
+//    }
+//
+//    Bitboard capture = attackBitboard & opponentPieces;
+//    while (capture)
+//    {
+//      *moveList++ = makeCapture(from, bitboard::popLS1B(capture));
+//      moveCounter++;
+//    }
+//  }
+//}
 
-void generateSlidingPieceMoves(const attackmap::BishopMap &attackMap,
-                               Move *moveList,
-                               int &moveCounter,
-                               Bitboard piecePositions,
-                               Bitboard emptySquares,
-                               Bitboard opponentPieces)
-{
-  while (piecePositions)
-  {
-    Square from = bitboard::popLS1B(piecePositions);
-    Bitboard attackBitboard = attackMap.attacks(from, ~emptySquares);
-
-    Bitboard quiet = attackBitboard & emptySquares;
-    while (quiet)
-    {
-      *moveList++ = makeQuiet(from, bitboard::popLS1B(quiet));
-      moveCounter++;
-    }
-
-    Bitboard capture = attackBitboard & opponentPieces;
-    while (capture)
-    {
-      *moveList++ = makeCapture(from, bitboard::popLS1B(capture));
-      moveCounter++;
-    }
-  }
-}
-
-void generateSlidingPieceMoves(const attackmap::QueenMap &attackMap,
-                               Move *moveList,
-                               int &moveCounter,
-                               Bitboard piecePositions,
-                               Bitboard emptySquares,
-                               Bitboard opponentPieces)
-{
-  while (piecePositions)
-  {
-    Square from = bitboard::popLS1B(piecePositions);
-    Bitboard attackBitboard = attackMap.attacks(from, ~emptySquares);
-
-    Bitboard quiet = attackBitboard & emptySquares;
-    while (quiet)
-    {
-      *moveList++ = makeQuiet(from, bitboard::popLS1B(quiet));
-      moveCounter++;
-    }
-
-    Bitboard capture = attackBitboard & opponentPieces;
-    while (capture)
-    {
-      *moveList++ = makeCapture(from, bitboard::popLS1B(capture));
-      moveCounter++;
-    }
-  }
-}
+//void generateSlidingPieceMoves(const attackmap::QueenMap &attackMap,
+//                               Move *moveList,
+//                               int &moveCounter,
+//                               Bitboard piecePositions,
+//                               Bitboard emptySquares,
+//                               Bitboard opponentPieces)
+//{
+//  while (piecePositions)
+//  {
+//    Square from = bitboard::popLS1B(piecePositions);
+//    Bitboard attackBitboard = attackMap.attacks(from, ~emptySquares);
+//
+//    Bitboard quiet = attackBitboard & emptySquares;
+//    while (quiet)
+//    {
+//      *moveList++ = makeQuiet(from, bitboard::popLS1B(quiet));
+//      moveCounter++;
+//    }
+//
+//    Bitboard capture = attackBitboard & opponentPieces;
+//    while (capture)
+//    {
+//      *moveList++ = makeCapture(from, bitboard::popLS1B(capture));
+//      moveCounter++;
+//    }
+//  }
+//}
 
 } // namespace piece
 

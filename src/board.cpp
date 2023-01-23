@@ -1,3 +1,4 @@
+#include <cassert>
 #include "board.h"
 
 /*
@@ -105,73 +106,77 @@ Bitboard Board::emptySquares()
 
 std::vector<piece::Move> Board::generateMoves()
 {
-  piece::Move psuedo_legal_move_list[330];
-  piece::Move en_passant_move;
+  piece::Move psuedoLegalMoveList[330];
+  piece::Move enPassantMove;
   int move_counter{0};
 
-  PieceColour this_side = m_currentState.sideToMove();
-  PieceColour other_side = m_currentState.sideNotToMove();
+  PieceColour thisSide = m_currentState.sideToMove();
+  PieceColour otherSide = m_currentState.sideNotToMove();
 
-  if (this_side == PieceColour::WHITE)
+  if (thisSide == PieceColour::WHITE)
   {
-    piece::generate_pawn_moves<PieceColour::WHITE>(&psuedo_legal_move_list[move_counter],
+    piece::generate_pawn_moves<PieceColour::WHITE>(&psuedoLegalMoveList[move_counter],
                                                    move_counter,
-                                                   getPosition(this_side, PieceType::PAWN),
+                                                   getPosition(thisSide, PieceType::PAWN),
                                                    emptySquares(),
-                                                   get_position(other_side));
+                                                   get_position(otherSide));
 
-    piece::generate_ep_captures<PieceColour::WHITE>(&en_passant_move, move_counter,
-                                                    getPosition(this_side, PieceType::PAWN), epTarget());
+    piece::generateEpCaptures<PieceColour::WHITE>(&enPassantMove,
+                                                  move_counter,
+                                                  getPosition(thisSide, PieceType::PAWN),
+                                                  epTarget());
   }
   else
   {
-    piece::generate_pawn_moves<PieceColour::BLACK>(&psuedo_legal_move_list[move_counter],
+    piece::generate_pawn_moves<PieceColour::BLACK>(&psuedoLegalMoveList[move_counter],
                                                    move_counter,
-                                                   getPosition(this_side, PieceType::PAWN),
+                                                   getPosition(thisSide, PieceType::PAWN),
                                                    emptySquares(),
-                                                   get_position(other_side));
+                                                   get_position(otherSide));
 
-    piece::generate_ep_captures<PieceColour::BLACK>(&psuedo_legal_move_list[move_counter], move_counter,
-                                                    getPosition(this_side, PieceType::PAWN), epTarget());
+    piece::generateEpCaptures<PieceColour::BLACK>(&psuedoLegalMoveList[move_counter],
+                                                  move_counter,
+                                                  getPosition(thisSide, PieceType::PAWN),
+                                                  epTarget());
   }
 
-  piece::generate_piece_moves<PieceType::KNIGHT>(&psuedo_legal_move_list[move_counter],
-                                                 move_counter,
-                                                 getPosition(this_side, PieceType::KNIGHT),
-                                                 emptySquares(),
-                                                 get_position(other_side));
-
-  piece::generate_piece_moves<PieceType::KING>(&psuedo_legal_move_list[move_counter],
+  piece::generatePieceMoves<PieceType::KNIGHT>(&psuedoLegalMoveList[move_counter],
                                                move_counter,
-                                               getPosition(this_side, PieceType::KING),
+                                               getPosition(thisSide, PieceType::KNIGHT),
                                                emptySquares(),
-                                               get_position(other_side));
+                                               get_position(otherSide));
 
-  piece::generate_piece_moves<PieceType::BISHOP>(&psuedo_legal_move_list[move_counter],
-                                                 move_counter,
-                                                 getPosition(this_side, PieceType::BISHOP),
-                                                 emptySquares(),
-                                                 get_position(other_side));
+  piece::generatePieceMoves<PieceType::KING>(&psuedoLegalMoveList[move_counter],
+                                             move_counter,
+                                             getPosition(thisSide, PieceType::KING),
+                                             emptySquares(),
+                                             get_position(otherSide));
 
-  piece::generate_piece_moves<PieceType::ROOK>(&psuedo_legal_move_list[move_counter],
+  piece::generatePieceMoves<PieceType::BISHOP>(&psuedoLegalMoveList[move_counter],
                                                move_counter,
-                                               getPosition(this_side, PieceType::ROOK),
+                                               getPosition(thisSide, PieceType::BISHOP),
                                                emptySquares(),
-                                               get_position(other_side));
+                                               get_position(otherSide));
 
-  piece::generate_piece_moves<PieceType::QUEEN>(&psuedo_legal_move_list[move_counter],
-                                                move_counter,
-                                                getPosition(this_side, PieceType::QUEEN),
-                                                emptySquares(),
-                                                get_position(other_side));
+  piece::generatePieceMoves<PieceType::ROOK>(&psuedoLegalMoveList[move_counter],
+                                             move_counter,
+                                             getPosition(thisSide, PieceType::ROOK),
+                                             emptySquares(),
+                                             get_position(otherSide));
+
+  piece::generatePieceMoves<PieceType::QUEEN>(&psuedoLegalMoveList[move_counter],
+                                              move_counter,
+                                              getPosition(thisSide, PieceType::QUEEN),
+                                              emptySquares(),
+                                              get_position(otherSide));
 
   std::vector<piece::Move> legal_moves;
   for (int i = 0; i < move_counter; i++)
   {
-    makeMove(psuedo_legal_move_list[i]);
+    makeMove(psuedoLegalMoveList[i]);
     if (!isCheck(m_previousState.sideToMove()))
     {
-      legal_moves.push_back(psuedo_legal_move_list[i]);
+      legal_moves.push_back(psuedoLegalMoveList[i]);
     }
     undoMove();
   }
@@ -183,7 +188,6 @@ std::vector<piece::Move> Board::generateMoves()
 
 std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> moves)
 {
-
   Bitboard squares_attacked_by_enemy = attacked_by(m_currentState.sideNotToMove());
 
   Bitboard king = getPosition(m_currentState.sideToMove(), PieceType::KING);

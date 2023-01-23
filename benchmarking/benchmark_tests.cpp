@@ -75,11 +75,11 @@ void ROOK_MOVE_GENERATION() {
     for (int i = 0; i < 1000; i++) {
       move_counter = 0;
       yak::piece::generate_pawn_moves<PieceColour::WHITE>(&move_list[0], move_counter, pawns, empty, 0);
-      yak::piece::generate_piece_moves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty, 0);
-      yak::piece::generate_piece_moves<PieceType::KING>(&move_list[0], move_counter, knights, empty, 0);
-      yak::piece::generate_piece_moves<PieceType::BISHOP>(&move_list[0], move_counter, knights, empty, 0);
-      yak::piece::generate_piece_moves<PieceType::ROOK>(&move_list[0], move_counter, knights, empty, 0);
-      yak::piece::generate_piece_moves<PieceType::QUEEN>(&move_list[0], move_counter, knights, empty, 0);
+      yak::piece::generatePieceMoves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty, 0);
+      yak::piece::generatePieceMoves<PieceType::KING>(&move_list[0], move_counter, knights, empty, 0);
+      yak::piece::generatePieceMoves<PieceType::BISHOP>(&move_list[0], move_counter, knights, empty, 0);
+      yak::piece::generatePieceMoves<PieceType::ROOK>(&move_list[0], move_counter, knights, empty, 0);
+      yak::piece::generatePieceMoves<PieceType::QUEEN>(&move_list[0], move_counter, knights, empty, 0);
     }
 
     std::cout << move_counter << std::endl;
