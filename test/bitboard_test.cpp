@@ -8,7 +8,7 @@ TEST(BitboardTest, SouthOne) {
     Bitboard expected_bitboard = 0x00000000000000ff; // RANK 1
     // Act
 
-    shifted_bitboard = bitboard::south_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::SOUTH>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -20,7 +20,7 @@ TEST(BitboardTest, SouthOneFromRank1) {
     Bitboard shifted_bitboard = 0;
     Bitboard expected_bitboard = 0; // EMPTY BOARD
     // Act
-    shifted_bitboard = bitboard::south_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::SOUTH>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -34,7 +34,7 @@ TEST(BitboardTest, NorthOne) {
     Bitboard expected_bitboard = 0x0000000000ff0000; // RANK 3
     
     // Act
-    shifted_bitboard = bitboard::north_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::NORTH>(initial_bitboard);
     
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -47,7 +47,7 @@ TEST(BitboardTest, NorthOneFromRank8) {
     Bitboard expected_bitboard = 0; // EMPTY BOARD
     
     // Act
-    shifted_bitboard = bitboard::north_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::NORTH>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -60,7 +60,7 @@ TEST(BitboardTest, EastOne) {
     Bitboard expected_bitboard = 0x0404040404040404; // C FILE
 
     // Act
-    shifted_bitboard = bitboard::east_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::EAST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -73,7 +73,7 @@ TEST(BitboardTest, EastOneFromHFile) {
     Bitboard expected_bitboard = 0; // EMPTY BOARD
     
     // Act
-    shifted_bitboard = bitboard::east_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::EAST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -81,11 +81,11 @@ TEST(BitboardTest, EastOneFromHFile) {
 
 TEST(BitboardTest, WestOne) {
     // Arrange
-    Bitboard initial_bitboard = bitboard::FILE_B;
-    Bitboard expected_bitboard = bitboard::FILE_A;
+    Bitboard initial_bitboard = yak::bitboard::FILE_B;
+    Bitboard expected_bitboard = yak::bitboard::FILE_A;
   
     // Act
-    Bitboard shifted_bitboard = bitboard::west_one(initial_bitboard);
+    Bitboard shifted_bitboard = yak::bitboard::shift<Direction::WEST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -93,11 +93,11 @@ TEST(BitboardTest, WestOne) {
 
 TEST(BitboardTest, WestOneFromAFile) {
     // Arrange
-    Bitboard initial_bitboard = bitboard::FILE_A; // 0x0101010101010101; // A FILE
-    Bitboard expected_bitboard = bitboard::EMPTY; // EMPTY BOARD
+    Bitboard initial_bitboard = yak::bitboard::FILE_A; // 0x0101010101010101; // A FILE
+    Bitboard expected_bitboard = yak::bitboard::EMPTY; // EMPTY BOARD
 
     // Act
-    Bitboard shifted_bitboard = bitboard::west_one(initial_bitboard);
+    Bitboard shifted_bitboard = yak::bitboard::shift<Direction::WEST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -105,11 +105,11 @@ TEST(BitboardTest, WestOneFromAFile) {
 
 TEST(BitboardTest, NorthEastOneFromMiddleOfBoard) { 
     // Arrange
-    Bitboard initial_bitboard = bitboard::static_bitboard<A2>::value; // A2
-    Bitboard expected_bitboard = bitboard::static_bitboard<B3>::value; // A2 should go to B3 (square 17)
+    Bitboard initial_bitboard = yak::bitboard::static_bitboard<A2>::value; // A2
+    Bitboard expected_bitboard = yak::bitboard::static_bitboard<B3>::value; // A2 should go to B3 (square 17)
   
     // Act
-    Bitboard shifted_bitboard = bitboard::north_east_one(initial_bitboard);
+    Bitboard shifted_bitboard = yak::bitboard::shift<Direction::NORTH_EAST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -117,11 +117,11 @@ TEST(BitboardTest, NorthEastOneFromMiddleOfBoard) {
 
 TEST(BitboardTest, SouthEastOneFromMiddleOfBoard) { 
     // Arrange
-    Bitboard initial = bitboard::static_bitboard<A2>::value; // A2
-    Bitboard expected = bitboard::static_bitboard<B1>::value; // A2 should go to B1 (square 1)
+    Bitboard initial = yak::bitboard::static_bitboard<A2>::value; // A2
+    Bitboard expected = yak::bitboard::static_bitboard<B1>::value; // A2 should go to B1 (square 1)
 
     // Act
-    Bitboard actual =  bitboard::south_east_one(initial);
+    Bitboard actual =  yak::bitboard::shift<Direction::SOUTH_EAST>(initial);
 
     // Assert
     EXPECT_EQ(actual, expected);
@@ -134,7 +134,7 @@ TEST(BitboardTest, NorthWestOneFromMiddleOfBoard) {
     Bitboard expected_bitboard = 0; // EMPTY BOARD
 
     //Act
-    shifted_bitboard = bitboard::north_west_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::NORTH_WEST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -147,7 +147,7 @@ TEST(BitboardTest, SouthWestOneFromMiddleOfBoard) {
     Bitboard expected_bitboard = 0; // EMPTY BOARD
 
     // Act
-    shifted_bitboard = bitboard::south_west_one(initial_bitboard);
+    shifted_bitboard = yak::bitboard::shift<Direction::SOUTH_WEST>(initial_bitboard);
 
     // Assert
     EXPECT_EQ(shifted_bitboard, expected_bitboard);
@@ -159,7 +159,7 @@ TEST(BitboardTest, PopMS1B) {
     Bitboard expected = 0x7f00000000000000;
 
     // Act
-    Square MS1B_index = bitboard::pop_MS1B(initial);
+    Square MS1B_index = yak::bitboard::popMS1B(initial);
 
     // Assert
     EXPECT_EQ(MS1B_index, 63);
@@ -173,7 +173,7 @@ TEST(BitboardTest, PopMS1BWithValueOne) {
     Bitboard expected = 0x0000000000000000;
 
     // Act
-    Square MS1B_index = bitboard::pop_MS1B(initial);
+    Square MS1B_index = yak::bitboard::popMS1B(initial);
 
     // Assert
     EXPECT_EQ(MS1B_index, 0);
@@ -189,7 +189,7 @@ TEST(BitboardTest, PopMS1BWithOnlyOneSetBit) {
     // Act
     for (int i = 0; i < 63; i++) {
         Bitboard one = Bitboard{ 1 } << i;
-        Square MS1B_index = bitboard::pop_MS1B(one);
+        Square MS1B_index = yak::bitboard::popMS1B(one);
         actual.push_back(one);
     }
     
@@ -205,7 +205,7 @@ TEST(BitboardTest, PopLS1B) {
     Bitboard expected = 0xfe00000000000000;
 
     // Act
-    Square MS1B_index = bitboard::pop_LS1B(initial);
+    Square MS1B_index = yak::bitboard::popLS1B(initial);
 
     // Assert
     EXPECT_EQ(MS1B_index, 56);
@@ -217,7 +217,7 @@ TEST(BitboardTest, ScanForwardOnEmptyBoardReturnsEmptyStack) {
     // Arrange
     Bitboard initial_bitboard = 0;
     // Act
-    std::vector<Square> serialised_bitboard = bitboard::scan_forward(initial_bitboard);
+    std::vector<Square> serialised_bitboard = yak::bitboard::scanForward(initial_bitboard);
 
     // Assert
     EXPECT_EQ(serialised_bitboard.size(), 0);
@@ -225,10 +225,10 @@ TEST(BitboardTest, ScanForwardOnEmptyBoardReturnsEmptyStack) {
 
 TEST(BitboardTest, ScanForwardForPieceOnE4) {
     // Arrange
-    Bitboard initial_bitboard = bitboard::static_bitboard<E4>::value;
+    Bitboard initial_bitboard = yak::bitboard::static_bitboard<E4>::value;
 
     // Act
-    std::vector<Square> serialised_bitboard = bitboard::scan_forward(initial_bitboard);
+    std::vector<Square> serialised_bitboard = yak::bitboard::scanForward(initial_bitboard);
 
     // Assert
     EXPECT_EQ(serialised_bitboard[0], E4);
@@ -239,7 +239,7 @@ TEST(BitboardTest, ScanBackwardOnEmptyBoardReturnsEmptyStack) {
     Bitboard initial_bitboard = 0;
 
     // Act
-    std::vector<Square> serialised_bitboard = bitboard::scan_backward(initial_bitboard);
+    std::vector<Square> serialised_bitboard = yak::bitboard::scanBackward(initial_bitboard);
 
     // Assert
     EXPECT_EQ(serialised_bitboard.size(), 0);
@@ -247,10 +247,10 @@ TEST(BitboardTest, ScanBackwardOnEmptyBoardReturnsEmptyStack) {
 
 TEST(BitboardTest, ScanBackwardForPieceOnE4) { 
     // Arrange
-    Bitboard initial_bitboard = bitboard::static_bitboard<E4>::value;
+    Bitboard initial_bitboard = yak::bitboard::static_bitboard<E4>::value;
 
     // Act
-    std::vector<Square> serialised_bitboard = bitboard::scan_backward(initial_bitboard);
+    std::vector<Square> serialised_bitboard = yak::bitboard::scanBackward(initial_bitboard);
 
     // Assert
     EXPECT_EQ(serialised_bitboard[0], E4);  
@@ -263,7 +263,7 @@ TEST(BitboardTest, CanGetFileIndexOfSquareOnTheBoard) {
     File file_of_a8;
 
     // Act
-    file_of_a8 = bitboard::file_index(square_index);
+    file_of_a8 = yak::bitboard::fileIndex(square_index);
 
     // Assert
     EXPECT_EQ(file_of_a8, expected_file);
@@ -275,7 +275,7 @@ TEST(BitboardTest, FileIndexReturnsMinusOneWhenSquareIndexIsOutOfRange) {
     File file_of_invalid_square;
 
     // Act
-    file_of_invalid_square = bitboard::file_index(square_index);
+    file_of_invalid_square = yak::bitboard::fileIndex(square_index);
 
     // Assert
     EXPECT_EQ(file_of_invalid_square, -1);
@@ -288,7 +288,7 @@ TEST(BitboardTest, CanGetRankIndexOfSquareOnTheBoard) {
     Rank rank_of_a8;
 
     // Act
-    rank_of_a8 = bitboard::rank_index(square_index);
+    rank_of_a8 = yak::bitboard::rankIndex(square_index);
 
     // Assert
     EXPECT_EQ(rank_of_a8, expected_rank);
@@ -300,7 +300,7 @@ TEST(BitboardTest, RankIndexReturnsMinusOneWhenSquareIndexIsOutOfRange) {
     Rank rank_of_invalid_square;
 
     // Act
-    rank_of_invalid_square = bitboard::rank_index(square_index);
+    rank_of_invalid_square = yak::bitboard::rankIndex(square_index);
 
     // Assert
     EXPECT_EQ(rank_of_invalid_square, -1);
@@ -314,7 +314,7 @@ TEST(BitboardTest, CanGetSquareIndexFromVaildRankAndFileIndices) {
     Square valid_square;
 
     // Act
-    valid_square = bitboard::square_index(valid_file, valid_rank);
+    valid_square = yak::bitboard::squareIndex(valid_file, valid_rank);
 
     // Assert
     EXPECT_EQ(valid_square, expected_square);
@@ -327,7 +327,7 @@ TEST(BitboardTest, SetSquareCanCorrectlySetAnUnsetSquareOnBitboard) {
     Bitboard actual{ 0 };
 
     // Act
-    bitboard::set_square(actual, square);
+  yak::bitboard::setSquare(actual, square);
 
     // Assert
     EXPECT_EQ(actual, expected);
@@ -341,7 +341,7 @@ TEST(BitboardTest, SetSquareCanCorrectlySetAnUnsetSquareOnBitboardWithRankAndFil
     Bitboard actual{ 0 };
 
     // Act
-    bitboard::set_square(actual, rank, file);
+  yak::bitboard::setSquare(actual, rank, file);
 
     // Assert
     EXPECT_EQ(actual, expected);
@@ -350,10 +350,10 @@ TEST(BitboardTest, SetSquareCanCorrectlySetAnUnsetSquareOnBitboardWithRankAndFil
 TEST(BitboardTest, SquareToBitboardDetectsE4) {
     // Arrange
     Square square{ E4 }; // E4
-    Bitboard expected = bitboard::static_bitboard<E4>::value;
+    Bitboard expected = yak::bitboard::static_bitboard<E4>::value;
 
     // Act
-    Bitboard actual = bitboard::to_bitboard(square);
+    Bitboard actual = yak::bitboard::toBitboard(square);
 
     // Assert
     EXPECT_EQ(actual, expected);
@@ -362,10 +362,10 @@ TEST(BitboardTest, SquareToBitboardDetectsE4) {
 TEST(BitboardTest, AlgebraicToBitboardDetectsE4) {
     // Arrange
     std::string square = "e4";
-    Bitboard expected = bitboard::static_bitboard<E4>::value;
+    Bitboard expected = yak::bitboard::static_bitboard<E4>::value;
 
     // Act
-    Bitboard actual = bitboard::to_bitboard(square);
+    Bitboard actual = yak::bitboard::toBitboard(square);
 
     // Assert
     EXPECT_EQ(actual, expected);
@@ -381,7 +381,7 @@ TEST(BitboardTest, CanConvertAlgebraicSquareNotationToSquareIndex) {
     for (int iRank = 0; iRank < 8; ++iRank) {
         for (int iFile = 0; iFile < 8; ++iFile) {
             std::string algebraic_square{ files[iFile], ranks[iRank] };
-            actual[iRank][iFile] = bitboard::square_index(algebraic_square);
+            actual[iRank][iFile] = yak::bitboard::squareIndex(algebraic_square);
         }
     }
 
@@ -404,7 +404,7 @@ TEST(BitboardTest, CanConvertAlgebraicSquareNotationToSquareIndexWithCapitalFile
     for (int iRank = 0; iRank < 8; ++iRank) {
         for (int iFile = 0; iFile < 8; ++iFile) {
             std::string algebraic_square{ files[iFile], ranks[iRank] };
-            actual[iRank][iFile] = bitboard::square_index(algebraic_square);
+            actual[iRank][iFile] = yak::bitboard::squareIndex(algebraic_square);
         }
     }
 
@@ -430,17 +430,17 @@ TEST(BitboardTest, CanConvertSquareIndexToAlgebraicSquareNotation) {
 
     // Act & Assert
     for (int i = 0; i < 64; i++) {
-        std::string actual = bitboard::to_algebraic(i);
+        std::string actual = yak::bitboard::to_algebraic(i);
         EXPECT_EQ(actual, expected[i]);
     }
 }
 
 TEST(StaticBitboardTest, MultiPieceBitboardGeneratesCorrectly) {
     // Arrange
-    Bitboard expected = bitboard::RANK_1;
+    Bitboard expected = yak::bitboard::RANK_1;
 
     // Act
-    Bitboard actual = bitboard::static_bitboard<0, 1, 2, 3, 4, 5, 6, 7> ::value;
+    Bitboard actual = yak::bitboard::static_bitboard<0, 1, 2, 3, 4, 5, 6, 7> ::value;
 
     // Assert
     EXPECT_EQ(actual, expected);

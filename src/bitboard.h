@@ -60,6 +60,8 @@ enum class Direction {
   SOUTH_WEST
 };
 
+namespace yak {
+
 namespace bitboard {
 
 // Bitmasks of all ranks
@@ -107,43 +109,6 @@ const Bitboard DIAG_A8_H1 = 0x0102040810204080;
 const Bitboard UNIVERSAL = 0xffffffffffffffff;
 const Bitboard EMPTY = 0x0000000000000000;
 
-
-/**
-* Shifts a Bitboard south by one rank.
-* 
-* @param The Bitbaord to be shifted.
-* @returns The shifted Bitboard.
-*/
-inline Bitboard south_one(Bitboard board) { return board >> 8; }
-
-/**
-* Shifts a Bitboard north by one rank.
-*
-* @param The Bitbaord to be shifted.
-* @returns The shifted Bitboard.
-*/
-inline Bitboard north_one(Bitboard board) { return board << 8; }
-
-/**
-* Shifts a Bitboard east by one file.
-*
-* @param The Bitbaord to be shifted.
-* @returns The shifted Bitboard.
-*/
-inline Bitboard east_one(Bitboard board) { return (board << 1) & NOT_FILE_A; }
-
-/**
-* Shifts a Bitboard west by one file.
-*
-* @param The Bitbaord to be shifted.
-* @returns The shifted Bitboard.
-*/
-inline Bitboard west_one(Bitboard board) { return (board >> 1) & NOT_FILE_H; }
-inline Bitboard north_east_one(Bitboard board) { return (board << 9) & NOT_FILE_A; }
-inline Bitboard south_east_one(Bitboard board) { return (board >> 7) & NOT_FILE_A; }
-inline Bitboard north_west_one(Bitboard board) { return (board << 7) & NOT_FILE_H; }
-inline Bitboard south_west_one(Bitboard board) { return (board >> 9) & NOT_FILE_H; }
-
 /**
  * \brief Shifts a Bitboard by one square in a specified direction.
  * \tparam D - The direction in which to shift.
@@ -151,17 +116,18 @@ inline Bitboard south_west_one(Bitboard board) { return (board >> 9) & NOT_FILE_
  * \return The shifted bitboard.
  */
 template<Direction D>
-Bitboard shift(Bitboard board) {
-  if (D == Direction::NORTH) return north_one(board);
-  if (D == Direction::SOUTH) return south_one(board);
-  if (D == Direction::EAST) return east_one(board);
-  if (D == Direction::WEST) return west_one(board);
-  if (D == Direction::NORTH_EAST) return north_east_one(board);
-  if (D == Direction::NORTH_WEST) return north_west_one(board);
-  if (D == Direction::SOUTH_EAST) return south_east_one(board);
-  if (D == Direction::SOUTH_WEST) return south_west_one(board);
+constexpr Bitboard shift(Bitboard board)
+{
+  if (D == Direction::NORTH) return board << 8;
+  if (D == Direction::SOUTH) return board >> 8;
+  if (D == Direction::EAST) return (board << 1) & bitboard::NOT_FILE_A;
+  if (D == Direction::WEST) return (board >> 1) & bitboard::NOT_FILE_H;
+  if (D == Direction::NORTH_EAST) return (board << 9) & bitboard::NOT_FILE_A;
+  if (D == Direction::SOUTH_EAST) return (board >> 7) & bitboard::NOT_FILE_A;
+  if (D == Direction::NORTH_WEST) return (board << 7) & bitboard::NOT_FILE_H;
+  if (D == Direction::SOUTH_WEST) return (board >> 9) & bitboard::NOT_FILE_H;
   return board;
-}
+};
 
 /**
  * \brief Returns the index of the most significant 1 bit (MS1B).
@@ -175,10 +141,10 @@ inline Square MS1B(Bitboard board)
   return static_cast<Square>(63 - idx);
 #elif defined _MSC_VER
   unsigned long idx;
-        _BitScanReverse64(&idx, board);
-        return static_cast<Square>(idx);
-    #else
-        return 0;
+  _BitScanReverse64(&idx, board);
+  return static_cast<Square>(idx);
+#else
+  return 0;
 #endif
 }
 
@@ -194,10 +160,10 @@ inline Square LS1B(Bitboard board)
   return static_cast<Square>(idx);
 #elif defined _MSC_VER
   unsigned long idx;
-        _BitScanForward64(&idx, board);
-        return static_cast<Square>(idx);
-    #else
-        return 0;
+  _BitScanForward64(&idx, board);
+  return static_cast<Square>(idx);
+#else
+  return 0;
 #endif
 }
 
@@ -206,64 +172,67 @@ inline Square LS1B(Bitboard board)
  * \param[in] board - A reference to a non-zero bitboard.
  * \return A Square corresponding to the index of the bit that was cleared.
  */
-Square pop_LS1B(Bitboard& board);
+Square popLS1B(Bitboard &board);
 
 /**
  * \brief Clears the most significant 1 bit (MS1B).
  * \param[in] board - A reference to a non-zero bitboard.
  * \return A Square corresponding to the index of the bit that was cleared.
  */
-Square pop_MS1B(Bitboard& board);
+Square popMS1B(Bitboard &board);
 
-void set_square(Bitboard& board, Square square);
-void set_square(Bitboard& board, Rank rank, File file);
+void setSquare(Bitboard& board, const Square& square);
+void setSquare(Bitboard &board, const Rank& rank, const File& file);
 
-
-std::vector<Square> scan_forward(Bitboard board);
-std::vector<Square> scan_backward(Bitboard board);
+std::vector<Square> scanForward(Bitboard board);
+std::vector<Square> scanBackward(Bitboard board);
 
 /**
  * \brief Returns the file index of the specified square.
- * \param[in] square_index - The index of the square.
+ * \param[in] squareIndex - The index of the square.
  * \return The file that the square is on.
  */
-File file_index(Square square_index);
-File file_index(char algebraic_file);
+File fileIndex(const Square& squareIndex);
+File fileIndex(char algebraicFile);
 File file_index(std::string algebraic_square);
 
 /**
  * \brief Returns the rank index of the specified square.
- * \param[in] square_index - The index of the square.
+ * \param[in] squareIndex - The index of the square.
  * \return The rank that the square is on.
  */
-Rank rank_index(Square square_index);
-Rank rank_index(char algebraic_file);
-Rank rank_index(std::string algebraic_square);
+Rank rankIndex(const Square& squareIndex);
+Rank rankIndex(char algebraic_file);
+Rank rankIndex(const std::string& algebraicSquare);
 
-Square square_index(File file_index, Rank rank_index);
-Square square_index(std::string square);
+Square squareIndex(File fileIndex, Rank rankIndex);
+Square squareIndex(const std::string& square);
 
-Bitboard to_bitboard(Square square);
-Bitboard to_bitboard(File file, Rank rank);
-Bitboard to_bitboard(std::string algebraic_square);
+Bitboard toBitboard(const Square& square);
+Bitboard toBitboard(const File& file, const Rank& rank);
+Bitboard toBitboard(const std::string& algebraic_square);
 
 /**
  * \brief Provides single and multi piece bitboards at compile time.
  * \tparam S... - The squares on which the pieces are placed.
  */
-template<Square... S> struct static_bitboard { static constexpr Bitboard value = 0; };
-
-template<Square S, Square... Sp> struct static_bitboard<S, Sp...>
+template<Square... S>
+struct static_bitboard
 {
-  static constexpr Bitboard value = (Bitboard{ 1 } << S) | static_bitboard<Sp...>::value;
-};
-template<Square S1, Square S2> struct static_bitboard<S1, S2>
-{
-  static constexpr Bitboard value = (Bitboard{ 1 } << S1) | (Bitboard{ 1 } << S2);
+  static constexpr Bitboard value = 0;
 };
 
+template<Square S, Square... Sp>
+struct static_bitboard<S, Sp...>
+{
+  static constexpr Bitboard value = (Bitboard{1} << S) | static_bitboard<Sp...>::value;
+};
 
-
+template<Square S1, Square S2>
+struct static_bitboard<S1, S2>
+{
+  static constexpr Bitboard value = (Bitboard{1} << S1) | (Bitboard{1} << S2);
+};
 
 void print_board(Bitboard board);
 
@@ -271,5 +240,7 @@ std::string to_algebraic(Square square);
 std::string to_algebraic(File file_index, Rank rank_index);
 
 } // namespace bitboard
+
+} // namespace yak
 
 #endif // YAK_BITBOARD_H_
