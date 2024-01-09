@@ -352,29 +352,44 @@ Bitboard Board::pieceAttacks(PieceType pieceType, PieceColour pieceColour)
   switch (pieceType)
   {
     case PieceType::KNIGHT:
+    {
       return piece::pieceAttacks<PieceType::KNIGHT>(getPosition(pieceColour, pieceType),
                                                     occupiedSquares());
+    }
 
     case PieceType::BISHOP:
+    {
       return piece::pieceAttacks<PieceType::BISHOP>(getPosition(pieceColour, pieceType),
                                                     occupiedSquares());
+    }
 
     case PieceType::ROOK:
+    {
       return piece::pieceAttacks<PieceType::ROOK>(getPosition(pieceColour, pieceType),
                                                   occupiedSquares());
+    }
 
     case PieceType::QUEEN:
+    {
       return piece::pieceAttacks<PieceType::QUEEN>(getPosition(pieceColour, pieceType),
                                                    occupiedSquares());
+    }
 
     case PieceType::KING:
+    {
       return piece::pieceAttacks<PieceType::KING>(getPosition(pieceColour, pieceType),
                                                   occupiedSquares());
+    }
 
     case PieceType::PAWN:
     case PieceType::NULL_PIECE:
-      throw;
+    default:
+    {
+      break;
+    }
   }
+  // If the wrong piece has been provided then we return 0, i.e., this piece attacks no squares.
+  return Bitboard{0};
 }
 
 Bitboard Board::allAttacks(PieceColour colour)
@@ -422,8 +437,6 @@ CastlingRights::CastlingRights(std::string fen)
         break;
       }
     }
-
-
   }
 }
 
