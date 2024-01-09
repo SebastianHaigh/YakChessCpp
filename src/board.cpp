@@ -665,9 +665,5 @@ PieceColour GameState::sideNotToMove() const
 {
   return pieces::otherColour(m_side);
 }
-PieceColour GameState::sideToMove() const
-{
-  return m_side;
-}
 
 } // namespace yak

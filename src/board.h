@@ -120,7 +120,10 @@ public:
   /*! \brief Change the side to move. */
   void toggleSideToMove();
 
-  inline PieceColour sideToMove() const;
+  inline PieceColour sideToMove() const
+  {
+    return m_side;
+  }
 
   PieceColour sideNotToMove() const;
 
@@ -399,9 +402,6 @@ private:
   std::vector<piece::Move> generateCastlingMoves(std::vector<piece::Move> moves);
   void parseFen(const std::string &fen);
   std::string rankToFen(Rank rank);
-
-
-
 };
 
 template<PieceColour C>
