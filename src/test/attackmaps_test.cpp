@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include "../src/attackmaps.h"
-#include "../src/bitboard.h"
+#include <attackmaps.h>
+#include <bitboard.h>
 
 TEST(NorthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
-    // 1 . . . . . . . 
-    // 1 . . . . . . . 
-    // 1 . . . . . . . 
-    // 1 . . . . . . . 
+    // 1 . . . . . . .
+    // 1 . . . . . . .
+    // 1 . . . . . . .
+    // 1 . . . . . . .
     // 1 . . . . . . .
     // x . . . . . . .
     // . . . . . . . .
@@ -25,10 +25,10 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
 }
 
 TEST(NorthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
-    // . . . . . . . . 
-    // B . . . . . . . 
-    // 1 . . . . . . . 
-    // 1 . . . . . . . 
+    // . . . . . . . .
+    // B . . . . . . .
+    // 1 . . . . . . .
+    // 1 . . . . . . .
     // 1 . . . . . . .
     // x . . . . . . .
     // . . . . . . . .
@@ -38,7 +38,7 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Square serialised_piece = 16;
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 48;
-    
+
     // Act
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH>(serialised_piece, occupied_squares);
 
@@ -49,10 +49,10 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
 }
 
 TEST(NorthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
-    // . . . . . B . . 
-    // . . . . . x . . 
-    // . . . . . . . . 
-    // . . . . . . . . 
+    // . . . . . B . .
+    // . . . . . x . .
+    // . . . . . . . .
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -62,7 +62,7 @@ TEST(NorthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 61; // Blocker on F8
-    
+
     // Act
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH>(serialised_piece, occupied_squares);
 
@@ -98,10 +98,10 @@ TEST(NorthRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheEightRank) {
 
 
 TEST(SouthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // x . . . . . . . 
-    // 1 . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // x . . . . . . .
+    // 1 . . . . . . .
     // 1 . . . . . . .
     // 1 . . . . . . .
     // 1 . . . . . . .
@@ -120,10 +120,10 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
 }
 
 TEST(SouthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // x . . . . . . . 
-    // 1 . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // x . . . . . . .
+    // 1 . . . . . . .
     // 1 . . . . . . .
     // 1 . . . . . . .
     // B . . . . . . .
@@ -144,10 +144,10 @@ TEST(SouthRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
 }
 
 TEST(SouthRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
-    // . . . . . . . . 
-    // . . . . . x . . 
-    // . . . . . B . . 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . x . .
+    // . . . . . B . .
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -192,10 +192,10 @@ TEST(SouthRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheFirstRank) {
 
 
 TEST(EastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // x 1 1 1 1 1 1 1 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // x 1 1 1 1 1 1 1
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -214,10 +214,10 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
 }
 
 TEST(EastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // x 1 1 1 1 B . . 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // x 1 1 1 1 B . .
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -238,10 +238,10 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
 }
 
 TEST(EastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
-    // . . . . . . . . 
-    // . . . . . x B . 
-    // . . . . . . . . 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . x B .
+    // . . . . . . . .
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -251,7 +251,7 @@ TEST(EastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 54; // Blocker on G7
-    
+
     // Act
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::EAST>(serialised_piece, occupied_squares);
 
@@ -282,10 +282,10 @@ TEST(EastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
 
 
 TEST(WestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // 1 1 1 1 1 1 1 x 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // 1 1 1 1 1 1 1 x
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -304,10 +304,10 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
 }
 
 TEST(WestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // . . B 1 1 1 1 x 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . B 1 1 1 1 x
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -317,7 +317,7 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
     Square serialised_piece = 47; // Ray casting piece on H6
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 42; // Blocker on C6
-    
+
     // Act
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::WEST>(serialised_piece, occupied_squares);
 
@@ -328,10 +328,10 @@ TEST(WestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
 }
 
 TEST(WestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
-    // . . . . . . . . 
-    // . . . . B x . . 
-    // . . . . . . . . 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . B x . .
+    // . . . . . . . .
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -376,10 +376,10 @@ TEST(WestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
 
 
 TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
-    // . . . . . . 1 . 
-    // . . . . . 1 . . 
-    // . . . . 1 . . . 
-    // . . . 1 . . . . 
+    // . . . . . . 1 .
+    // . . . . . 1 . .
+    // . . . . 1 . . .
+    // . . . 1 . . . .
     // . . x . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -398,10 +398,10 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
 }
 
 TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
-    // . . . . . . . . 
-    // . . . . . B . . 
-    // . . . . 1 . . . 
-    // . . . 1 . . . . 
+    // . . . . . . . .
+    // . . . . . B . .
+    // . . . . 1 . . .
+    // . . . 1 . . . .
     // . . x . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -422,10 +422,10 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
 }
 
 TEST(NorthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
-    // . . . . . . B . 
-    // . . . . . x . . 
-    // . . . . . . . . 
-    // . . . . . . . . 
+    // . . . . . . B .
+    // . . . . . x . .
+    // . . . . . . . .
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -435,7 +435,7 @@ TEST(NorthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 62; // Blocker on G8
-    
+
     // Act
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::NORTH_EAST>(serialised_piece, occupied_squares);
 
@@ -470,10 +470,10 @@ TEST(NorthEastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
 
 
 TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . . . . .
     // . . x . . . . .
     // . . . 1 . . . .
     // . . . . 1 . . .
@@ -492,10 +492,10 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
 }
 
 TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . . . . . . .
     // . . x . . . . .
     // . . . 1 . . . .
     // . . . . B . . .
@@ -516,10 +516,10 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
 }
 
 TEST(SouthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
-    // . . . . . . . . 
-    // . . . . . x . . 
-    // . . . . . . B . 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . x . .
+    // . . . . . . B .
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -529,7 +529,7 @@ TEST(SouthEastRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare)
     Square serialised_piece = 53; // Ray casting piece on F7
     Bitboard occupied_squares = 1;
     occupied_squares = occupied_squares << 46; // Blocker on G6
-    
+
     // Act
     Bitboard attack_ray = yak::attackmap::blocked_ray<Direction::SOUTH_EAST>(serialised_piece, occupied_squares);
 
@@ -565,10 +565,10 @@ TEST(SouthEastRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheHFile) {
 
 
 TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
-    // 1 . . . . . . . 
-    // . 1 . . . . . . 
-    // . . 1 . . . . . 
-    // . . . 1 . . . . 
+    // 1 . . . . . . .
+    // . 1 . . . . . .
+    // . . 1 . . . . .
+    // . . . 1 . . . .
     // . . . . 1 . . .
     // . . . . . x . .
     // . . . . . . . .
@@ -587,10 +587,10 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
 }
 
 TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
-    // . . . . . . . . 
-    // . . . . . . . . 
-    // . . B . . . . . 
-    // . . . 1 . . . . 
+    // . . . . . . . .
+    // . . . . . . . .
+    // . . B . . . . .
+    // . . . 1 . . . .
     // . . . . 1 . . .
     // . . . . . x . .
     // . . . . . . . .
@@ -611,10 +611,10 @@ TEST(NorthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
 }
 
 TEST(NorthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
-    // . . . . B . . . 
-    // . . . . . x . . 
-    // . . . . . . . . 
-    // . . . . . . . . 
+    // . . . . B . . .
+    // . . . . . x . .
+    // . . . . . . . .
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -661,10 +661,10 @@ TEST(NorthWestRayAttackMapTest, ReturnsEmptyBitboardForAnySquareOnTheAFile) {
 
 
 TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
-    // . . . . . . . . 
-    // . . . . . x . . 
-    // . . . . 1 . . . 
-    // . . . 1 . . . . 
+    // . . . . . . . .
+    // . . . . . x . .
+    // . . . . 1 . . .
+    // . . . 1 . . . .
     // . . 1 . . . . .
     // . 1 . . . . . .
     // 1 . . . . . . .
@@ -683,10 +683,10 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereAreNoBlockingPieces) {
 }
 
 TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
-    // . . . . . . . . 
-    // . . . . . x . . 
-    // . . . . 1 . . . 
-    // . . . 1 . . . . 
+    // . . . . . . . .
+    // . . . . . x . .
+    // . . . . 1 . . .
+    // . . . 1 . . . .
     // . . B . . . . .
     // . . . . . . . .
     // . . . . . . . .
@@ -707,10 +707,10 @@ TEST(SouthWestRayAttackMapTest, CanReturnRayWhenThereIsASingleBlockingPiece) {
 }
 
 TEST(SouthWestRayAttackMapTest, CanReturnRayWhenBlockingPieceIsOnAdjacentSquare) {
-    // . . . . . . . . 
-    // . . . . . x . . 
-    // . . . . B . . . 
-    // . . . . . . . . 
+    // . . . . . . . .
+    // . . . . . x . .
+    // . . . . B . . .
+    // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
     // . . . . . . . .
