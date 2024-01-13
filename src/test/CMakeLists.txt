@@ -1,11 +1,41 @@
 enable_testing()
 
-add_executable(YakTests attackmaps_test.cpp bitboard_test.cpp board_test.cpp pieces_test.cpp)
-target_link_libraries(YakTests
+add_executable(AttackMapTests attackmaps_test.cpp)
+target_link_libraries(AttackMapTests
                       PUBLIC
                         yak
                       PRIVATE
                         Catch2::Catch2WithMain)
 
-add_test(NAME YakTests
-         COMMAND YakTests)
+add_test(NAME AttackMapTests
+         COMMAND AttackMapTests)
+
+add_executable(BitboardTests bitboard_test.cpp board_test.cpp pieces_test.cpp)
+target_link_libraries(BitboardTests
+                      PUBLIC
+                        yak
+                      PRIVATE
+                        Catch2::Catch2WithMain)
+
+add_test(NAME BitboardTests
+         COMMAND BitboardTests)
+
+add_executable(BoardTests board_test.cpp pieces_test.cpp)
+target_link_libraries(BoardTests
+                      PUBLIC
+                        yak
+                      PRIVATE
+                        Catch2::Catch2WithMain)
+
+add_test(NAME BoardTests
+         COMMAND BoardTests)
+
+add_executable(PiecesTests pieces_test.cpp)
+target_link_libraries(PiecesTests
+                      PUBLIC
+                        yak
+                      PRIVATE
+                        Catch2::Catch2WithMain)
+
+add_test(NAME PiecesTests
+         COMMAND PiecesTests)

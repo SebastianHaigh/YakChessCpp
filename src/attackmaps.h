@@ -42,13 +42,13 @@ struct ray<D, S, 0>
  * \details
  * Usage: ray_map<Direction::NORTH>::value[42];
  */
-template<Direction D, Square S = 0, Bitboard... B>
-struct rayMap : rayMap<D, S + 1, B..., ray<D, S>::value>
+template<Direction D, Square S = A1, Bitboard... B>
+struct rayMap : rayMap<D, static_cast<Square>(S + 1), B..., ray<D, S>::value>
 {
 };
 
 template<Direction D, Bitboard... B>
-struct rayMap<D, 63, B...>
+struct rayMap<D, static_cast<Square>(63), B...>
 {
   static constexpr std::array<Bitboard, 64> value = {B...};
 };
@@ -64,10 +64,12 @@ Bitboard blocked_ray(Square square, Bitboard occupied)
 {
   constexpr std::array<Bitboard, 64> thisDirectionRayMap = rayMap<D>::value;
 
-  Bitboard piecesInRay = thisDirectionRayMap[square] & occupied;
+  const Bitboard piecesInRay = thisDirectionRayMap[square] & occupied;
 
   if (piecesInRay == 0)
+  {
     return thisDirectionRayMap[square];
+  }
 
   Square blockerSquare{ 0};
 

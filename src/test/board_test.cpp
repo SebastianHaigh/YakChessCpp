@@ -10,7 +10,7 @@ TEST_CASE("MoveTest: DoublePawnPushCreatesEpTargetSquare") {
   std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
   std::string expected{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1" };
   yak::Board board(fen);
-  auto move = yak::piece::makeDoublePush(8, 24);
+  auto move = yak::piece::makeDoublePush(A2, A4);
 
   // Act
   board.makeMove(move);
@@ -24,12 +24,11 @@ TEST_CASE("MoveTest: CanMakeEpCapture") {
   std::string fen{ "8/8/8/8/Pp6/1P6/8/8 b KQkq a3 0 1" };
   std::string expected{ "8/8/8/8/8/pP6/8/8 w KQkq - 0 2" };
   yak::Board board(fen);
-  auto move = yak::piece::make_ep_capture(25, 16);
+  auto move = yak::piece::make_ep_capture(B4, A3);
   //move.set_en_passant(yak::bitboard::to_yak::bitboard(Square(24)));
 
   // Act
   board.makeMove(move);
-
 
   // Assert
   CHECK(board.toFen() == expected);
@@ -55,8 +54,7 @@ TEST_CASE("MoveFactoryTest: CanCreatePawnPushMove") {
   yak::Board board(fen);
 
   // Act
-  auto pawn_push = yak::piece::makeQuiet(8, 16);
-  //Move pawn_push = mf.create_pawn_push(8, 16);
+  auto pawn_push = yak::piece::makeQuiet(A2, A3);
 
   // Assert
   board.makeMove(pawn_push);
@@ -70,7 +68,7 @@ TEST_CASE("MoveFactoryTest: CanCreatePawnDoublePushMove") {
   yak::Board board(fen);
 
   // Act
-  yak::piece::Move pawn_push = yak::piece::makeDoublePush(8, 24);
+  yak::piece::Move pawn_push = yak::piece::makeDoublePush(A2, A4);
 
   // Assert
   board.makeMove(pawn_push);
@@ -392,7 +390,7 @@ TEST_CASE("BoardTest: CastlingRightsChangeWhenRookIsCaptured") {
   std::string expected{ "rnbqkbn1/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNr w Qq - 0 2" };
   yak::Board board(fen);
 
-  yak::piece::Move move = yak::piece::makeCapture(63, 7);
+  yak::piece::Move move = yak::piece::makeCapture(H8, H1);
   //move.set_capture(PieceType::ROOK);
 
   board.makeMove(move);

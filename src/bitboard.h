@@ -10,7 +10,6 @@
 #endif
 
 typedef uint64_t Bitboard; //!< Type for holding representations of the chess board.
-typedef uint64_t Square; /** Type for holding representation of squares. */
 typedef uint64_t File;
 typedef uint64_t Rank;
 
@@ -32,8 +31,7 @@ typedef uint64_t Rank;
 //  |     FILE      |   A   B   C   D   E   F   G   H   |                     |
 //  | - - - - - - - + - - - - - - - - - - - - - - - - - + - - - - - - - - - - +
 
-
-enum Squares {
+enum Square {
   A1 = 0, B1, C1, D1, E1, F1, G1, H1,
   A2, B2, C2, D2, E2, F2, G2, H2,
   A3, B3, C3, D3, E3, F3, G3, H3,
@@ -41,7 +39,8 @@ enum Squares {
   A5, B5, C5, D5, E5, F5, G5, H5,
   A6, B6, C6, D6, E6, F6, G6, H6,
   A7, B7, C7, D7, E7, F7, G7, H7,
-  A8, B8, C8, D8, E8, F8, G8, H8
+  A8, B8, C8, D8, E8, F8, G8, H8,
+  NULL_SQUARE
 };
 
 enum class RayType {
@@ -235,6 +234,7 @@ struct static_bitboard<S1, S2>
 };
 
 void print_board(Bitboard board);
+std::string to_string(Bitboard board);
 
 std::string to_algebraic(Square square);
 std::string to_algebraic(File file_index, Rank rank_index);

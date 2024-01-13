@@ -10,14 +10,14 @@
 TEST_CASE("BlackPawnsTest: CanGenerateSinglePushesFromUnobstructedStartingPosition") {
     // Assemble
     Bitboard pawns = yak::bitboard::RANK_7;
-    yak::piece::Move move_list[20];
-    int move_counter{ 0 };
+    yak::piece::Move moveList[20];
+    int moveCounter{ 0 };
 
     // Act
-    yak::piece::generate_pawn_single_pushes<PieceColour::BLACK, false>(&move_list[move_counter], move_counter, pawns, ~pawns);
+    yak::piece::generate_pawn_single_pushes<PieceColour::BLACK, false>(&moveList[moveCounter], moveCounter, pawns, ~pawns);
 
     // Assert
-    CHECK(move_counter == 8);
+    CHECK(moveCounter == 8);
 }
 
 TEST_CASE("BlackPawnsTest: DoublePushTargetIsRank5") {
@@ -34,19 +34,19 @@ TEST_CASE("BlackPawnsTest: DoublePushTargetIsRank5") {
 TEST_CASE("BlackPawnsTest: DoublePushOnlyAllowedFromRank7") {
     // Assemble
     Bitboard pawns = yak::bitboard::RANK_1;
-    yak::piece::Move move_list[20];
-    int move_counter{ 0 };
+    yak::piece::Move moveList[20];
+    int moveCounter{ 0 };
     int actual[8]{ 0 };
 
     // Act
     for (int i = 0; i < 8; i++)
     {
-        move_counter = 0;
-      yak::piece::generatePawnDoublePushes<PieceColour::BLACK, false>(&move_list[move_counter],
-                                                                      move_counter,
+        moveCounter = 0;
+      yak::piece::generatePawnDoublePushes<PieceColour::BLACK, false>(&moveList[moveCounter],
+                                                                      moveCounter,
                                                                       pawns,
                                                                       ~pawns);
-        actual[i] = move_counter;
+        actual[i] = moveCounter;
         pawns = yak::bitboard::shift<Direction::NORTH>(pawns);
     }
 
@@ -78,15 +78,15 @@ TEST_CASE("BlackPawnsTest: FriendlyPieceBlocksPawnPushes") {
     // Assemble
     auto pawn_bitboard = yak::bitboard::RANK_7;
     auto extra_piece = yak::bitboard::static_bitboard<C6>::value;
-    auto empty_squares = ~(pawn_bitboard ^ extra_piece);
-    yak::piece::Move move_list[20];
-    int move_counter{ 0 };
+    auto emptySquares_bb = ~(pawn_bitboard ^ extra_piece);
+    yak::piece::Move moveList[20];
+    int moveCounter{ 0 };
 
     // Act
-    yak::piece::generate_pawn_single_pushes<PieceColour::BLACK, false>(&move_list[move_counter], move_counter, pawn_bitboard, empty_squares);
+    yak::piece::generate_pawn_single_pushes<PieceColour::BLACK, false>(&moveList[moveCounter], moveCounter, pawn_bitboard, emptySquares_bb);
 
     // Assert
-    CHECK(move_counter == 7);
+    CHECK(moveCounter == 7);
 }
 
 TEST_CASE("BlackPawnsTest: WestAttackSources")
@@ -209,12 +209,12 @@ TEST_CASE("BlackPawnsTest: OpponentPieceCanBeCaptured") {
 
     // Assemble
     Bitboard pawn_bitboard = yak::bitboard::RANK_7;
-    Bitboard opponent_pieces = yak::bitboard::RANK_6 & yak::bitboard::FILE_C;
+    Bitboard opponentPieces_bb = yak::bitboard::RANK_6 & yak::bitboard::FILE_C;
 
-  yak::piece::pawnWestAttackSource<PieceColour::BLACK>(opponent_pieces);
+  yak::piece::pawnWestAttackSource<PieceColour::BLACK>(opponentPieces_bb);
     // Act
-   // auto west_moves = pawns.west_captures(pawn_bitboard, opponent_pieces);
-    //auto east_moves = pawns.east_captures(pawn_bitboard, opponent_pieces);
+   // auto west_moves = pawns.west_captures(pawn_bitboard, opponentPieces_bb);
+    //auto east_moves = pawns.east_captures(pawn_bitboard, opponentPieces_bb);
 
     // Assert
     //CHECK(west_moves.size() == 1);
@@ -224,29 +224,29 @@ TEST_CASE("BlackPawnsTest: OpponentPieceCanBeCaptured") {
 TEST_CASE("WhitePawnTests: CanGenerateSinglePushesFromUnobstructedStartingPosition") {
     // Assemble
     Bitboard pawns = yak::bitboard::RANK_2;
-    yak::piece::Move move_list[20];
-    int move_counter{ 0 };
+    yak::piece::Move moveList[20];
+    int moveCounter{ 0 };
 
     // Act
-    yak::piece::generate_pawn_single_pushes<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, ~pawns);
+    yak::piece::generate_pawn_single_pushes<PieceColour::WHITE, false>(&moveList[moveCounter], moveCounter, pawns, ~pawns);
 
     // Assert
 
-    CHECK(move_counter == 8);
+    CHECK(moveCounter == 8);
 }
 
 TEST_CASE("WhitePawnTests: CanGenerateDoublePushesFromUnobstructedStartingPosition") {
     // Assemble
     Bitboard pawns = yak::bitboard::RANK_2;
-    yak::piece::Move move_list[20];
-    int move_counter{ 0 };
+    yak::piece::Move moveList[20];
+    int moveCounter{ 0 };
 
     // Act
-    yak::piece::generate_pawn_single_pushes<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, ~pawns);
+    yak::piece::generate_pawn_single_pushes<PieceColour::WHITE, false>(&moveList[moveCounter], moveCounter, pawns, ~pawns);
 
     // Assert
 
-    CHECK(move_counter == 8);
+    CHECK(moveCounter == 8);
 }
 
 TEST_CASE("WhitePawnTests: PieceObstructsSinglePush") {
@@ -264,15 +264,15 @@ TEST_CASE("WhitePawnTests: PieceObstructsSinglePush") {
     // Arrange
     Bitboard pawns = yak::bitboard::RANK_2;
     Bitboard extra_piece = yak::bitboard::static_bitboard<C3>::value;
-    Bitboard empty_squares = ~(pawns ^ extra_piece);
-    yak::piece::Move move_list[20];
-    int move_counter{ 0 };
+    Bitboard emptySquares_bb = ~(pawns ^ extra_piece);
+    yak::piece::Move moveList[20];
+    int moveCounter{ 0 };
 
     // Act
-    yak::piece::generate_pawn_single_pushes<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, empty_squares);
+    yak::piece::generate_pawn_single_pushes<PieceColour::WHITE, false>(&moveList[moveCounter], moveCounter, pawns, emptySquares_bb);
 
     // Assert
-    CHECK(move_counter == 7);
+    CHECK(moveCounter == 7);
 
 }
 
@@ -291,18 +291,18 @@ TEST_CASE("WhitePawnTests: PiecesObstructsDoublePush") {
     // Arrange
     Bitboard pawns = yak::bitboard::RANK_2;
     Bitboard extra_pieces = yak::bitboard::static_bitboard<C3, E4>::value;
-    Bitboard empty_squares = ~(pawns ^ extra_pieces);
-    yak::piece::Move move_list[20];
-    int move_counter{ 0 };
+    Bitboard emptySquares_bb = ~(pawns ^ extra_pieces);
+    yak::piece::Move moveList[20];
+    int moveCounter{ 0 };
 
     // Act
-  yak::piece::generatePawnDoublePushes<PieceColour::WHITE, false>(&move_list[move_counter],
-                                                                  move_counter,
+  yak::piece::generatePawnDoublePushes<PieceColour::WHITE, false>(&moveList[moveCounter],
+                                                                  moveCounter,
                                                                   pawns,
-                                                                  empty_squares);
+                                                                  emptySquares_bb);
 
     // Assert
-    CHECK(move_counter == 6);
+    CHECK(moveCounter == 6);
 
 }
 
@@ -321,135 +321,141 @@ TEST_CASE("WhitePawnTests: OpponentPieceCanBeCaptured") {
 
     // Assemble
     Bitboard pawns = yak::bitboard::RANK_2;
-    Bitboard opponent_pieces = yak::bitboard::static_bitboard<C3>::value;
-    yak::piece::Move move_list[20];
-    int move_counter{ 0 };
+    Bitboard opponentPieces_bb = yak::bitboard::static_bitboard<C3>::value;
+    yak::piece::Move moveList[20];
+    int moveCounter{ 0 };
 
     // Act
-    yak::piece::generate_pawn_east_captures<PieceColour::WHITE, false>(&move_list[move_counter], move_counter, pawns, opponent_pieces);
-  yak::piece::generatePawnWestCaptures<PieceColour::WHITE, false>(&move_list[move_counter],
-                                                                  move_counter,
+    yak::piece::generate_pawn_east_captures<PieceColour::WHITE, false>(&moveList[moveCounter], moveCounter, pawns, opponentPieces_bb);
+  yak::piece::generatePawnWestCaptures<PieceColour::WHITE, false>(&moveList[moveCounter],
+                                                                  moveCounter,
                                                                   pawns,
-                                                                  opponent_pieces);
+                                                                  opponentPieces_bb);
 
     // Assert
-    CHECK(move_counter == 2);
+    CHECK(moveCounter == 2);
 }
 TEST_CASE("KnightTests: KnightOnA1AttacksTheCorrectSquares") {
     // Arrange
-    yak::piece::Move move_list[50];
-    int move_counter{ 0 };
+    yak::piece::Move moveList[50];
+    int moveCounter{ 0 };
     Bitboard knights = yak::bitboard::static_bitboard<A1>::value;
-    Bitboard empty_squares = yak::bitboard::UNIVERSAL;
-    Bitboard opponent_pieces = yak::bitboard::EMPTY;
+    Bitboard emptySquares_bb = yak::bitboard::UNIVERSAL;
+    Bitboard opponentPieces_bb = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generatePieceMoves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty_squares, opponent_pieces);
+    moveCounter += yak::piece::generatePieceMoves<PieceType::KNIGHT>(&moveList[0],
+                                                                     knights,
+                                                                     emptySquares_bb,
+                                                                     opponentPieces_bb);
 
     // Assert
-    CHECK(move_counter == 2);
-    CHECK(move_list[0].to == C2);
-    CHECK(move_list[1].to == B3);
+    CHECK(moveCounter == 2);
+    CHECK(moveList[0].to == C2);
+    CHECK(moveList[1].to == B3);
 }
 
 TEST_CASE("KnightTests: KnightOnD4AttacksTheCorrectSquares") {
     // Arrange
-    yak::piece::Move move_list[50];
-    int move_counter{ 0 };
+    yak::piece::Move moveList[50];
+    int moveCounter{ 0 };
     Bitboard knights = yak::bitboard::static_bitboard<D4>::value;
-    Bitboard empty_squares = yak::bitboard::UNIVERSAL;
-    Bitboard opponent_pieces = yak::bitboard::EMPTY;
+    Bitboard emptySquares_bb = yak::bitboard::UNIVERSAL;
+    Bitboard opponentPieces_bb = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generatePieceMoves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty_squares, opponent_pieces);
+    moveCounter += yak::piece::generatePieceMoves<PieceType::KNIGHT>(&moveList[0],
+                                                                     knights,
+                                                                     emptySquares_bb,
+                                                                     opponentPieces_bb);
 
     // Assert
-    CHECK(move_counter == 8);
-    CHECK(move_list[0].to == C2);
-    CHECK(move_list[1].to == E2);
-    CHECK(move_list[2].to == B3);
-    CHECK(move_list[3].to == F3);
-    CHECK(move_list[4].to == B5);
-    CHECK(move_list[5].to == F5);
-    CHECK(move_list[6].to == C6);
-    CHECK(move_list[7].to == E6);
+    CHECK(moveCounter == 8);
+    CHECK(moveList[0].to == C2);
+    CHECK(moveList[1].to == E2);
+    CHECK(moveList[2].to == B3);
+    CHECK(moveList[3].to == F3);
+    CHECK(moveList[4].to == B5);
+    CHECK(moveList[5].to == F5);
+    CHECK(moveList[6].to == C6);
+    CHECK(moveList[7].to == E6);
 }
 
 TEST_CASE("KingTests: KnightOnA1AttacksTheCorrectSquares") {
     // Arrange
-    Square starting_square{ A1 };
-    yak::piece::Move move_list[50];
-    int move_counter{ 0 };
-    Bitboard empty_squares = yak::bitboard::UNIVERSAL;
-    Bitboard opponent_pieces = yak::bitboard::EMPTY;
+    Square startingSquare{ A1 };
+    yak::piece::Move moveList[50];
+    int moveCounter{ 0 };
+    Bitboard emptySquares_bb = yak::bitboard::UNIVERSAL;
+    Bitboard opponentPieces_bb = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generatePieceMoves<PieceType::KING>(&move_list[0], move_counter,
-                                                      yak::bitboard::toBitboard(starting_square), empty_squares, opponent_pieces);
+    moveCounter += yak::piece::generatePieceMoves<PieceType::KING>(&moveList[0],
+                                                                   yak::bitboard::toBitboard(startingSquare),
+                                                                   emptySquares_bb,
+                                                                   opponentPieces_bb);
 
     // Assert
-    CHECK(move_counter == 3);
-    CHECK(move_list[0].to == B1);
-    CHECK(move_list[1].to == A2);
-    CHECK(move_list[2].to == B2);
+    CHECK(moveCounter == 3);
+    CHECK(moveList[0].to == B1);
+    CHECK(moveList[1].to == A2);
+    CHECK(moveList[2].to == B2);
 }
 
 TEST_CASE("KingTests: KnightOnD4AttacksTheCorrectSquares") {
     // Arrange
-    Square starting_square{ D4 };
-    yak::piece::Move move_list[50];
-    int move_counter{ 0 };
-    Bitboard empty_squares = yak::bitboard::UNIVERSAL;
-    Bitboard opponent_pieces = yak::bitboard::EMPTY;
+    Square startingSquare{ D4 };
+    yak::piece::Move moveList[50];
+    int moveCounter{ 0 };
+    Bitboard emptySquares_bb = yak::bitboard::UNIVERSAL;
+    Bitboard opponentPieces_bb = yak::bitboard::EMPTY;
 
     // Act
-    yak::piece::generatePieceMoves<PieceType::KING>(&move_list[0],
-                                                    move_counter,
-                                                    yak::bitboard::toBitboard(starting_square),
-                                                    empty_squares,
-                                                    opponent_pieces);
+    moveCounter += yak::piece::generatePieceMoves<PieceType::KING>(&moveList[0],
+                                                                   yak::bitboard::toBitboard(startingSquare),
+                                                                   emptySquares_bb,
+                                                                   opponentPieces_bb);
 
     // Assert
-    CHECK(move_counter == 8);
-    CHECK(move_list[0].to == C3);
-    CHECK(move_list[1].to == D3);
-    CHECK(move_list[2].to == E3);
-    CHECK(move_list[3].to == C4);
-    CHECK(move_list[4].to == E4);
-    CHECK(move_list[5].to == C5);
-    CHECK(move_list[6].to == D5);
-    CHECK(move_list[7].to == E5);
+    CHECK(moveCounter == 8);
+    CHECK(moveList[0].to == C3);
+    CHECK(moveList[1].to == D3);
+    CHECK(moveList[2].to == E3);
+    CHECK(moveList[3].to == C4);
+    CHECK(moveList[4].to == E4);
+    CHECK(moveList[5].to == C5);
+    CHECK(moveList[6].to == D5);
+    CHECK(moveList[7].to == E5);
 }
 
 TEST_CASE("RookTests: RookAttacksProperly") {
     // Arrange
-    yak::attackmap::RookMap atk_map;
+    yak::attackmap::RookMap attackMap;
     yak::piece::Move list[100];
-    int move_counter{ 0 };
+    int moveCounter{ 0 };
     Bitboard rook_bb = yak::bitboard::static_bitboard<A1>::value;
     Bitboard opponentPieces = yak::bitboard::static_bitboard<A5>::value;
-    auto emptySquares = ~(rook_bb | opponentPieces);
+    auto emptySquares_bb = ~(rook_bb | opponentPieces);
 
     // Act
-    yak::piece::generatePieceMoves<PieceType::ROOK>(&list[0],
-                                                    move_counter,
-                                                    rook_bb,
-                                                    emptySquares,
-                                                    opponentPieces);
+    moveCounter += yak::piece::generatePieceMoves<PieceType::ROOK>(&list[0],
+                                                                   rook_bb,
+                                                                   emptySquares_bb,
+                                                                   opponentPieces);
 
     // Assert
-    CHECK(move_counter == 11);
+    CHECK(moveCounter == 11);
 }
 
 TEST_CASE("QueenTests: CanCalculateQueenAttackBitboard") {
     // Arrange
-    yak::attackmap::RookMap atk_map;
+    yak::attackmap::RookMap attackMap;
     yak::piece::Move list[100];
-    int move_counter{ 0 };
+    int moveCounter{ 0 };
     Bitboard queen_bb = yak::bitboard::static_bitboard<A1>::value;
-    Bitboard opponent_pieces = yak::bitboard::static_bitboard<A8>::value;
-    Bitboard friendly_pieces = queen_bb | yak::bitboard::static_bitboard<H8>::value;
-    Bitboard occupied = opponent_pieces | friendly_pieces;
+    Bitboard opponentPieces_bb = yak::bitboard::static_bitboard<A8>::value;
+    Bitboard friendlyPieces_bb = queen_bb | yak::bitboard::static_bitboard<H8>::value;
+    Bitboard occupied = opponentPieces_bb | friendlyPieces_bb;
     Bitboard expected = (yak::bitboard::FILE_A | yak::bitboard::RANK_1 | yak::bitboard::DIAG_A1_H8) & ~queen_bb;
 
     // Act
@@ -462,9 +468,9 @@ TEST_CASE("QueenTests: CanCalculateQueenAttackBitboard") {
 TEST_CASE("BishopTests: CanCalculateBishopAttackBitboardWithTwoBishops") {
     // Arrange
     Bitboard bishop_bb = yak::bitboard::static_bitboard<A1, A8>::value;
-    Bitboard opponent_pieces = yak::bitboard::static_bitboard<A8>::value;
-    Bitboard friendly_pieces = bishop_bb | yak::bitboard::static_bitboard<H8>::value;
-    Bitboard occupied = opponent_pieces | friendly_pieces;
+    Bitboard opponentPieces_bb = yak::bitboard::static_bitboard<A8>::value;
+    Bitboard friendlyPieces_bb = bishop_bb | yak::bitboard::static_bitboard<H8>::value;
+    Bitboard occupied = opponentPieces_bb | friendlyPieces_bb;
     Bitboard expected = (yak::bitboard::DIAG_A8_H1 | yak::bitboard::DIAG_A1_H8) & yak::bitboard::NOT_FILE_A;
 
     // Act
@@ -475,13 +481,13 @@ TEST_CASE("BishopTests: CanCalculateBishopAttackBitboardWithTwoBishops") {
 }
 TEST_CASE("FunctionTests: FenCharToPieceTypeTestForBlackPieces") {
     // Arrange
-    std::string fen_chars{ "pnbrqkx" };
+    std::string fenChars{ "pnbrqkx" };
     PieceType expected[7]{ PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING, PieceType::NULL_PIECE };
     PieceType actual[7]{ PieceType::NULL_PIECE };
 
     // Act
     for (int i = 0; i < 7; i++) {
-        actual[i] = pieces::fenCharToPieceType(fen_chars[i]);
+        actual[i] = pieces::fenCharToPieceType(fenChars[i]);
     }
 
     // Assert
@@ -492,13 +498,13 @@ TEST_CASE("FunctionTests: FenCharToPieceTypeTestForBlackPieces") {
 
 TEST_CASE("FunctionTests: FenCharToPieceTypeTestForWhitePieces") {
     // Arrange
-    std::string fen_chars{ "PNBRQKX" };
+    std::string fenChars{ "PNBRQKX" };
     PieceType expected[7]{ PieceType::PAWN, PieceType::KNIGHT, PieceType::BISHOP, PieceType::ROOK, PieceType::QUEEN, PieceType::KING, PieceType::NULL_PIECE };
     PieceType actual[7]{ PieceType::NULL_PIECE };
 
     // Act
     for (int i = 0; i < 7; i++) {
-        actual[i] = pieces::fenCharToPieceType(fen_chars[i]);
+        actual[i] = pieces::fenCharToPieceType(fenChars[i]);
     }
 
     // Assert
@@ -509,14 +515,14 @@ TEST_CASE("FunctionTests: FenCharToPieceTypeTestForWhitePieces") {
 
 TEST_CASE("FunctionTests: FenCharToPieceColourTestForBlackPieces") {
     // Arrange
-    std::string fen_chars{ "pnbrqkx" };
+    std::string fenChars{ "pnbrqkx" };
     std::vector<PieceColour> expected(6, PieceColour::BLACK);
     expected.push_back(PieceColour::NULL_COLOUR);
     std::vector<PieceColour> actual(7, PieceColour::NULL_COLOUR);
 
     // Act
     for (int i = 0; i < 7; i++) {
-        actual[i] = pieces::fenCharToPieceColour(fen_chars[i]);
+        actual[i] = pieces::fenCharToPieceColour(fenChars[i]);
     }
 
     // Assert
@@ -527,14 +533,14 @@ TEST_CASE("FunctionTests: FenCharToPieceColourTestForBlackPieces") {
 
 TEST_CASE("FunctionTests: FenCharToPieceColourTestForWhitePieces") {
     // Arrange
-    std::string fen_chars{ "PNBRQKX" };
+    std::string fenChars{ "PNBRQKX" };
     std::vector<PieceColour> expected(6, PieceColour::WHITE);
     expected.push_back(PieceColour::NULL_COLOUR);
     PieceColour actual[7]{ PieceColour::NULL_COLOUR };
 
     // Act
     for (int i = 0; i < 7; i++) {
-        actual[i] = pieces::fenCharToPieceColour(fen_chars[i]);
+        actual[i] = pieces::fenCharToPieceColour(fenChars[i]);
     }
 
     // Assert

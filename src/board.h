@@ -17,6 +17,7 @@ class CastlingRights
 private:
   bool black[2]{0};
   bool white[2]{0};
+  bool rights[4]{0};
 public:
   /* \brief Default constructor. */
   CastlingRights()
@@ -136,7 +137,7 @@ private:
   PieceColour m_side;
   int m_moveClock = 1;
   bool m_hasEpTarget = false;
-  Square m_epSquare = 0;
+  Square m_epSquare = NULL_SQUARE;
   void parseFen(const std::string& fen);
 };
 
@@ -149,25 +150,25 @@ struct KingCastleTarget
 template<>
 struct KingCastleTarget<PieceType::KING, PieceColour::WHITE>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<6>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<G1>::value;
 };
 
 template<>
 struct KingCastleTarget<PieceType::KING, PieceColour::BLACK>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<62>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<G8>::value;
 };
 
 template<>
 struct KingCastleTarget<PieceType::QUEEN, PieceColour::WHITE>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<2>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<C1>::value;
 };
 
 template<>
 struct KingCastleTarget<PieceType::QUEEN, PieceColour::BLACK>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<58>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<C8>::value;
 };
 
 template<PieceType T, PieceColour C>
@@ -179,25 +180,25 @@ struct RookCastleSource
 template<>
 struct RookCastleSource<PieceType::KING, PieceColour::WHITE>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<7>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<H1>::value;
 };
 
 template<>
 struct RookCastleSource<PieceType::KING, PieceColour::BLACK>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<63>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<H8>::value;
 };
 
 template<>
 struct RookCastleSource<PieceType::QUEEN, PieceColour::WHITE>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<0>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<A1>::value;
 };
 
 template<>
 struct RookCastleSource<PieceType::QUEEN, PieceColour::BLACK>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<56>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<A8>::value;
 };
 
 template<PieceType T, PieceColour C>
@@ -209,25 +210,25 @@ struct RookCastleTarget
 template<>
 struct RookCastleTarget<PieceType::KING, PieceColour::WHITE>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<5>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<F1>::value;
 };
 
 template<>
 struct RookCastleTarget<PieceType::KING, PieceColour::BLACK>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<61>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<F8>::value;
 };
 
 template<>
 struct RookCastleTarget<PieceType::QUEEN, PieceColour::WHITE>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<3>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<D1>::value;
 };
 
 template<>
 struct RookCastleTarget<PieceType::QUEEN, PieceColour::BLACK>
 {
-  static constexpr Bitboard value = bitboard::static_bitboard<59>::value;
+  static constexpr Bitboard value = bitboard::static_bitboard<D8>::value;
 };
 
 template<PieceColour C>
@@ -251,10 +252,10 @@ struct OppositeColour<PieceColour::BLACK>
 class Board
 {
 public:
-  Board() : m_pieceTypeBitboard{ 0}, m_colourBitboard{ 0}, m_previousMoveF(piece::Move())
+  Board() : m_pieceTypeBitboard{ 0 }, m_colourBitboard{ 0 }, m_previousMoveF(piece::Move())
   {
   }
-  Board(const std::string &fen) : m_pieceTypeBitboard{ 0}, m_colourBitboard{ 0}, m_previousMoveF(piece::Move())
+  Board(const std::string &fen) : m_pieceTypeBitboard{ 0 }, m_colourBitboard{ 0 }, m_previousMoveF(piece::Move())
   {
     parseFen(fen);
   }
