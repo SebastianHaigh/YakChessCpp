@@ -65,7 +65,7 @@ void ROOK_MOVE_GENERATION() {
     Bitboard friendly = yak::bitboard::RANK_1 | yak::bitboard::RANK_2;
     Bitboard occupied = friendly;
     Bitboard empty = ~occupied;
-    int move_counter = 0;
+    int moveCounter = 0;
 
     yak::attackmap::RookMap rook_atks;
     yak::attackmap::BishopMap bishop_atks;
@@ -73,16 +73,16 @@ void ROOK_MOVE_GENERATION() {
     Timer timer;
 
     for (int i = 0; i < 1000; i++) {
-      move_counter = 0;
-      yak::piece::generate_pawn_moves<PieceColour::WHITE>(&move_list[0], move_counter, pawns, empty, 0);
-      yak::piece::generatePieceMoves<PieceType::KNIGHT>(&move_list[0], move_counter, knights, empty, 0);
-      yak::piece::generatePieceMoves<PieceType::KING>(&move_list[0], move_counter, knights, empty, 0);
-      yak::piece::generatePieceMoves<PieceType::BISHOP>(&move_list[0], move_counter, knights, empty, 0);
-      yak::piece::generatePieceMoves<PieceType::ROOK>(&move_list[0], move_counter, knights, empty, 0);
-      yak::piece::generatePieceMoves<PieceType::QUEEN>(&move_list[0], move_counter, knights, empty, 0);
+      moveCounter = 0;
+      yak::piece::generate_pawn_moves<PieceColour::WHITE>(&move_list[0], moveCounter, pawns, empty, 0);
+      moveCounter += yak::piece::generatePieceMoves<PieceType::KNIGHT>(&move_list[0], knights, empty, 0);
+      moveCounter += yak::piece::generatePieceMoves<PieceType::KING>(&move_list[0], kings, empty, 0);
+      moveCounter += yak::piece::generatePieceMoves<PieceType::BISHOP>(&move_list[0], bishops, empty, 0);
+      moveCounter += yak::piece::generatePieceMoves<PieceType::ROOK>(&move_list[0], rooks, empty, 0);
+      moveCounter += yak::piece::generatePieceMoves<PieceType::QUEEN>(&move_list[0], queens, empty, 0);
     }
 
-    std::cout << move_counter << std::endl;
+    std::cout << moveCounter << std::endl;
 
     //for (int i = 0; i < 50; i++) {
     //	std::cout << move_list[i].from << ", " << move_list[i].to << ", " << move_list[i].capture << std::endl;

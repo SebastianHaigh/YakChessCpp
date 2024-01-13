@@ -35,9 +35,9 @@ namespace piece {
 /**
  * \brief Static table of jumping piece attacks.
  */
-template<PieceType T, Square S = 0, Bitboard... B>
+template<PieceType T, Square S = A1, Bitboard... B>
 struct jump_map : jump_map<T,
-                           S + 1,
+                           static_cast<Square>(S + 1),
                            B...,
                            (T == PieceType::KNIGHT) ?
                            attackmap::knight_map<S>::value :
@@ -48,7 +48,7 @@ struct jump_map : jump_map<T,
 };
 
 template<PieceType T, Bitboard... B>
-struct jump_map<T, 63, B...>
+struct jump_map<T, H8, B...>
 {
   static constexpr std::array<Bitboard, 64> value = {B...};
 };
@@ -184,7 +184,7 @@ struct Move
   bool capture = false;
   bool en_passant = false;
   bool double_push = false;
-  Square ep_target = 0;
+  Square ep_target = NULL_SQUARE;
   PieceType castle = PieceType::NULL_PIECE;
   PieceType promotion = PieceType::NULL_PIECE;
   std::string to_algebraic() const
@@ -467,12 +467,12 @@ void generateSlidingPieceMoves(const attackmap::QueenMap &,
                                Bitboard opponentPieces);
 
 template<PieceType T>
-void generatePieceMoves(Move *moveList,
-                        int &moveCounter,
-                        Bitboard piecePositions,
-                        Bitboard emptySquares,
-                        Bitboard opponentPieces)
+int generatePieceMoves(Move *moveList,
+                       Bitboard piecePositions,
+                       Bitboard emptySquares,
+                       Bitboard opponentPieces)
 {
+  int moveCounter{ 0 };
 
   while (piecePositions)
   {
@@ -487,16 +487,18 @@ void generatePieceMoves(Move *moveList,
     while (quiet)
     {
       *moveList++ = makeQuiet(from, bitboard::popLS1B(quiet));
-      moveCounter++;
+      ++moveCounter;
     }
 
     Bitboard capture = atk_bb & opponentPieces;
     while (capture)
     {
       *moveList++ = makeCapture(from, bitboard::popLS1B(capture));
-      moveCounter++;
+      ++moveCounter;
     }
   }
+
+  return moveCounter;
 }
 
 /**

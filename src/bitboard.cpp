@@ -54,11 +54,11 @@ std::vector<Square> scanForward(Bitboard board)
 
 Square firstOccupiedSquare(const Bitboard& board)
 {
-  for (Square square = 0; square < 64; square++)
+  for (int square = 0; square < 64; square++)
   {
-    if (board & toBitboard(square))
+    if (board & toBitboard(static_cast<Square>(square)))
     {
-      return square;
+      return static_cast<Square>(square);
     }
   }
 
@@ -111,7 +111,7 @@ Rank rankIndex(const std::string& algebraicSquare)
 
 Square squareIndex(File fileIndex, Rank rankIndex)
 {
-  return (8 * rankIndex) + fileIndex;
+  return static_cast<Square>((8 * rankIndex) + fileIndex);
 }
 
 Square squareIndex(const std::string& square)
@@ -164,7 +164,39 @@ void print_board(Bitboard board)
     std::cout << std::endl;
   }
   std::cout << std::endl;
+}
 
+std::string to_string(Bitboard board)
+{
+  std::vector<std::vector<bool>> boardVector(8, std::vector<bool>(8, false));
+
+  for (Rank rank = 0; rank < 8; rank++)
+  {
+    for (File file = 0; file < 8; file++)
+    {
+      boardVector[rank][file] = (board & toBitboard(file, rank)) > 0;
+    }
+  }
+
+  std::string boardStr{};
+
+  for (auto rit = boardVector.rbegin(); rit != boardVector.rend(); ++rit)
+  {
+    for (auto file : *rit)
+    {
+      if (file)
+      {
+        boardStr += " 1";
+      }
+      else
+      {
+        boardStr += " 0";
+      }
+    }
+    boardStr += "\n";
+  }
+  boardStr += "\n";
+  return boardStr;
 }
 
 std::string to_algebraic(Square square)
