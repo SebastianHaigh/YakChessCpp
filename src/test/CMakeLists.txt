@@ -39,3 +39,13 @@ target_link_libraries(PiecesTests
 
 add_test(NAME PiecesTests
          COMMAND PiecesTests)
+
+add_executable(GameStateTests GameStateTests.cpp)
+target_link_libraries(GameStateTests
+                      PUBLIC
+                        yak
+                      PRIVATE
+                        Catch2::Catch2WithMain)
+
+add_test(NAME GameStateTests
+         COMMAND GameStateTests)

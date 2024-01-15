@@ -4,6 +4,11 @@
 
 namespace yak {
 
+Board::Board(const std::string &fen)
+{
+  parseFen(fen);
+}
+
 void Board::parseFen(const std::string &fen)
 {
   auto endOfPiecePlacement = fen.find_first_of(" ");
@@ -32,7 +37,8 @@ void Board::parseFen(const std::string &fen)
       currentSquare = static_cast<Square>(currentSquare + 1);
     }
   }
-  m_currentState = GameState(fen.substr(endOfPiecePlacement + 1));
+
+  m_state.loadFen(fen.substr(endOfPiecePlacement + 1));
 }
 
 PieceType Board::getPieceTypeOn(Square square)
@@ -79,8 +85,8 @@ std::vector<piece::Move> Board::generateMoves()
   piece::Move enPassantMove;
   int moveCounter{0};
 
-  PieceColour thisSide = m_currentState.sideToMove();
-  PieceColour otherSide = m_currentState.sideNotToMove();
+  const PieceColour thisSide = m_state->sideToMove();
+  const PieceColour otherSide = m_state->sideNotToMove();
 
   if (thisSide == PieceColour::WHITE)
   {
@@ -138,7 +144,8 @@ std::vector<piece::Move> Board::generateMoves()
   for (int i = 0; i < moveCounter; i++)
   {
     makeMove(psuedoLegalMoveList[i]);
-    if (!isCheck(m_previousState.sideToMove()))
+    // TODO (haigh) not safe, check for null here
+    if (!isCheck(m_state->getPrevState()->sideToMove()))
     {
       legal_moves.push_back(psuedoLegalMoveList[i]);
     }
@@ -152,24 +159,23 @@ std::vector<piece::Move> Board::generateMoves()
 
 std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> moves)
 {
-  Bitboard squares_attacked_by_enemy = attacked_by(m_currentState.sideNotToMove());
+  const Bitboard squaresAttackedByEnemy = attacked_by(m_state->sideNotToMove());
+  const Bitboard king = getPosition(m_state->sideToMove(), PieceType::KING);
 
-  Bitboard king = getPosition(m_currentState.sideToMove(), PieceType::KING);
-
-  if (m_currentState.canKingSideCastle() && !isCheck())
+  if (m_state->canKingSideCastle() && !isCheck())
   {
-    Bitboard king_path = bitboard::shift<Direction::EAST>(king) | bitboard::shift<Direction::EAST>(bitboard::shift<Direction::EAST>(king));
-    if ((king_path & occupiedSquares()) == 0 && (king_path & squares_attacked_by_enemy) == 0)
+    const Bitboard kingPath = bitboard::shift<Direction::EAST>(king) | bitboard::shift<Direction::EAST>(bitboard::shift<Direction::EAST>(king));
+    if ((kingPath & occupiedSquares()) == 0 && (kingPath & squaresAttackedByEnemy) == 0)
     {
       moves.push_back(piece::makeKingsideCastle());
     }
   }
 
-  if (m_currentState.canQueenSideCastle() && !isCheck())
+  if (m_state->canQueenSideCastle() && !isCheck())
   {
-    Bitboard king_path = bitboard::shift<Direction::WEST>(king) | bitboard::shift<Direction::WEST>(bitboard::shift<Direction::WEST>(king));
-    Bitboard rook_path = king_path | bitboard::shift<Direction::WEST>(king_path);
-    if ((rook_path & occupiedSquares()) == 0 && (king_path & squares_attacked_by_enemy) == 0)
+    const Bitboard kingPath = bitboard::shift<Direction::WEST>(king) | bitboard::shift<Direction::WEST>(bitboard::shift<Direction::WEST>(king));
+    const Bitboard rookPath = kingPath | bitboard::shift<Direction::WEST>(kingPath);
+    if ((rookPath & occupiedSquares()) == 0 && (kingPath & squaresAttackedByEnemy) == 0)
     {
       moves.push_back(piece::makeQueensideCastle());
     }
@@ -178,16 +184,9 @@ std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> m
   return moves;
 }
 
-void Board::makeMove(PieceType type, PieceColour colour, Square from, Square to)
-{
-  Bitboard from_to_bitboard = bitboard::toBitboard(from) ^ bitboard::toBitboard(to);
-  m_pieceTypeBitboard[static_cast<int>(type)] ^= from_to_bitboard;
-  m_colourBitboard[static_cast<int>(colour)] ^= from_to_bitboard;
-}
-
 void Board::makeMove(const piece::Move &move)
 {
-  if (m_currentState.sideToMove() == PieceColour::WHITE)
+  if (m_state->sideToMove() == PieceColour::WHITE)
   {
     processMove<PieceColour::WHITE>(move, false);
   }
@@ -196,33 +195,28 @@ void Board::makeMove(const piece::Move &move)
     processMove<PieceColour::BLACK>(move, false);
   }
 
-  m_previousState = m_currentState;
-  m_currentState.update(move);
-  m_currentState.toggleSideToMove();
-  m_previousMoveF = move;
+  m_state.update(move);
 }
 
 void Board::undoMove()
 {
-  if (m_previousMoveF.from != m_previousMoveF.to)
+  const piece::Move* move = m_state.pop();
+
+  // TODO (haigh) check that move and state not null
+
+  if (m_state->sideToMove() == PieceColour::WHITE)
   {
-    m_currentState.toggleSideToMove();
-    if (m_currentState.sideToMove() == PieceColour::WHITE)
-    {
-      processMove<PieceColour::WHITE>(m_previousMoveF, true);
-    }
-    else
-    {
-      processMove<PieceColour::BLACK>(m_previousMoveF, true);
-    }
-    m_currentState = m_previousState;
+    processMove<PieceColour::WHITE>(*move, true);
+    return;
   }
+
+  processMove<PieceColour::BLACK>(*move, true);
 }
 
 bool Board::isCheck()
 {
-  Bitboard king = getPosition(m_currentState.sideToMove(), PieceType::KING);
-  Bitboard attackers = attacked_by(pieces::otherColour(m_currentState.sideToMove()));
+  Bitboard king = getPosition(m_state->sideToMove(), PieceType::KING);
+  Bitboard attackers = attacked_by(m_state->sideNotToMove());
   return (king & attackers) > 0;
 }
 
@@ -259,18 +253,18 @@ std::string Board::toFen()
     }
   }
   fen += " ";
-  fen += m_currentState.toFen();
+  fen += m_state->toFen();
   return fen;
 }
 
 bool Board::canKingSideCastle(PieceColour colour)
 {
-  return m_currentState.canKingSideCastle(colour);
+  return m_state->canKingSideCastle(colour);
 }
 
 bool Board::canQueenSideCastle(PieceColour colour)
 {
-  return m_currentState.canQueenSideCastle(colour);
+  return m_state->canQueenSideCastle(colour);
 }
 
 std::string Board::rankToFen(Rank rank)
@@ -367,287 +361,6 @@ Bitboard Board::allAttacks(PieceColour colour)
   attacked_squares |= (pieceAttacks(PieceType::QUEEN, colour) & ~friendly_pieces);
   attacked_squares |= (pieceAttacks(PieceType::KING, colour) & ~friendly_pieces);
   return attacked_squares;
-}
-
-CastlingRights::CastlingRights(std::string fen)
-{
-  if (fen.empty() || (fen.size() == 1 && fen[0] == '-'))
-  {
-    return;
-  }
-
-  for (const auto &character : fen)
-  {
-    switch (character)
-    {
-      case 'K':
-      {
-        white[0] = true;
-        break;
-      }
-      case 'Q':
-      {
-        white[1] = true;
-        break;
-      }
-      case 'k':
-      {
-        black[0] = true;
-        break;
-      }
-      case 'q':
-      {
-        black[1] = true;
-        break;
-      }
-    }
-  }
-}
-
-bool CastlingRights::kingSide(PieceColour colour)
-{
-  bool possible[3] = {black[0], white[0], false};
-
-  return possible[static_cast<int>(colour)];
-
-  /* if (colour == PieceColour::BLACK) */
-  /* { */
-  /*   return black[0]; */
-  /* } */
-  /* else */
-  /* { */
-  /*   return white[0]; */
-  /* } */
-}
-
-bool CastlingRights::queenSide(PieceColour colour)
-{
-  bool possible[3] = {black[1], white[1], false};
-
-  return possible[static_cast<int>(colour)];
-
-  /* if (colour == PieceColour::BLACK) */
-  /* { */
-  /*   return black[1]; */
-  /* } */
-  /* else */
-  /* { */
-  /*   return white[1]; */
-  /* } */
-}
-
-void CastlingRights::update(const piece::Move &move, PieceColour side)
-{
-  // TODO (haigh) check if this is actually faster that the branches
-  /* if (move.castle != PieceType::NULL_PIECE) */
-  /* { */
-  /*   if (side == PieceColour::WHITE) */
-  /*   { */
-  /*     white[0] = false; */
-  /*     white[1] = false; */
-  /*   } */
-  /*   else */
-  /*   { */
-  /*     black[0] = false; */
-  /*     black[1] = false; */
-  /*   } */
-  /*   return; */
-  /* } */
-
-  bool isCastle = (move.castle != PieceType::NULL_PIECE);
-  bool isWhiteCastle = isCastle && (side == PieceColour::WHITE);
-  bool isBlackCastle = isCastle && (side == PieceColour::BLACK);
-
-  bool removesWhiteKingSide = (move.from == 7) || (move.to == 7) || (move.from == 4);
-  bool removesWhiteQueenSide = (move.from == 0) || (move.to == 0) || (move.from == 4);
-  bool removesBlackKingSide = (move.from == 63) || (move.to == 63) || (move.from == 60);
-  bool removesBlackQueenSide = (move.from == 56) || (move.to == 56) || (move.from == 60);
-
-  white[0] = not isWhiteCastle && not removesWhiteKingSide && white[0];
-  white[1] = not isWhiteCastle && not removesWhiteQueenSide && white[1];
-  black[0] = not isBlackCastle && not removesBlackKingSide && black[0];
-  black[1] = not isBlackCastle && not removesBlackQueenSide && black[1];
-
-}
-
-std::string CastlingRights::fen()
-{
-  std::string fen_string = "";
-  fen_string += white[0] ? "K" : "";
-  fen_string += white[1] ? "Q" : "";
-  fen_string += black[0] ? "k" : "";
-  fen_string += black[1] ? "q" : "";
-  if (fen_string.empty())
-  {
-    fen_string += "-";
-  }
-  return fen_string;
-}
-
-GameState::GameState() : m_side(PieceColour::WHITE)
-{
-}
-
-GameState::GameState(const std::string& fen)
-{
-  parseFen(fen);
-}
-
-void GameState::parseFen(const std::string& fen)
-{
-  auto startOfCastlingRights = fen.find_first_of(" ");
-  auto startOfEpTarget = fen.find_first_of(" ", startOfCastlingRights + 1);
-  auto startOfMoveNumber = fen.find_first_of(" ", startOfEpTarget + 1);
-  if (fen[0] == 'w')
-  {
-    m_side = PieceColour::WHITE;
-  }
-  else if (fen[0] == 'b')
-  {
-    m_side = PieceColour::BLACK;
-  }
-  else
-  {
-    // TODO Throw an exception for this
-  }
-
-  if (fen[startOfEpTarget + 1] == '-')
-  {
-    m_hasEpTarget = false;
-  }
-  else
-  {
-    m_hasEpTarget = true;
-    m_epSquare = bitboard::squareIndex(fen.substr(startOfEpTarget + 1, 2));
-  }
-
-  int lengthCastlingRights = startOfEpTarget - startOfCastlingRights;
-  m_castlingRights = CastlingRights(fen.substr(startOfCastlingRights + 1, lengthCastlingRights));
-}
-
-std::string GameState::toFen()
-{
-  std::string fen = "";
-
-  if (m_side == PieceColour::WHITE)
-  {
-    fen += 'w';
-  }
-  else
-  {
-    fen += 'b';
-  }
-
-  fen += " " + m_castlingRights.fen() + " ";
-  fen += m_hasEpTarget ? bitboard::to_algebraic(m_epSquare) : "-";
-  fen += " 0 ";
-  fen += std::to_string(m_moveClock);
-
-  return fen;
-}
-
-/*
-void GameState::update(Move move) {
-	if (move.is_double_push()) {
-		m_hasEpTarget = true;
-		if (m_side == PieceColour::WHITE) {
-			m_epSquare = move.to_square() - 8;
-		}
-		else {
-			m_epSquare = move.to_square() + 8;
-		}
-	}
-	else {
-		m_hasEpTarget = false;
-	}
-
-	m_castlingRights.update(move, m_side);
-	if (m_side == PieceColour::BLACK) {
-		m_moveClock++;
-	}
-}
-*/
-
-void GameState::update(const piece::Move &move)
-{
-  // TODO (haigh) Check if this is actually faster than the branched version
-  m_hasEpTarget = move.double_push;
-  int possibleTargets[3] = {move.to + 8, move.to - 8, NULL_SQUARE};
-  m_epSquare = static_cast<Square>(possibleTargets[static_cast<int>(m_side)]);
-
-  /* if (move.double_push) */
-  /* { */
-  /*   m_hasEpTarget = true; */
-
-  /*   if (m_side == PieceColour::WHITE) */
-  /*   { */
-  /*     m_epSquare = static_cast<Square>(move.to - 8); */
-  /*   } */
-  /*   else */
-  /*   { */
-  /*     m_epSquare = static_cast<Square>(move.to + 8); */
-  /*   } */
-  /* } */
-  /* else */
-  /* { */
-  /*   m_hasEpTarget = false; */
-  /* } */
-
-  m_castlingRights.update(move, m_side);
-
-  const int newMoveClock = m_moveClock + 1;
-  m_moveClock = (m_side == PieceColour::BLACK) ? newMoveClock : m_moveClock;
-}
-
-bool GameState::canKingSideCastle(PieceColour colour)
-{
-  return m_castlingRights.kingSide(colour);
-}
-
-bool GameState::canKingSideCastle()
-{
-  return m_castlingRights.kingSide(m_side);
-}
-
-bool GameState::canQueenSideCastle(PieceColour colour)
-{
-  return m_castlingRights.queenSide(colour);
-}
-
-bool GameState::canQueenSideCastle()
-{
-  return m_castlingRights.queenSide(m_side);
-}
-
-void GameState::toggleSideToMove()
-{
-  PieceColour colours[3] = {PieceColour::WHITE, PieceColour::BLACK, PieceColour::NULL_COLOUR};
-
-  m_side = colours[static_cast<int>(m_side)];
-
-  /* if (m_side == PieceColour::BLACK) */
-  /* { */
-  /*   m_side = PieceColour::WHITE; */
-  /* } */
-  /* else */
-  /* { */
-  /*   m_side = PieceColour::BLACK; */
-  /* } */
-}
-
-Bitboard GameState::epTarget() const
-{
-  return (m_hasEpTarget) ? bitboard::toBitboard(m_epSquare) : Bitboard{0};
-}
-
-Square GameState::epTargetSquare() const
-{
-  return m_epSquare;
-}
-
-PieceColour GameState::sideNotToMove() const
-{
-  return pieces::otherColour(m_side);
 }
 
 } // namespace yak

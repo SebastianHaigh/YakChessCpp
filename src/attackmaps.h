@@ -71,16 +71,9 @@ Bitboard blocked_ray(Square square, Bitboard occupied)
     return thisDirectionRayMap[square];
   }
 
-  Square blockerSquare{A2};
-
-  if (isPositiveRay<D>::value)
-  {
-    blockerSquare = bitboard::LS1B(piecesInRay);
-  }
-  else
-  {
-    blockerSquare = bitboard::MS1B(piecesInRay);
-  }
+  const Square blockerSquare = (isPositiveRay<D>::value)
+                               ? bitboard::LS1B(piecesInRay)
+                               : bitboard::MS1B(piecesInRay);
 
   return thisDirectionRayMap[square] ^ thisDirectionRayMap[blockerSquare];
 }

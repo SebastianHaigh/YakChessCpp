@@ -179,11 +179,12 @@ Bitboard non_promotable_pawns(Bitboard pawn_positions)
 
 struct Move
 {
-  Square from;
-  Square to;
+  Square from{NULL_SQUARE};
+  Square to{NULL_SQUARE};
   bool capture = false;
   bool en_passant = false;
   bool double_push = false;
+  bool pawn_move = false;
   Square ep_target = NULL_SQUARE;
   PieceType castle = PieceType::NULL_PIECE;
   PieceType promotion = PieceType::NULL_PIECE;

@@ -4,142 +4,11 @@
 #include <iostream>
 #include <string>
 
+#include "GameState.h"
 #include "pieces.h"
 #include "bitboard.h"
 
 namespace yak {
-
-/*
- * \brief Encodes and maintains castling rights for the game state.
- */
-class CastlingRights
-{
-private:
-  bool black[2]{0};
-  bool white[2]{0};
-  bool rights[4]{0};
-public:
-  /* \brief Default constructor. */
-  CastlingRights()
-  {
-  };
-
-  /*!
-   * \brief Construct castling rights from fen.
-   * \param[in] fen - std::string containing the castling rights in fen format
-   */
-  CastlingRights(std::string fen);
-
-  /*!
-   * \brief Check if a side can castle in the king m_side.
-   * \param[in] colour - the colour of the side to check the rights for.
-   * \return true if colour can castle, false otherwise.
-   */
-  bool kingSide(PieceColour colour);
-
-  /*!
-   * \brief Check if a side can castle in the queen m_side.
-   * \param[in] colour - the colour of the m_side to check the rights for.
-   * \return true if colour can castle, false otherwise.
-   */
-  bool queenSide(PieceColour colour);
-
-  /*!
-   * \brief Update castling rights based on a move.
-   * \param[in] move - a move that may update the rights.
-   * \param[in] side - the side that is making the move.
-   */
-  void update(const piece::Move &move, PieceColour side);
-
-  /*!
-   * \brief Get the current castling rights in fen format.
-   * \return std::string containing the fen of the current castling rights.
-   */
-  std::string fen();
-};
-
-/*!
- * \brief Holds all of the games state except for piece positions.
- */
-class GameState
-{
-public:
-  /*! \brief Default constructor */
-  GameState();
-
-  /*!
-   * \brief Construct from fen.
-   * \param[in] fen - the fen string of the game state to be initialised.
-   */
-  explicit GameState(const std::string& fen);
-
-  /*!
-   * \brief Return the current game state in FEN notation.
-   * \return std::string in FEN notation.
-   */
-  std::string toFen();
-
-  /*!
-   * \brief Update the game state based on a given move.
-   * \param[in] move - The move to be made.
-   */
-  void update(const piece::Move &move);
-
-  /*!
-   * \brief Check if a side can castle on the king m_side.
-   * \param[in] colour - The colour of the side to check.
-   * \return true if the m_side can castle on the king side, false otherwise.
-   */
-  bool canKingSideCastle(PieceColour colour);
-
-  /*!
-   * \brief Check if the current side to move can king side castle.
-   * \return true if the side to move can king side castle, false otherwise.
-   */
-  bool canKingSideCastle();
-
-  /*!
-   * \brief Check if a side can castle on the queen side.
-   * \param[in] colour - The colour of the side to check.
-   * \return true if the side can castle on the queen side, false otherwise.
-   */
-  bool canQueenSideCastle(PieceColour colour);
-
-  /*!
-   * \brief Check if the current side to move can queen side castle.
-   * \return true if the side to move can queen side castle, false otherwise.
-   */
-  bool canQueenSideCastle();
-
-  template<PieceType T>
-  bool can_castle()
-  {
-    return (T == PieceType::KING) ? canKingSideCastle() :
-           (T == PieceType::QUEEN) ? canQueenSideCastle() : false;
-  }
-
-  /*! \brief Change the side to move. */
-  void toggleSideToMove();
-
-  inline PieceColour sideToMove() const
-  {
-    return m_side;
-  }
-
-  PieceColour sideNotToMove() const;
-
-  Square epTargetSquare() const;
-
-  Bitboard epTarget() const;
-
-private:
-  CastlingRights m_castlingRights;
-  PieceColour m_side;
-  int m_moveClock = 1;
-  bool m_hasEpTarget = false;
-  Square m_epSquare = NULL_SQUARE;
-  void parseFen(const std::string& fen);
-};
 
 template<PieceType T, PieceColour C>
 struct KingCastleTarget
@@ -252,13 +121,11 @@ struct OppositeColour<PieceColour::BLACK>
 class Board
 {
 public:
-  Board() : m_pieceTypeBitboard{ 0 }, m_colourBitboard{ 0 }, m_previousMoveF(piece::Move())
-  {
-  }
-  Board(const std::string &fen) : m_pieceTypeBitboard{ 0 }, m_colourBitboard{ 0 }, m_previousMoveF(piece::Move())
-  {
-    parseFen(fen);
-  }
+  Board() = default;
+  Board(const std::string &fen);
+
+  Board(const Board&) = delete;
+  Board& operator=(const Board&) = delete;
 
   PieceType getPieceTypeOn(Square square);
   PieceColour getPieceColourOn(Square square);
@@ -284,17 +151,17 @@ public:
 
   Bitboard epTarget()
   {
-    return m_currentState.epTarget();
+    return bitboard::toBitboard(m_state->epTargetSquare());
   }
 
   Square ep_target_square()
   {
-    return m_currentState.epTargetSquare();
+    return m_state->epTargetSquare();
   }
 
   PieceColour to_move()
   {
-    return m_currentState.sideToMove();
+    return m_state->sideToMove();
   }
 
   Bitboard attacked_by(PieceColour colour)
@@ -337,22 +204,14 @@ public:
   }
 
 private:
+  Bitboard m_pieceTypeBitboard[6] = { 0, 0, 0, 0, 0, 0 };
+  Bitboard m_colourBitboard[2] { 0, 0 };
 
-  Bitboard m_pieceTypeBitboard[6];
-  Bitboard m_colourBitboard[2];
-
-  /* \brief The current GameState */
-  GameState m_currentState;
-
-  /* \brief A record of the GameState before the last move, for undoing moves. */
-  GameState m_previousState;
+  GameStateManager m_state;
 
   attackmap::RookMap m_rookAtks;      /* \brief Attack map for Rooks */
   attackmap::BishopMap m_bishopAtks;    /* \brief Attack map for Bishops */
   attackmap::QueenMap m_queenAtks;    /* \brief Attack map for Queens */
-
-  /* \brief The last move to have been made on this board. */
-  piece::Move m_previousMoveF;
 
   /* \brief The piece captured on the last move, NULL_PIECE if last move was not a capture. */
   PieceType m_previousCapturedPiece = PieceType::NULL_PIECE;
@@ -455,7 +314,7 @@ void Board::processMove(const piece::Move &move, bool undo)
   {
     Bitboard capture_square = to_bitboard;
     if (move.en_passant)
-      capture_square = m_currentState.epTarget();
+      capture_square = m_state->epTarget();
 
     m_pieceTypeBitboard[piece_to_capture] ^= capture_square;
     m_colourBitboard[opposing_colour] ^= capture_square;
@@ -498,8 +357,7 @@ void Board::processEp(const piece::Move &move)
 template<PieceType T, PieceColour C>
 void Board::processCastle(const piece::Move &move)
 {
-
-  if (m_currentState.can_castle<T>())
+  if (m_state->can_castle<T>())
   {
     // Move the king
     Bitboard from_to_bitboard = getPosition(C, PieceType::KING) ^ KingCastleTarget<T, C>::value;
