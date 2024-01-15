@@ -10,7 +10,7 @@ target_link_libraries(AttackMapTests
 add_test(NAME AttackMapTests
          COMMAND AttackMapTests)
 
-add_executable(BitboardTests bitboard_test.cpp board_test.cpp pieces_test.cpp)
+add_executable(BitboardTests bitboard_test.cpp)
 target_link_libraries(BitboardTests
                       PUBLIC
                         yak
@@ -20,7 +20,7 @@ target_link_libraries(BitboardTests
 add_test(NAME BitboardTests
          COMMAND BitboardTests)
 
-add_executable(BoardTests board_test.cpp pieces_test.cpp)
+add_executable(BoardTests board_test.cpp)
 target_link_libraries(BoardTests
                       PUBLIC
                         yak

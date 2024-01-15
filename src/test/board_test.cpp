@@ -215,7 +215,9 @@ TEST_CASE("BoardTest: CastlingRightsChangeWhenRookIsCaptured") {
   std::string expected{ "rnbqkbn1/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNr w Qq - 0 2" };
   Board board{fen};
 
-  const piece::Move move = piece::makeCapture(H8, H1);
+  piece::Move move = piece::makeCapture(H8, H1);
+  move.capturePiece = PieceType::ROOK;
+
 
   board.makeMove(move);
 
@@ -483,16 +485,17 @@ TEST_CASE("BoardMoveGenerationTests: CanCastleQueenSideBlack") {
 
   std::vector<piece::Move> moves = board.generateMoves();
 
-  // Act
+  bool foundCastle{false};
   for (auto& move : moves) {
     if (move.castle != PieceType::NULL_PIECE) {
-      board.makeMove(move);
+      yak::Board::MoveResult result = board.makeMove(move);
+      CHECK(result == yak::Board::MoveResult::SUCCESS);
+      foundCastle = true;
       break;
     }
-
   }
 
-  // Assert
+  CHECK(foundCastle);
   CHECK(board.toFen() == expected);
 }
 

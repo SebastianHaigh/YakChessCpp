@@ -1,4 +1,6 @@
 #include <cassert>
+#include <stdexcept>
+#include "bitboard.h"
 #include "board.h"
 #include "pieces.h"
 
@@ -39,6 +41,21 @@ void Board::parseFen(const std::string &fen)
   }
 
   m_state.loadFen(fen.substr(endOfPiecePlacement + 1));
+}
+
+Bitboard Board::get_position(PieceType type)
+{
+  return m_pieceTypeBitboard[static_cast<int>(type)];
+}
+
+Bitboard Board::get_position(PieceColour colour)
+{
+  return m_colourBitboard[static_cast<int>(colour)];
+}
+
+Bitboard Board::getPosition(PieceColour pieceColour, PieceType pieceType)
+{
+  return get_position(pieceType) & get_position(pieceColour);
 }
 
 PieceType Board::getPieceTypeOn(Square square)
@@ -90,55 +107,43 @@ std::vector<piece::Move> Board::generateMoves()
 
   if (thisSide == PieceColour::WHITE)
   {
-    piece::generate_pawn_moves<PieceColour::WHITE>(&psuedoLegalMoveList[moveCounter],
+    generatePawnMoves<PieceColour::WHITE>(&psuedoLegalMoveList[moveCounter],
                                                    moveCounter,
                                                    getPosition(thisSide, PieceType::PAWN),
-                                                   emptySquares(),
-                                                   get_position(otherSide));
+                                                   emptySquares());
 
     piece::generateEpCaptures<PieceColour::WHITE>(&enPassantMove,
                                                   moveCounter,
                                                   getPosition(thisSide, PieceType::PAWN),
-                                                  epTarget());
+                                                  m_state->epTarget());
   }
   else
   {
-    piece::generate_pawn_moves<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
-                                                   moveCounter,
-                                                   getPosition(thisSide, PieceType::PAWN),
-                                                   emptySquares(),
-                                                   get_position(otherSide));
+    generatePawnMoves<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
+                                          moveCounter,
+                                          getPosition(thisSide, PieceType::PAWN),
+                                          emptySquares());
 
     piece::generateEpCaptures<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
                                                   moveCounter,
                                                   getPosition(thisSide, PieceType::PAWN),
-                                                  epTarget());
+                                                  m_state->epTarget());
   }
 
-  moveCounter += piece::generatePieceMoves<PieceType::KNIGHT>(&psuedoLegalMoveList[moveCounter],
-                                                              getPosition(thisSide, PieceType::KNIGHT),
-                                                              emptySquares(),
-                                                              get_position(otherSide));
+  moveCounter += generatePieceMoves<PieceType::KNIGHT>(&psuedoLegalMoveList[moveCounter],
+                                                       thisSide);
 
-  moveCounter += piece::generatePieceMoves<PieceType::KING>(&psuedoLegalMoveList[moveCounter],
-                                                            getPosition(thisSide, PieceType::KING),
-                                                            emptySquares(),
-                                                            get_position(otherSide));
+  moveCounter += generatePieceMoves<PieceType::KING>(&psuedoLegalMoveList[moveCounter],
+                                                     thisSide);
 
-  moveCounter += piece::generatePieceMoves<PieceType::BISHOP>(&psuedoLegalMoveList[moveCounter],
-                                                              getPosition(thisSide, PieceType::BISHOP),
-                                                              emptySquares(),
-                                                              get_position(otherSide));
+  moveCounter += generatePieceMoves<PieceType::BISHOP>(&psuedoLegalMoveList[moveCounter],
+                                                       thisSide);
 
-  moveCounter += piece::generatePieceMoves<PieceType::ROOK>(&psuedoLegalMoveList[moveCounter],
-                                                            getPosition(thisSide, PieceType::ROOK),
-                                                            emptySquares(),
-                                                            get_position(otherSide));
+  moveCounter += generatePieceMoves<PieceType::ROOK>(&psuedoLegalMoveList[moveCounter],
+                                                     thisSide);
 
-  moveCounter += piece::generatePieceMoves<PieceType::QUEEN>(&psuedoLegalMoveList[moveCounter],
-                                                             getPosition(thisSide, PieceType::QUEEN),
-                                                             emptySquares(),
-                                                             get_position(otherSide));
+  moveCounter += generatePieceMoves<PieceType::QUEEN>(&psuedoLegalMoveList[moveCounter],
+                                                      thisSide);
 
   std::vector<piece::Move> legal_moves;
   for (int i = 0; i < moveCounter; i++)
@@ -284,6 +289,39 @@ std::string Board::rankToFen(Rank rank)
       {
         fen += std::to_string(emptySum);
         emptySum = 0;
+      }
+      fen += pieces::pieceToFenChar(type, colour);
+    }
+    else
+    {
+      emptySum++;
+    }
+  }
+  if (emptySum != 0)
+  {
+    fen += std::to_string(emptySum);
+  }
+
+  return fen;
+}
+
+std::string Board::rankToBoardFen(Rank rank)
+{
+  std::string fen{""};
+  int emptySum = 0;
+  for (File fileIndex = 0; fileIndex < 8; fileIndex++)
+  {
+    PieceType type = getPieceTypeOn(bitboard::squareIndex(fileIndex, rank));
+    if (type != PieceType::NULL_PIECE)
+    {
+      PieceColour colour = getPieceColourOn(bitboard::squareIndex(fileIndex, rank));
+      if (emptySum != 0)
+      {
+        while (emptySum)
+        {
+          fen += ".";
+          --emptySum;
+        }
       }
       fen += pieces::pieceToFenChar(type, colour);
     }

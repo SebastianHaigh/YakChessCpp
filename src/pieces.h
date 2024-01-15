@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 enum class PieceType {
-  PAWN,
+  PAWN = 0,
   KNIGHT,
   BISHOP,
   ROOK,
@@ -22,7 +22,7 @@ enum class PieceType {
 };
 
 enum class PieceColour {
-  BLACK,
+  BLACK = 0,
   WHITE,
   NULL_COLOUR
 };
@@ -31,6 +31,18 @@ namespace yak {
 
 /** faster_pieces namespace for benchmark testing. */
 namespace piece {
+
+template<PieceType T>
+std::string to_string()
+{
+  if (T == PieceType::PAWN) return "PAWN";
+  if (T == PieceType::KNIGHT) return "KNIGHT";
+  if (T == PieceType::BISHOP) return "BISHOP";
+  if (T == PieceType::ROOK) return "ROOK";
+  if (T == PieceType::QUEEN) return "QUEEN";
+  if (T == PieceType::KING) return "KING";
+  return "NULL";
+}
 
 /**
  * \brief Static table of jumping piece attacks.
@@ -81,7 +93,7 @@ public:
  * \return The Bitboard of the target squares.
  */
 template<PieceColour C>
-Bitboard pawn_single_push_target(Bitboard source)
+Bitboard pawnSinglePushTarget(Bitboard source)
 {
   return (C == PieceColour::WHITE) ? bitboard::shift<Direction::NORTH>(source) :
          (C == PieceColour::BLACK) ? bitboard::shift<Direction::SOUTH>(source) : source;
@@ -177,11 +189,17 @@ Bitboard non_promotable_pawns(Bitboard pawn_positions)
   return ~promotablePawns<C>(pawn_positions) & pawn_positions;
 }
 
+// TODO this needs to be compacted into a 32 bit int
+// from square 6 bits
+// to square 6 bits
+// flags 4 bits
+// captured piece 4 bits?
 struct Move
 {
   Square from{NULL_SQUARE};
   Square to{NULL_SQUARE};
   bool capture = false;
+  PieceType capturePiece = PieceType::NULL_PIECE;
   bool en_passant = false;
   bool double_push = false;
   bool pawn_move = false;
@@ -312,7 +330,7 @@ inline void generate_pawn_single_pushes(Move *move_list,
 {
   pawn_positions = PROMOTIONS ? promotablePawns<C>(pawn_positions) : non_promotable_pawns<C>(pawn_positions);
   Bitboard sources = pawnSinglePushSource<C>(empty_squares) & pawn_positions;
-  Bitboard targets = pawn_single_push_target<C>(sources);
+  Bitboard targets = pawnSinglePushTarget<C>(sources);
   while (sources && !PROMOTIONS)
   {
     *move_list++ = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
@@ -359,7 +377,7 @@ inline void generatePawnWestCaptures(Move *moveList,
   Bitboard targets = pawnWestAttackTarget<C>(sources);
   while (sources && !PROMOTIONS)
   {
-    *moveList++ = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *moveList = makeCapture(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     moveCounter++;
   }
 
@@ -418,9 +436,9 @@ void generate_pawn_moves(Move *moveList,
 
   /* PROMOTIONS                    */
   /* ----------------------------- */
-  generate_pawn_single_pushes<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
-  generatePawnWestCaptures<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, opponentPieces);
-  generate_pawn_east_captures<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, opponentPieces);
+  /* generate_pawn_single_pushes<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares); */
+  /* generatePawnWestCaptures<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, opponentPieces); */
+  /* generate_pawn_east_captures<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, opponentPieces); */
 };
 
 template<PieceColour C>
@@ -467,6 +485,8 @@ void generateSlidingPieceMoves(const attackmap::QueenMap &,
                                Bitboard emptySquares,
                                Bitboard opponentPieces);
 
+// Can this be moved into the board?
+// TODO I need to update this method so that it can save the piece to be capture if there is a capture
 template<PieceType T>
 int generatePieceMoves(Move *moveList,
                        Bitboard piecePositions,
@@ -492,6 +512,7 @@ int generatePieceMoves(Move *moveList,
     }
 
     Bitboard capture = atk_bb & opponentPieces;
+
     while (capture)
     {
       *moveList++ = makeCapture(from, bitboard::popLS1B(capture));
@@ -558,8 +579,6 @@ PieceColour otherColour(PieceColour colour);
 PieceType fenCharToPieceType(const char fenChar);
 PieceColour fenCharToPieceColour(const char fenChar);
 char pieceToFenChar(const PieceType& type, const PieceColour& colour);
-char blackPieceTypeToFenChar(const PieceType& type);
-char whitePieceTypeToFenChar(const PieceType& type);
 
 class PawnTargets {
   // PawnTargets store pawn move target bitboards and their source bitboards.
