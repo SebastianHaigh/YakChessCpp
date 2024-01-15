@@ -184,21 +184,25 @@ std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> m
   return moves;
 }
 
-void Board::makeMove(const piece::Move &move)
+Board::MoveResult Board::makeMove(const piece::Move &move)
 {
+  MoveResult result{};
+
   if (m_state->sideToMove() == PieceColour::WHITE)
   {
-    processMove<PieceColour::WHITE>(move, false);
+    result = processMove<PieceColour::WHITE>(move, false);
   }
   else
   {
-    processMove<PieceColour::BLACK>(move, false);
+    result = processMove<PieceColour::BLACK>(move, false);
   }
 
   m_state.update(move);
+
+  return result;
 }
 
-void Board::undoMove()
+Board::MoveResult Board::undoMove()
 {
   const piece::Move* move = m_state.pop();
 
@@ -206,11 +210,10 @@ void Board::undoMove()
 
   if (m_state->sideToMove() == PieceColour::WHITE)
   {
-    processMove<PieceColour::WHITE>(*move, true);
-    return;
+    return processMove<PieceColour::WHITE>(*move, true);
   }
 
-  processMove<PieceColour::BLACK>(*move, true);
+  return processMove<PieceColour::BLACK>(*move, true);
 }
 
 bool Board::isCheck()

@@ -133,11 +133,19 @@ public:
   Bitboard occupiedSquares();
   Bitboard emptySquares();
 
+  enum class MoveResult
+  {
+    SUCCESS = 0,
+    NO_PIECE_TO_MOVE,
+    NO_PIECE_TO_CAPTURE,
+    INVALID_TO_OR_FROM,
+  };
+
   std::vector<piece::Move> generateMoves();
-  void makeMove(PieceType type, PieceColour colour, Square from, Square to);
+  /* MoveResult makeMove(PieceType type, PieceColour colour, Square from, Square to); */
   //void makeMove(Move move);
-  void makeMove(const piece::Move &move);
-  void undoMove();
+  MoveResult makeMove(const piece::Move &move);
+  MoveResult undoMove();
 
   /**
    * \brief Check if the king of the current m_side to move is in check/
@@ -213,9 +221,6 @@ private:
   attackmap::BishopMap m_bishopAtks;    /* \brief Attack map for Bishops */
   attackmap::QueenMap m_queenAtks;    /* \brief Attack map for Queens */
 
-  /* \brief The piece captured on the last move, NULL_PIECE if last move was not a capture. */
-  PieceType m_previousCapturedPiece = PieceType::NULL_PIECE;
-
   /*!
    * \brief Executes a move on the underlying board representation.
    * \tparam C - Colour of the m_side on which to execute the move.
@@ -223,7 +228,7 @@ private:
    * \param[in] undo - If true this will process an undo move.
    */
   template<PieceColour C>
-  void processMove(const piece::Move &move, bool undo);
+  MoveResult processMove(const piece::Move &move, bool undo);
 
   /*!
    * \brief Executes a castling move on the underlying board representation.
@@ -232,10 +237,10 @@ private:
    * \param[in] move - The move to be executed.
    */
   template<PieceType T, PieceColour C>
-  void processCastle(const piece::Move &move);
+  MoveResult processCastle(const piece::Move &move);
 
   template<PieceColour C>
-  void processEp(const piece::Move &move);
+  MoveResult processEp(const piece::Move &move);
 
   /*!
    * \brief Returns all of the squares attacked by pawns of a given colour.
@@ -265,9 +270,8 @@ private:
 };
 
 template<PieceColour C>
-void Board::processMove(const piece::Move &move, bool undo)
+Board::MoveResult Board::processMove(const piece::Move &move, bool undo)
 {
-
   // If the move to be processed is a castle then we can handle this here and then exit.
   if (move.castle == PieceType::KING)
     return processCastle<PieceType::KING, C>(move);
@@ -295,11 +299,9 @@ void Board::processMove(const piece::Move &move, bool undo)
     // If this is a make rather than unmake we need to determine the type of the piece to capture.
     while (!(to_bitboard & m_pieceTypeBitboard[piece_to_capture]))
       piece_to_capture++;
-    m_previousCapturedPiece = PieceType(piece_to_capture);
   }
   else if (move.capture && undo)
   {
-    piece_to_capture = static_cast<int>(m_previousCapturedPiece);
   }
 
   int colour_to_move = static_cast<int>(C);
@@ -331,13 +333,13 @@ void Board::processMove(const piece::Move &move, bool undo)
 
   if (undo)
   {
-    m_previousCapturedPiece = PieceType::NULL_PIECE;
   }
 
+  return MoveResult::SUCCESS;
 }
 
 template<PieceColour C>
-void Board::processEp(const piece::Move &move)
+Board::MoveResult Board::processEp(const piece::Move &move)
 {
   Bitboard to_bitboard = bitboard::toBitboard(move.to);
   Bitboard from_bitboard = bitboard::toBitboard(move.from);
@@ -352,10 +354,12 @@ void Board::processEp(const piece::Move &move)
   m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= capture_square;
   m_colourBitboard[static_cast<int>(OppositeColour<C>::value)] ^= capture_square;
 
+  // TODO (haigh) Can this fail?
+  return MoveResult::SUCCESS;
 }
 
 template<PieceType T, PieceColour C>
-void Board::processCastle(const piece::Move &move)
+Board::MoveResult Board::processCastle(const piece::Move &move)
 {
   if (m_state->can_castle<T>())
   {
