@@ -159,35 +159,6 @@ constexpr auto countSetBits(Bitboard board) -> int
   return setBits;
 }
 
-template <Bitboard board>
-constexpr Square _LS1B()
-{
-  for (int i = 0; i < 64; ++i)
-  {
-    if (board & (Bitboard{1} << i))
-    {
-      return static_cast<Square>(i);
-    }
-  }
-
-  return NULL_SQUARE;
-}
-
-template <Bitboard board>
-constexpr Square _MS1B()
-{
-  Bitboard check = Bitboard{1} << 63;
-  for (int i = 0; i < 64; ++i)
-  {
-    if (board & (check >> i))
-    {
-      return static_cast<Square>(64 - i);
-    }
-  }
-
-  return NULL_SQUARE;
-}
-
 void setSquare(Bitboard& board, const Square& square);
 void setSquare(Bitboard &board, const Rank& rank, const File& file);
 

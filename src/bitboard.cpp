@@ -1,25 +1,23 @@
-#include "bitboard.h"
+#include <bitboard.h>
 #include <string>
 
-namespace yak {
+namespace yak::bitboard {
 
-namespace bitboard {
-
-Square popLS1B(Bitboard &board)
+auto popLS1B(Bitboard& board) -> Square
 {
   Square idx = LS1B(board);
   board &= board - 1;
   return idx;
 }
 
-Square popMS1B(Bitboard &board)
+auto popMS1B(Bitboard& board) -> Square
 {
   Square idx = MS1B(board);
   board &= ~(Bitboard{1} << idx);
   return idx;
 }
 
-void setSquare(Bitboard& board, const Square& square)
+void setSquare(Bitboard& board, Square const& square)
 {
   Bitboard pieceToSet{1};
   board |= pieceToSet << square;
@@ -52,33 +50,20 @@ std::vector<Square> scanForward(Bitboard board)
   return serialisedBoard;
 }
 
-Square firstOccupiedSquare(const Bitboard& board)
-{
-  for (int square = 0; square < 64; square++)
-  {
-    if (board & toBitboard(static_cast<Square>(square)))
-    {
-      return static_cast<Square>(square);
-    }
-  }
+/* Bitboard toBitboard(const Square& square) */
+/* { */
+/*   return Bitboard(1) << square; */
+/* } */
 
-  return Square(64);
-}
+/* Bitboard toBitboard(const File& file, const Rank& rank) */
+/* { */
+/*   return toBitboard(squareIndex(file, rank)); */
+/* }; */
 
-Bitboard toBitboard(const Square& square)
-{
-  return Bitboard(1) << square;
-}
-
-Bitboard toBitboard(const File& file, const Rank& rank)
-{
-  return toBitboard(squareIndex(file, rank));
-};
-
-Bitboard toBitboard(std::string_view square)
-{
-  return Bitboard(1) << squareIndex(square);
-}
+/* Bitboard toBitboard(std::string_view square) */
+/* { */
+/*   return Bitboard(1) << squareIndex(square); */
+/* } */
 
 void print_board(Bitboard board)
 {
@@ -143,6 +128,5 @@ std::string to_string(Bitboard board)
   return boardStr;
 }
 
-} // namespace bitboard
+} // namespace bitboard::yak
 
-} // namespace yak
