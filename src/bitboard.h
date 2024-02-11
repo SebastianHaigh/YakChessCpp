@@ -4,14 +4,11 @@
 #include <stdint.h>
 #include <iostream>
 #include <vector>
+#include "types.h"
 
 #if defined _MVC_VER
 #include <intrin.h>
 #endif
-
-typedef uint64_t Bitboard; //!< Type for holding representations of the chess board.
-typedef uint64_t File;
-typedef uint64_t Rank;
 
 //  + - - - + - - - + - - - - - - - - - - - - - - - - - + - - - - - - - - - - +
 //  |  RANK | RANK  |           SQUARE INDICES          |   NORTH      NORTH  |
@@ -31,37 +28,7 @@ typedef uint64_t Rank;
 //  |     FILE      |   A   B   C   D   E   F   G   H   |                     |
 //  | - - - - - - - + - - - - - - - - - - - - - - - - - + - - - - - - - - - - +
 
-enum Square {
-  A1 = 0, B1, C1, D1, E1, F1, G1, H1,
-  A2, B2, C2, D2, E2, F2, G2, H2,
-  A3, B3, C3, D3, E3, F3, G3, H3,
-  A4, B4, C4, D4, E4, F4, G4, H4,
-  A5, B5, C5, D5, E5, F5, G5, H5,
-  A6, B6, C6, D6, E6, F6, G6, H6,
-  A7, B7, C7, D7, E7, F7, G7, H7,
-  A8, B8, C8, D8, E8, F8, G8, H8,
-  NULL_SQUARE
-};
-
-enum class RayType {
-  POSITIVE,
-  NEGATIVE
-};
-
-enum class Direction {
-  NORTH,
-  EAST,
-  SOUTH,
-  WEST,
-  NORTH_EAST,
-  NORTH_WEST,
-  SOUTH_EAST,
-  SOUTH_WEST
-};
-
-namespace yak {
-
-namespace bitboard {
+namespace yak::bitboard {
 
 // Bitmasks of all ranks
 const Bitboard RANK_1 = 0x00000000000000ff; /* Bitboard mask of the 1st rank. */
@@ -180,36 +147,56 @@ Square popLS1B(Bitboard &board);
  */
 Square popMS1B(Bitboard &board);
 
+constexpr auto countSetBits(Bitboard board) -> int
+{
+  int setBits{0};
+  while (board)
+  {
+    board &= board - 1;
+    ++setBits;
+  }
+
+  return setBits;
+}
+
+template <Bitboard board>
+constexpr Square _LS1B()
+{
+  for (int i = 0; i < 64; ++i)
+  {
+    if (board & (Bitboard{1} << i))
+    {
+      return static_cast<Square>(i);
+    }
+  }
+
+  return NULL_SQUARE;
+}
+
+template <Bitboard board>
+constexpr Square _MS1B()
+{
+  Bitboard check = Bitboard{1} << 63;
+  for (int i = 0; i < 64; ++i)
+  {
+    if (board & (check >> i))
+    {
+      return static_cast<Square>(64 - i);
+    }
+  }
+
+  return NULL_SQUARE;
+}
+
 void setSquare(Bitboard& board, const Square& square);
 void setSquare(Bitboard &board, const Rank& rank, const File& file);
 
 std::vector<Square> scanForward(Bitboard board);
 std::vector<Square> scanBackward(Bitboard board);
 
-/**
- * \brief Returns the file index of the specified square.
- * \param[in] squareIndex - The index of the square.
- * \return The file that the square is on.
- */
-File fileIndex(const Square& squareIndex);
-File fileIndex(char algebraicFile);
-File file_index(std::string algebraic_square);
-
-/**
- * \brief Returns the rank index of the specified square.
- * \param[in] squareIndex - The index of the square.
- * \return The rank that the square is on.
- */
-Rank rankIndex(const Square& squareIndex);
-Rank rankIndex(char algebraic_file);
-Rank rankIndex(const std::string& algebraicSquare);
-
-Square squareIndex(File fileIndex, Rank rankIndex);
-Square squareIndex(const std::string& square);
-
 Bitboard toBitboard(const Square& square);
 Bitboard toBitboard(const File& file, const Rank& rank);
-Bitboard toBitboard(const std::string& algebraic_square);
+Bitboard toBitboard(std::string_view algebraic_square);
 
 /**
  * \brief Provides single and multi piece bitboards at compile time.
@@ -233,14 +220,23 @@ struct static_bitboard<S1, S2>
   static constexpr Bitboard value = (Bitboard{1} << S1) | (Bitboard{1} << S2);
 };
 
+template<typename... Squares>
+constexpr auto createBitboard(Squares&& ...squares) -> Bitboard
+{
+  static_assert((... && std::is_same_v<Squares, Square>));
+
+  Bitboard board{0ULL};
+
+  (..., setSquare(board, squares));
+
+  return board;
+}
+
+
 void print_board(Bitboard board);
 std::string to_string(Bitboard board);
 
-std::string to_algebraic(Square square);
-std::string to_algebraic(File file_index, Rank rank_index);
 
-} // namespace bitboard
-
-} // namespace yak
+} // namespace yak::bitboard
 
 #endif // YAK_BITBOARD_H_

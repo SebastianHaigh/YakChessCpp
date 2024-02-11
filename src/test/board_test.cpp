@@ -12,7 +12,7 @@ TEST_CASE("MoveTest: DoublePawnPushCreatesEpTargetSquare") {
   std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
   std::string expected{ "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1" };
   Board board{fen};
-  const piece::Move move = piece::makeDoublePush(A2, A4);
+  const Move move = move::makeDoublePush(A2, A4);
 
   // Act
   board.makeMove(move);
@@ -26,7 +26,7 @@ TEST_CASE("MoveTest: CanMakeEpCapture") {
   std::string fen{ "8/8/8/8/Pp6/1P6/8/8 b KQkq a3 0 1" };
   std::string expected{ "8/8/8/8/8/pP6/8/8 w KQkq - 0 2" };
   Board board{fen};
-  const piece::Move move = piece::make_ep_capture(B4, A3);
+  const Move move = move::makeEpCapture(B4, A3);
 
   // Act
   board.makeMove(move);
@@ -42,7 +42,7 @@ TEST_CASE("MoveFactoryTest: CanCreatePawnPushMove") {
   Board board{fen};
 
   // Act
-  const piece::Move pawn_push = piece::makeQuiet(A2, A3);
+  const Move pawn_push = move::makeQuiet(A2, A3);
 
   // Assert
   board.makeMove(pawn_push);
@@ -56,7 +56,7 @@ TEST_CASE("MoveFactoryTest: CanCreatePawnDoublePushMove") {
   Board board{fen};
 
   // Act
-  const piece::Move pawn_push = piece::makeDoublePush(A2, A4);
+  const Move pawn_push = move::makeDoublePush(A2, A4);
 
   // Assert
   board.makeMove(pawn_push);
@@ -215,9 +215,8 @@ TEST_CASE("BoardTest: CastlingRightsChangeWhenRookIsCaptured") {
   std::string expected{ "rnbqkbn1/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNr w Qq - 0 2" };
   Board board{fen};
 
-  piece::Move move = piece::makeCapture(H8, H1);
+  Move move = move::makeCapture(H8, H1);
   move.capturePiece = PieceType::ROOK;
-
 
   board.makeMove(move);
 
@@ -228,12 +227,79 @@ TEST_CASE("BoardTest: UndoingMoveRestoresState") {
   // Arrange
   std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
   Board board{fen};
-  const piece::Move move = piece::makeQuiet(bitboard::squareIndex("e2"), bitboard::squareIndex("e4"));
+  const Move move = move::makeQuiet(squareIndex("e2"), squareIndex("e4"));
   board.makeMove(move);
 
   // Act
   board.undoMove();
 
+  // Assert
+  CHECK(board.toFen() == fen);
+}
+
+TEST_CASE("BoardTest: Make and undo all moves to depth 3") {
+  // Arrange
+  std::string fen{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
+  yak::Board board(fen);
+
+  std::vector<Move> moves = board.generateMoves();
+
+  CHECK(moves.size() == 20);
+
+  size_t secondMoveTotal{0};
+  size_t thirdMoveTotal{0};
+  size_t fourthMoveTotal{0};
+
+  for (const auto& move : moves)
+  {
+    std::cout << "making a first move WHITE" << std::endl;
+    yak::Board::MoveResult makeResult = board.makeMove(move);
+    CHECK(makeResult == yak::Board::MoveResult::SUCCESS);
+
+    std::vector<Move> secondMoves = board.generateMoves();
+
+    secondMoveTotal += secondMoves.size();
+
+    for (const auto& secondMove : secondMoves)
+    {
+      yak::Board::MoveResult makeResult = board.makeMove(secondMove);
+      CHECK(makeResult == yak::Board::MoveResult::SUCCESS);
+
+      std::vector<Move> thirdMoves = board.generateMoves();
+      thirdMoveTotal += thirdMoves.size();
+
+      for (const auto& thirdMove : thirdMoves)
+      {
+        yak::Board::MoveResult makeResult = board.makeMove(thirdMove);
+        CHECK(makeResult == yak::Board::MoveResult::SUCCESS);
+
+        std::vector<Move> fourthMoves = board.generateMoves();
+        fourthMoveTotal += fourthMoves.size();
+
+        for (const auto& fourthMove : fourthMoves)
+        {
+          yak::Board::MoveResult makeResult = board.makeMove(fourthMove);
+          CHECK(makeResult == yak::Board::MoveResult::SUCCESS);
+
+          yak::Board::MoveResult undoResult = board.undoMove();
+          CHECK(makeResult == yak::Board::MoveResult::SUCCESS);
+        }
+
+        yak::Board::MoveResult undoResult = board.undoMove();
+        CHECK(makeResult == yak::Board::MoveResult::SUCCESS);
+      }
+
+      yak::Board::MoveResult undoResult = board.undoMove();
+      CHECK(makeResult == yak::Board::MoveResult::SUCCESS);
+    }
+
+    yak::Board::MoveResult undoResult = board.undoMove();
+    CHECK(makeResult == yak::Board::MoveResult::SUCCESS);
+  }
+
+  CHECK(secondMoveTotal == 400);
+  CHECK(thirdMoveTotal == 8902);
+  CHECK(fourthMoveTotal == 197281);
   // Assert
   CHECK(board.toFen() == fen);
 }
@@ -299,7 +365,7 @@ TEST_CASE("BoardMoveGenerationTests: DetectsLegalCapturesWithWhitePawns") {
   Board board{fen};
 
   // Act
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Assert
   CHECK(moves.size() == 3);
@@ -322,7 +388,7 @@ TEST_CASE("BoardMoveGenerationTests: DetectsLegalCapturesWithBlackPawns") {
   Board board{fen};
 
   // Act
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Assert
   CHECK(moves.size() == 3);
@@ -334,7 +400,7 @@ TEST_CASE("BoardMoveGenerationTests: Kiwipete") {
   Board board{fen};
 
   // Act
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Assert
   CHECK(moves.size() == 48);
@@ -344,7 +410,7 @@ TEST_CASE("BoardMoveGenerationTests: KiwipeteFast") {
 	// Arrange
 	std::string fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
 	Board board = Board(fen);
-	piece::Move move_list[330];
+	Move move_list[330];
 	piece::SpecialisedRay<Direction::NORTH> n_ray;
 	piece::SpecialisedRay<Direction::EAST> e_ray;
 	piece::SpecialisedRay<Direction::SOUTH> s_ray;
@@ -381,15 +447,16 @@ TEST_CASE("BoardMoveGenerationTests: CanGenerateAndMakeEpCapture") {
   std::string expected{ "8/8/8/8/8/pP6/8/8 w - - 0 2" };
   Board board{fen};
 
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Act
-  for (auto move : moves) {
-    if (move.en_passant) {
+  for (auto move : moves)
+  {
+    if (move.enPassant)
+    {
       board.makeMove(move);
       break;
     }
-
   }
 
   // Assert
@@ -402,7 +469,7 @@ TEST_CASE("BoardMoveGenerationTests: CanCastleKingSideWhiteOnlyKingAndRook") {
   std::string expected{ "8/8/8/8/8/8/8/5RK1 b - - 0 1" };
   Board board{fen};
 
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Act
   for (auto move : moves) {
@@ -423,7 +490,7 @@ TEST_CASE("BoardMoveGenerationTests: CanCastleKingSideWhite") {
   std::string expected{ "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 0 1" };
   Board board{fen};
 
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Act
   for (auto move : moves) {
@@ -443,7 +510,7 @@ TEST_CASE("BoardMoveGenerationTests: CanCastleKingSideBlack") {
   std::string expected{ "rnbq1rk1/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 w - - 0 2" };
   Board board{fen};
 
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Act
   for (auto move : moves) {
@@ -463,7 +530,7 @@ TEST_CASE("BoardMoveGenerationTests: CanCastleQueenSideWhite") {
   std::string expected{ "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/2KR2NR b kq - 0 1" };
   Board board{fen};
 
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Act
   for (auto move : moves) {
@@ -483,7 +550,7 @@ TEST_CASE("BoardMoveGenerationTests: CanCastleQueenSideBlack") {
   std::string expected{ "2kr1bnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR w KQ - 0 2" };
   Board board{fen};
 
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   bool foundCastle{false};
   for (auto& move : moves) {
@@ -504,7 +571,7 @@ TEST_CASE("BoardMoveGenerationTests: PawnCanPromote") {
   std::string fen{ "8/P7/8/8/8/8/8/8 w - - 0 1" };
   Board board{fen};
 
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Act & Assert
 
@@ -576,7 +643,7 @@ TEST_CASE("BoardMoveGenerationTests: DetectsAllMovesInPosition") {
   }
 
   Board board{fen};
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
   CHECK(moves.size() == expectedNumMoves);
 }
 
@@ -595,7 +662,7 @@ TEST_CASE("BoardMoveGenerationTests: DetectsLegalMovesWhenInCheck") {
   Board board{fen};
 
   // Act
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Assert
   CHECK(moves.size() == 6); // The only legal moves are the six that remove the check: c6, Nc6, Nd7, Bd7, Qc7, Ke7
@@ -647,10 +714,10 @@ TEST_CASE("BoardMoveGenerationTests: CannotCastleOutOfCheck") {
   std::string fen = "8/8/4r3/8/8/8/8/4K2R w K - 0 1";
   Board board{fen};
 
-  std::vector<piece::Move> moves = board.generateMoves();
+  std::vector<Move> moves = board.generateMoves();
 
   // Assert
-  for (auto& move : moves) {
+  for (const auto& move : moves) {
     CHECK(move.castle == PieceType::NULL_PIECE);
   }
 }

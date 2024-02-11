@@ -1,8 +1,11 @@
-#include <cassert>
+#include <board.h>
+
 #include <stdexcept>
-#include "bitboard.h"
-#include "board.h"
+#include <cassert>
+#include "move.h"
 #include "pieces.h"
+#include "attackmaps.h"
+#include "generation.h"
 
 namespace yak {
 
@@ -31,8 +34,8 @@ void Board::parseFen(const std::string &fen)
     }
     else
     {
-      const PieceType pieceType = pieces::fenCharToPieceType(fen[i]);
-      const PieceColour pieceColour = pieces::fenCharToPieceColour(fen[i]);
+      const PieceType pieceType = piece::fenCharToPieceType(fen[i]);
+      const PieceColour pieceColour = piece::fenCharToPieceColour(fen[i]);
 
       bitboard::setSquare(m_pieceTypeBitboard[static_cast<int>(pieceType)], currentSquare);
       bitboard::setSquare(m_colourBitboard[static_cast<int>(pieceColour)], currentSquare);
@@ -96,10 +99,10 @@ Bitboard Board::emptySquares()
   return ~occupiedSquares();
 }
 
-std::vector<piece::Move> Board::generateMoves()
+std::vector<Move> Board::generateMoves()
 {
-  piece::Move psuedoLegalMoveList[330];
-  piece::Move enPassantMove;
+  Move psuedoLegalMoveList[330];
+  Move enPassantMove;
   int moveCounter{0};
 
   const PieceColour thisSide = m_state->sideToMove();
@@ -108,14 +111,14 @@ std::vector<piece::Move> Board::generateMoves()
   if (thisSide == PieceColour::WHITE)
   {
     generatePawnMoves<PieceColour::WHITE>(&psuedoLegalMoveList[moveCounter],
-                                                   moveCounter,
-                                                   getPosition(thisSide, PieceType::PAWN),
-                                                   emptySquares());
+                                          moveCounter,
+                                          getPosition(thisSide, PieceType::PAWN),
+                                          emptySquares());
 
-    piece::generateEpCaptures<PieceColour::WHITE>(&enPassantMove,
-                                                  moveCounter,
-                                                  getPosition(thisSide, PieceType::PAWN),
-                                                  m_state->epTarget());
+    move::generateEpCaptures<PieceColour::WHITE>(&enPassantMove,
+                                           moveCounter,
+                                           getPosition(thisSide, PieceType::PAWN),
+                                           m_state->epTarget());
   }
   else
   {
@@ -124,10 +127,10 @@ std::vector<piece::Move> Board::generateMoves()
                                           getPosition(thisSide, PieceType::PAWN),
                                           emptySquares());
 
-    piece::generateEpCaptures<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
-                                                  moveCounter,
-                                                  getPosition(thisSide, PieceType::PAWN),
-                                                  m_state->epTarget());
+    move::generateEpCaptures<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
+                                           moveCounter,
+                                           getPosition(thisSide, PieceType::PAWN),
+                                           m_state->epTarget());
   }
 
   moveCounter += generatePieceMoves<PieceType::KNIGHT>(&psuedoLegalMoveList[moveCounter],
@@ -145,7 +148,7 @@ std::vector<piece::Move> Board::generateMoves()
   moveCounter += generatePieceMoves<PieceType::QUEEN>(&psuedoLegalMoveList[moveCounter],
                                                       thisSide);
 
-  std::vector<piece::Move> legal_moves;
+  std::vector<Move> legal_moves;
   for (int i = 0; i < moveCounter; i++)
   {
     makeMove(psuedoLegalMoveList[i]);
@@ -162,7 +165,7 @@ std::vector<piece::Move> Board::generateMoves()
   return legal_moves;
 }
 
-std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> moves)
+std::vector<Move> Board::generateCastlingMoves(std::vector<Move> moves)
 {
   const Bitboard squaresAttackedByEnemy = attacked_by(m_state->sideNotToMove());
   const Bitboard king = getPosition(m_state->sideToMove(), PieceType::KING);
@@ -172,7 +175,7 @@ std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> m
     const Bitboard kingPath = bitboard::shift<Direction::EAST>(king) | bitboard::shift<Direction::EAST>(bitboard::shift<Direction::EAST>(king));
     if ((kingPath & occupiedSquares()) == 0 && (kingPath & squaresAttackedByEnemy) == 0)
     {
-      moves.push_back(piece::makeKingsideCastle());
+      moves.push_back(move::makeKingsideCastle());
     }
   }
 
@@ -182,14 +185,14 @@ std::vector<piece::Move> Board::generateCastlingMoves(std::vector<piece::Move> m
     const Bitboard rookPath = kingPath | bitboard::shift<Direction::WEST>(kingPath);
     if ((rookPath & occupiedSquares()) == 0 && (kingPath & squaresAttackedByEnemy) == 0)
     {
-      moves.push_back(piece::makeQueensideCastle());
+      moves.push_back(move::makeQueensideCastle());
     }
 
   }
   return moves;
 }
 
-Board::MoveResult Board::makeMove(const piece::Move &move)
+Board::MoveResult Board::makeMove(const Move &move)
 {
   MoveResult result{};
 
@@ -209,7 +212,7 @@ Board::MoveResult Board::makeMove(const piece::Move &move)
 
 Board::MoveResult Board::undoMove()
 {
-  const piece::Move* move = m_state.pop();
+  const Move* move = m_state.pop();
 
   // TODO (haigh) check that move and state not null
 
@@ -231,7 +234,7 @@ bool Board::isCheck()
 bool Board::isCheck(PieceColour colour)
 {
   Bitboard king = getPosition(colour, PieceType::KING);
-  Bitboard attackers = attacked_by(pieces::otherColour(colour));
+  Bitboard attackers = attacked_by(piece::otherColour(colour));
   return (king & attackers) > 0;
 }
 
@@ -239,7 +242,7 @@ bool Board::isCheckmate()
 {
   if (isCheck())
   {
-    std::vector<piece::Move> moves = generateMoves();
+    std::vector<Move> moves = generateMoves();
     if (moves.empty())
     {
       return true;
@@ -281,16 +284,16 @@ std::string Board::rankToFen(Rank rank)
   int emptySum = 0;
   for (File fileIndex = 0; fileIndex < 8; fileIndex++)
   {
-    PieceType type = getPieceTypeOn(bitboard::squareIndex(fileIndex, rank));
+    PieceType type = getPieceTypeOn(squareIndex(fileIndex, rank));
     if (type != PieceType::NULL_PIECE)
     {
-      PieceColour colour = getPieceColourOn(bitboard::squareIndex(fileIndex, rank));
+      PieceColour colour = getPieceColourOn(squareIndex(fileIndex, rank));
       if (emptySum != 0)
       {
         fen += std::to_string(emptySum);
         emptySum = 0;
       }
-      fen += pieces::pieceToFenChar(type, colour);
+      fen += piece::pieceToFenChar(type, colour);
     }
     else
     {
@@ -311,10 +314,10 @@ std::string Board::rankToBoardFen(Rank rank)
   int emptySum = 0;
   for (File fileIndex = 0; fileIndex < 8; fileIndex++)
   {
-    PieceType type = getPieceTypeOn(bitboard::squareIndex(fileIndex, rank));
+    PieceType type = getPieceTypeOn(squareIndex(fileIndex, rank));
     if (type != PieceType::NULL_PIECE)
     {
-      PieceColour colour = getPieceColourOn(bitboard::squareIndex(fileIndex, rank));
+      PieceColour colour = getPieceColourOn(squareIndex(fileIndex, rank));
       if (emptySum != 0)
       {
         while (emptySum)
@@ -323,7 +326,7 @@ std::string Board::rankToBoardFen(Rank rank)
           --emptySum;
         }
       }
-      fen += pieces::pieceToFenChar(type, colour);
+      fen += piece::pieceToFenChar(type, colour);
     }
     else
     {
@@ -342,8 +345,8 @@ Bitboard Board::pawnAttacks(PieceColour colour)
 {
   Bitboard pawnsBitboard = getPosition(colour, PieceType::PAWN);
 
-  return (colour == PieceColour::BLACK) ? piece::pawn_attacks<PieceColour::BLACK>(pawnsBitboard)
-                                        : piece::pawn_attacks<PieceColour::WHITE>(pawnsBitboard);
+  return (colour == PieceColour::BLACK) ? pawns::pawnAttacks<PieceColour::BLACK>(pawnsBitboard)
+                                        : pawns::pawnAttacks<PieceColour::WHITE>(pawnsBitboard);
 }
 
 Bitboard Board::pieceAttacks(PieceType pieceType, PieceColour pieceColour)
@@ -353,31 +356,31 @@ Bitboard Board::pieceAttacks(PieceType pieceType, PieceColour pieceColour)
     case PieceType::KNIGHT:
     {
       return piece::pieceAttacks<PieceType::KNIGHT>(getPosition(pieceColour, pieceType),
-                                                    occupiedSquares());
+                                                        occupiedSquares());
     }
 
     case PieceType::BISHOP:
     {
       return piece::pieceAttacks<PieceType::BISHOP>(getPosition(pieceColour, pieceType),
-                                                    occupiedSquares());
+                                                        occupiedSquares());
     }
 
     case PieceType::ROOK:
     {
       return piece::pieceAttacks<PieceType::ROOK>(getPosition(pieceColour, pieceType),
-                                                  occupiedSquares());
+                                                      occupiedSquares());
     }
 
     case PieceType::QUEEN:
     {
       return piece::pieceAttacks<PieceType::QUEEN>(getPosition(pieceColour, pieceType),
-                                                   occupiedSquares());
+                                                       occupiedSquares());
     }
 
     case PieceType::KING:
     {
       return piece::pieceAttacks<PieceType::KING>(getPosition(pieceColour, pieceType),
-                                                  occupiedSquares());
+                                                      occupiedSquares());
     }
 
     case PieceType::PAWN:

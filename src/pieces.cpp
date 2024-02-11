@@ -1,41 +1,6 @@
 #include "pieces.h"
 
-namespace yak {
-namespace piece {
-
-void generate_sliding_piece_moves(const attackmap::RookMap &atk_map,
-                                  Move *move_list,
-                                  int &move_counter,
-                                  Bitboard piece_positions,
-                                  Bitboard empty_squares,
-                                  Bitboard opponent_pieces)
-{
-  while (piece_positions)
-  {
-    Square from = bitboard::popLS1B(piece_positions);
-    Bitboard atk_bb = atk_map.attacks(from, ~empty_squares);
-
-    Bitboard quiet = atk_bb & empty_squares;
-    while (quiet)
-    {
-      *move_list++ = makeQuiet(from, bitboard::popLS1B(quiet));
-      move_counter++;
-    }
-
-    Bitboard capture = atk_bb & opponent_pieces;
-    while (capture)
-    {
-      *move_list++ = makeCapture(from, bitboard::popLS1B(capture));
-      move_counter++;
-    }
-  }
-}
-
-} // namespace piece
-
-} // namespace yak
-
-namespace pieces {
+namespace yak::piece {
 
 PieceColour otherColour(PieceColour colour) {
   if (colour == PieceColour::WHITE)
@@ -109,4 +74,4 @@ char pieceToFenChar(const PieceType& type, const PieceColour& colour) {
   return chars[index];
 }
 
-} // namespace pieces
+} // namespace yak::piece

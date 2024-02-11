@@ -4,10 +4,12 @@
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
 
+namespace yak {
+
 TEST_CASE("Side to move is toggled by state update")
 {
-  yak::GameStateManager gs{};
-  yak::piece::Move move;
+  GameStateManager gs{};
+  Move move;
 
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -23,7 +25,7 @@ TEST_CASE("Side to move is toggled by state update")
 
 TEST_CASE("Castling rights")
 {
-  yak::GameStateManager gs{};
+  GameStateManager gs{};
 
   bool blackKingSide{true};
   bool whiteKingSide{true};
@@ -40,7 +42,7 @@ TEST_CASE("Castling rights")
   CHECK(gs->canQueenSideCastle(PieceColour::BLACK));
   CHECK_FALSE(gs->canQueenSideCastle(PieceColour::NULL_COLOUR));
 
-  yak::piece::Move move;
+  Move move;
 
   // give the to and from squares non-zero default values, so they don't clash with whites queenside rook
   move.from = A2;
@@ -119,8 +121,8 @@ TEST_CASE("Castling rights")
 
 TEST_CASE("Game stack tests")
 {
-  yak::GameStateManager gs{};
-  yak::piece::Move move;
+  GameStateManager gs{};
+  Move move;
 
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -143,7 +145,7 @@ TEST_CASE("Game stack tests")
   CHECK_FALSE(gs->canQueenSideCastle(PieceColour::WHITE));
   CHECK_FALSE(gs->canKingSideCastle(PieceColour::WHITE));
 
-  const yak::piece::Move* move_p = gs.pop();
+  const Move* move_p = gs.pop();
   REQUIRE(move_p);
   CHECK(move_p->from == E8);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
@@ -169,11 +171,11 @@ TEST_CASE("Game stack tests")
 
 TEST_CASE("Check that the ep square works")
 {
-  yak::GameStateManager gs{};
-  yak::piece::Move move;
+  GameStateManager gs{};
+  Move move;
 
   move.to = A4;
-  move.double_push = true;
+  move.doublePush = true;
 
   gs.update(move);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
@@ -195,7 +197,7 @@ TEST_CASE("Check that the ep square works")
   CHECK(gs->epTargetSquare() == A6);
 
   move.to = F7;
-  move.double_push = false;
+  move.doublePush = false;
   gs.update(move);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
   CHECK(gs->sideNotToMove() == PieceColour::WHITE);
@@ -205,10 +207,10 @@ TEST_CASE("Check that the ep square works")
   CHECK(gs->canKingSideCastle(PieceColour::WHITE));
   CHECK(gs->epTargetSquare() == NULL_SQUARE);
 
-  const yak::piece::Move* move_p = gs.pop();
+  const Move* move_p = gs.pop();
   REQUIRE(move_p);
   CHECK(move_p->to == F7);
-  CHECK_FALSE(move_p->double_push);
+  CHECK_FALSE(move_p->doublePush);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -221,7 +223,7 @@ TEST_CASE("Check that the ep square works")
   move_p = gs.pop();
   REQUIRE(move_p);
   CHECK(move_p->to == A5);
-  CHECK(move_p->double_push);
+  CHECK(move_p->doublePush);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
   CHECK(gs->sideNotToMove() == PieceColour::WHITE);
   CHECK(gs->canQueenSideCastle(PieceColour::BLACK));
@@ -233,7 +235,7 @@ TEST_CASE("Check that the ep square works")
   move_p = gs.pop();
   REQUIRE(move_p);
   CHECK(move_p->to == A4);
-  CHECK(move_p->double_push);
+  CHECK(move_p->doublePush);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
   CHECK(gs->canQueenSideCastle(PieceColour::BLACK));
@@ -248,8 +250,8 @@ TEST_CASE("Check that the ep square works")
 
 TEST_CASE("Check that the move clock works")
 {
-  yak::GameStateManager gs{};
-  yak::piece::Move move;
+  GameStateManager gs{};
+  Move move;
 
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -274,7 +276,7 @@ TEST_CASE("Check that the move clock works")
   CHECK(gs->moveClock() == 2);
   CHECK(gs->halfMoveClock() == 3);
 
-  const yak::piece::Move* move_p = gs.pop();
+  const Move* move_p = gs.pop();
   CHECK(move_p);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -301,22 +303,22 @@ TEST_CASE("Check that the move clock works")
 
 TEST_CASE("Half move clock is reset by pawn moves and captures")
 {
-  yak::GameStateManager gs{};
-  yak::piece::Move move;
+  GameStateManager gs{};
+  Move move;
 
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
   CHECK(gs->moveClock() == 1);
   CHECK(gs->halfMoveClock() == 0);
 
-  move.pawn_move = true;
+  move.pawnMove = true;
   gs.update(move);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
   CHECK(gs->sideNotToMove() == PieceColour::WHITE);
   CHECK(gs->moveClock() == 1);
   CHECK(gs->halfMoveClock() == 0);
 
-  move.pawn_move = false;
+  move.pawnMove = false;
   gs.update(move);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -349,7 +351,7 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
   CHECK(gs->moveClock() == 4);
   CHECK(gs->halfMoveClock() == 1);
 
-  const yak::piece::Move* move_p = gs.pop();
+  const Move* move_p = gs.pop();
   CHECK(move_p);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
   CHECK(gs->sideNotToMove() == PieceColour::WHITE);
@@ -387,9 +389,11 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
 
   move_p = gs.pop();
   REQUIRE(move_p);
-  CHECK(move_p->pawn_move);
+  CHECK(move_p->pawnMove);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
   CHECK(gs->moveClock() == 1);
   CHECK(gs->halfMoveClock() == 0);
 }
+
+} // namespace yak

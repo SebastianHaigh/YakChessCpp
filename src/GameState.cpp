@@ -1,6 +1,7 @@
 #include "GameState.h"
 #include "bitboard.h"
 #include "board.h"
+#include "types.h"
 
 namespace yak {
 
@@ -34,12 +35,12 @@ GameStateManager::~GameStateManager()
   }
 }
 
-void GameStateManager::update(const piece::Move& move)
+void GameStateManager::update(const Move& move)
 {
   m_currentState = m_currentState->update(move);
 }
 
-const piece::Move* const GameStateManager::pop()
+const Move* const GameStateManager::pop()
 {
   if (not m_currentState->m_prevState) return nullptr;
 
@@ -67,6 +68,13 @@ bool GameStateManager::loadFen(const std::string& fen)
     state = newPrevState;
   }
 
+  // TODO (haigh) Stop creating new game states, and allocating memory, the manager can allocate
+  // a large block of memory aligned to 64 byte boundaries when it starts up. Then, when we want a
+  // new game state we can get a 64 byte chunk of preallocated memory from the manager, and when we
+  // want to delete a state we can hand it back to the manager.
+  //
+  // The when a new state is requested, the manager can hand out the most resently released block
+  // which is more likely to still be cached in L1.
   m_currentState = new GameState{};
 
   auto startOfCastlingRights = fen.find_first_of(" ");
@@ -87,7 +95,7 @@ bool GameStateManager::loadFen(const std::string& fen)
 
   if (fen[startOfEpTarget + 1] != '-')
   {
-    m_currentState->m_epSquare = bitboard::squareIndex(fen.substr(startOfEpTarget + 1, 2));
+    m_currentState->m_epSquare = squareIndex(fen.substr(startOfEpTarget + 1, 2));
   }
 
   int lengthCastlingRights = startOfEpTarget - startOfCastlingRights;
@@ -172,7 +180,7 @@ std::string GameState::toFen()
   }
   fen += " ";
 
-  fen += (m_epSquare == NULL_SQUARE) ? "-" : bitboard::to_algebraic(m_epSquare);
+  fen += (m_epSquare == NULL_SQUARE) ? "-" : toAlgebraic(m_epSquare);
   fen += " 0 ";  // TODO (haigh) half move clock
   fen += std::to_string(m_moveClock);
 
@@ -184,7 +192,7 @@ void GameState::toggleSideToMove()
   m_side = not m_side;
 }
 
-GameState* GameState::update(const piece::Move &move)
+GameState* GameState::update(const Move &move)
 {
   // Save the move in the current state
   m_move = move;
@@ -218,11 +226,11 @@ GameState* GameState::update(const piece::Move &move)
   //
   // m_side * 2 will either be 0 or 2
   // double push will either be 0 or 1
-  newState->m_epSquare = static_cast<Square>(possibleTargets[static_cast<int>(m_side) * 2 + move.double_push]);
+  newState->m_epSquare = static_cast<Square>(possibleTargets[static_cast<int>(m_side) * 2 + move.doublePush]);
 
   // Update the move clocks
   newState->m_moveClock = (not m_side) ? m_moveClock + 1 : m_moveClock;
-  newState->m_halfMoveClock = (move.capture || move.pawn_move) ? 0 : m_halfMoveClock + 1;
+  newState->m_halfMoveClock = (move.capture || move.pawnMove) ? 0 : m_halfMoveClock + 1;
 
   return newState;
 }

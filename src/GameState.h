@@ -19,8 +19,8 @@ public:
     return m_currentState;
   };
 
-  void update(const piece::Move& move);
-  const piece::Move* const pop();
+  void update(const Move& move);
+  const Move* const pop();
 
   bool loadFen(const std::string& fen);
 
@@ -42,7 +42,7 @@ public:
    * \brief Update the game state based on a given move.
    * \param[in] move - The move to be made.
    */
-  GameState* update(const piece::Move &move);
+  GameState* update(const Move &move);
   GameState* pop();
 
   inline GameState* getPrevState()
@@ -152,7 +152,7 @@ private:
   GameState* m_prevState = nullptr;  // 8 bytes
 
   // The move that was applied in order to get to the next state
-  piece::Move m_move;  // 24 bytes
+  Move m_move;  // 24 bytes
   PieceType m_captured = PieceType::NULL_PIECE;
   PieceColour m_colours[2] = {PieceColour::BLACK, PieceColour::WHITE};
 };

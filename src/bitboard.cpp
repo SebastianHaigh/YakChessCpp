@@ -65,62 +65,6 @@ Square firstOccupiedSquare(const Bitboard& board)
   return Square(64);
 }
 
-File fileIndex(const Square& squareIndex)
-{
-  if (squareIndex >= 0 && squareIndex <= 63)
-  {
-    return squareIndex & 7;
-  }
-  else
-  {
-    return -1;
-  }
-}
-
-File fileIndex(char algebraicFile)
-{
-  return toupper(algebraicFile) - 'A';
-}
-
-File file_index(std::string algebraic_square)
-{
-  return fileIndex(algebraic_square[0]);
-}
-
-Rank rankIndex(const Square& squareIndex)
-{
-  if (squareIndex >= 0 && squareIndex <= 63)
-  {
-    return squareIndex >> 3;
-  }
-  else
-  {
-    return -1;
-  }
-}
-
-Rank rankIndex(char algebraicRank)
-{
-  return algebraicRank - '1';
-}
-
-Rank rankIndex(const std::string& algebraicSquare)
-{
-  return fileIndex(algebraicSquare[1]);
-}
-
-Square squareIndex(File fileIndex, Rank rankIndex)
-{
-  return static_cast<Square>((8 * rankIndex) + fileIndex);
-}
-
-Square squareIndex(const std::string& square)
-{
-  File file = fileIndex(square[0]);
-  Rank rank = rankIndex(square[1]);
-  return squareIndex(file, rank);
-}
-
 Bitboard toBitboard(const Square& square)
 {
   return Bitboard(1) << square;
@@ -131,7 +75,7 @@ Bitboard toBitboard(const File& file, const Rank& rank)
   return toBitboard(squareIndex(file, rank));
 };
 
-Bitboard toBitboard(const std::string& square)
+Bitboard toBitboard(std::string_view square)
 {
   return Bitboard(1) << squareIndex(square);
 }
@@ -197,18 +141,6 @@ std::string to_string(Bitboard board)
   }
   boardStr += "\n";
   return boardStr;
-}
-
-std::string to_algebraic(Square square)
-{
-  std::string files{"abcdefgh"};
-  return files[fileIndex(square)] + std::to_string(rankIndex(square) + 1);
-}
-
-std::string to_algebraic(File file_index, Rank rank_index)
-{
-  std::string files{"abcdefgh"};
-  return files[file_index] + std::to_string(rank_index + 1);
 }
 
 } // namespace bitboard

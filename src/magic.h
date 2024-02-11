@@ -6,6 +6,8 @@
 
 #define USE_32_BIT_MULTIPLICATIONS
 
+namespace magic {
+
 typedef unsigned long long uint64;
 
 uint64 random_uint64() {
@@ -33,8 +35,8 @@ const int BitTable[64] = {
 };
 
 int pop_1st_bit(uint64* bb) {
-    // Always one minus a power of two 1, 3, 7, 15, 31 etc 
-    uint64 b = *bb ^ (*bb - 1); 
+    // Always one minus a power of two 1, 3, 7, 15, 31 etc
+    uint64 b = *bb ^ (*bb - 1);
 
     // b >> 32 shifts the upper 32 bits of b in to the lower 32 bits
     // we then XOR this with the lower bits
@@ -69,16 +71,16 @@ uint64 index_to_uint64(int index, int bits, uint64 m) {
 uint64 rmask(int sq) {
     uint64 result = 0ULL;
     int rank = sq / 8, file = sq % 8, r, f;
-    for (r = rank + 1; r <= 6; r++) 
+    for (r = rank + 1; r <= 6; r++)
         result |= (1ULL << (file + r * 8));
 
-    for (r = rank - 1; r >= 1; r--) 
+    for (r = rank - 1; r >= 1; r--)
         result |= (1ULL << (file + r * 8));
 
-    for (f = file + 1; f <= 6; f++) 
+    for (f = file + 1; f <= 6; f++)
         result |= (1ULL << (f + rank * 8));
 
-    for (f = file - 1; f >= 1; f--) 
+    for (f = file - 1; f >= 1; f--)
         result |= (1ULL << (f + rank * 8));
 
     return result;
@@ -88,16 +90,16 @@ uint64 rmask(int sq) {
 uint64 bmask(int sq) {
     uint64 result = 0ULL;
     int rank = sq / 8, file = sq % 8, r, f;
-    for (r = rank + 1, f = file + 1; r <= 6 && f <= 6; r++, f++) 
+    for (r = rank + 1, f = file + 1; r <= 6 && f <= 6; r++, f++)
         result |= (1ULL << (f + r * 8));
 
-    for (r = rank + 1, f = file - 1; r <= 6 && f >= 1; r++, f--) 
+    for (r = rank + 1, f = file - 1; r <= 6 && f >= 1; r++, f--)
         result |= (1ULL << (f + r * 8));
 
-    for (r = rank - 1, f = file + 1; r >= 1 && f <= 6; r--, f++) 
+    for (r = rank - 1, f = file + 1; r >= 1 && f <= 6; r--, f++)
         result |= (1ULL << (f + r * 8));
 
-    for (r = rank - 1, f = file - 1; r >= 1 && f >= 1; r--, f--) 
+    for (r = rank - 1, f = file - 1; r >= 1 && f >= 1; r--, f--)
         result |= (1ULL << (f + r * 8));
 
     return result;
@@ -162,7 +164,6 @@ uint64 find_magic(int sq, int m, int bishop) {
     uint64 mask, b[4096], a[4096], used[4096], magic;
     int i, j, k, n, fail;
 
-
     mask = bishop ? bmask(sq) : rmask(sq);
     n = count_1s(mask);
 
@@ -170,16 +171,38 @@ uint64 find_magic(int sq, int m, int bishop) {
         b[i] = index_to_uint64(i, n, mask);
         a[i] = bishop ? batt(sq, b[i]) : ratt(sq, b[i]);
     }
-    for (k = 0; k < 100000000; k++) {
+
+    for (k = 0; k < 100000000; k++)
+    {
         magic = random_uint64_fewbits();
-        if (count_1s((mask * magic) & 0xFF00000000000000ULL) < 6) continue;
-        for (i = 0; i < 4096; i++) used[i] = 0ULL;
-        for (i = 0, fail = 0; !fail && i < (1 << n); i++) {
-            j = transform(b[i], magic, m);
-            if (used[j] == 0ULL) used[j] = a[i];
-            else if (used[j] != a[i]) fail = 1;
+
+        if (count_1s((mask * magic) & 0xFF00000000000000ULL) < 6)
+        {
+          continue;
         }
-        if (!fail) return magic;
+
+        for (i = 0; i < 4096; i++)
+        {
+          used[i] = 0ULL;
+        }
+
+        for (i = 0, fail = 0; !fail && i < (1 << n); i++)
+        {
+            j = transform(b[i], magic, m);
+            if (used[j] == 0ULL)
+            {
+              used[j] = a[i];
+            }
+            else if (used[j] != a[i])
+            {
+              fail = 1;
+            }
+        }
+
+        if (!fail)
+        {
+          return magic;
+        }
     }
     printf("***Failed***\n");
     return 0ULL;
@@ -206,5 +229,7 @@ int BBits[64] = {
   5, 5, 5, 5, 5, 5, 5, 5,
   6, 5, 5, 5, 5, 5, 5, 6
 };
+
+} // namespace magic
 
 #endif // MAGIC_H_

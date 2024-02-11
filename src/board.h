@@ -5,8 +5,11 @@
 #include <string>
 
 #include "GameState.h"
+#include "attackmaps.h"
+#include "move.h"
 #include "pieces.h"
 #include "bitboard.h"
+#include "pawns.h"
 
 namespace yak {
 
@@ -109,8 +112,8 @@ public:
     INVALID_TO_OR_FROM,
   };
 
-  std::vector<piece::Move> generateMoves();
-  MoveResult makeMove(const piece::Move &move);
+  std::vector<Move> generateMoves();
+  MoveResult makeMove(const Move &move);
   MoveResult undoMove();
 
   /**
@@ -154,7 +157,7 @@ public:
   Bitboard getPosition(PieceColour pieceColour, PieceType pieceType);
 
   template<PieceType T>
-  int generatePieceMoves(piece::Move *moveList,
+  int generatePieceMoves(Move *moveList,
                          PieceColour colour);
 
 private:
@@ -174,7 +177,7 @@ private:
    * \param[in] undo - If true this will process an undo move.
    */
   template<PieceColour C>
-  MoveResult processMove(const piece::Move &move, bool undo);
+  MoveResult processMove(const Move &move, bool undo);
 
   /*!
    * \brief Executes a castling move on the underlying board representation.
@@ -183,10 +186,10 @@ private:
    * \param[in] move - The move to be executed.
    */
   template<PieceType T, PieceColour C>
-  MoveResult processCastle(const piece::Move &move);
+  MoveResult processCastle(const Move &move);
 
   template<PieceColour C>
-  MoveResult processEp(const piece::Move &move);
+  MoveResult processEp(const Move &move);
 
   /*!
    * \brief Returns all of the squares attacked by pawns of a given colour.
@@ -211,41 +214,41 @@ private:
   Bitboard allAttacks(PieceColour colour);
 
   template<PieceColour C, bool PROMOTIONS>
-  void generatePawnSinglePushes(piece::Move *move_list,
+  void generatePawnSinglePushes(Move *move_list,
                                 int &move_counter,
                                 Bitboard pawn_positions,
                                 Bitboard empty_squares);
 
   template<PieceColour C, bool PROMOTIONS>
-  void generatePawnDoublePushes(piece::Move *moveList,
+  void generatePawnDoublePushes(Move *moveList,
                                 int &moveCounter,
                                 Bitboard pawnPositions,
                                 Bitboard emptySquares);
 
   template<PieceColour C, bool PROMOTIONS>
-  void generatePawnWestCaptures(piece::Move *moveList,
+  void generatePawnWestCaptures(Move *moveList,
                                 int &moveCounter,
                                 Bitboard pawnPositions);
 
   template<PieceColour C, bool PROMOTIONS>
-  void generatePawnEastCaptures(piece::Move *moveList,
+  void generatePawnEastCaptures(Move *moveList,
                                 int &moveCounter,
                                 Bitboard pawnPositions);
 
   template<PieceColour C>
-  void generatePawnMoves(piece::Move *moveList,
+  void generatePawnMoves(Move *moveList,
                          int &moveCounter,
                          Bitboard pawnPositions,
                          Bitboard emptySquares);
 
-  std::vector<piece::Move> generateCastlingMoves(std::vector<piece::Move> moves);
+  std::vector<Move> generateCastlingMoves(std::vector<Move> moves);
   void parseFen(const std::string &fen);
   std::string rankToFen(Rank rank);
   std::string rankToBoardFen(Rank rank);
 };
 
 template<PieceColour C>
-Board::MoveResult Board::processMove(const piece::Move &move, bool undo)
+Board::MoveResult Board::processMove(const Move &move, bool undo)
 {
   // If the move to be processed is a castle then we can handle this here and then exit.
   if (move.castle == PieceType::KING)
@@ -260,7 +263,7 @@ Board::MoveResult Board::processMove(const piece::Move &move, bool undo)
   /* if (move.to == move.from) return MoveResult::INVALID_TO_OR_FROM; */
 
   // Same for en passant
-  if (move.en_passant)
+  if (move.enPassant)
   {
     return processEp<C>(move);
   }
@@ -286,7 +289,7 @@ Board::MoveResult Board::processMove(const piece::Move &move, bool undo)
   if (move.capture)
   {
     PieceType pieceToCapture = move.capturePiece;
-    Bitboard captureSquare = (move.en_passant ? m_state->epTarget() : toBitboard);
+    Bitboard captureSquare = (move.enPassant ? m_state->epTarget() : toBitboard);
 
     m_pieceTypeBitboard[static_cast<int>(pieceToCapture)] ^= captureSquare;
     m_colourBitboard[opposingColour] ^= captureSquare;
@@ -305,7 +308,7 @@ Board::MoveResult Board::processMove(const piece::Move &move, bool undo)
 }
 
 template<PieceColour C>
-Board::MoveResult Board::processEp(const piece::Move &move)
+Board::MoveResult Board::processEp(const Move &move)
 {
   const Bitboard toBitboard = bitboard::toBitboard(move.to);
   const Bitboard fromBitboard = bitboard::toBitboard(move.from);
@@ -316,7 +319,7 @@ Board::MoveResult Board::processEp(const piece::Move &move)
   // get the ep target square from move.to square.
   // This is better than using the Boards m_epSquare because
   // it will give the same result when the move is undo'd.
-  Bitboard captureSquare = piece::pawnSinglePushSource<C>(toBitboard);
+  Bitboard captureSquare = pawns::pawnSinglePushSource<C>(toBitboard);
   m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= captureSquare;
   m_colourBitboard[static_cast<int>(OppositeColour<C>::value)] ^= captureSquare;
 
@@ -325,7 +328,7 @@ Board::MoveResult Board::processEp(const piece::Move &move)
 }
 
 template<PieceType T, PieceColour C>
-Board::MoveResult Board::processCastle(const piece::Move &move)
+Board::MoveResult Board::processCastle(const Move &move)
 {
   if (m_state->can_castle<T>())
   {
@@ -345,7 +348,7 @@ Board::MoveResult Board::processCastle(const piece::Move &move)
 }
 
 template<PieceType T>
-int Board::generatePieceMoves(piece::Move *moveList,
+int Board::generatePieceMoves(Move *moveList,
                               PieceColour colour)
 {
   int moveCounter{ 0 };
@@ -364,17 +367,17 @@ int Board::generatePieceMoves(piece::Move *moveList,
     Bitboard quiet = atk_bb & emptySquares();
     while (quiet)
     {
-      *moveList++ = piece::makeQuiet(from, bitboard::popLS1B(quiet));
+      *moveList++ = move::makeQuiet(from, bitboard::popLS1B(quiet));
       ++moveCounter;
     }
 
-    Bitboard capture = atk_bb & get_position(pieces::otherColour(colour));
+    Bitboard capture = atk_bb & get_position(piece::otherColour(colour));
     while (capture)
     {
       Square captureSquare = bitboard::popLS1B(capture);
       PieceType capturePiece = getPieceTypeOn(captureSquare);
 
-      *moveList = piece::makeCapture(from, captureSquare);
+      *moveList = move::makeCapture(from, captureSquare);
       moveList->capturePiece = capturePiece;
       ++moveList;
       ++moveCounter;
@@ -384,129 +387,131 @@ int Board::generatePieceMoves(piece::Move *moveList,
   return moveCounter;
 }
 
-template<PieceColour C, bool PROMOTIONS>
-void Board::generatePawnSinglePushes(piece::Move *moveList,
+template<PieceColour Colour, bool Promotions>
+void Board::generatePawnSinglePushes(Move *moveList,
                                      int &moveCounter,
                                      Bitboard pawnPositions,
                                      Bitboard emptySquares)
 {
-  pawnPositions = PROMOTIONS ? piece::promotablePawns<C>(pawnPositions) : piece::non_promotable_pawns<C>(pawnPositions);
-  Bitboard sources = piece::pawnSinglePushSource<C>(emptySquares) & pawnPositions;
-  Bitboard targets = piece::pawnSinglePushTarget<C>(sources);
-  while (sources && !PROMOTIONS)
+  pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
+  Bitboard sources = pawns::pawnSinglePushSource<Colour>(emptySquares) & pawnPositions;
+  Bitboard targets = pawns::pawnSinglePushTarget<Colour>(sources);
+
+  while (sources && not Promotions)
   {
-    *moveList++ = piece::makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *moveList++ = move::makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     moveCounter++;
   }
 
-  while (sources && PROMOTIONS)
+  while (sources && Promotions)
   {
     const Square from = bitboard::popLS1B(sources);
     const Square to = bitboard::popLS1B(targets);
-    *moveList++ = piece::makeQuietPromotion(from, to, PieceType::KNIGHT);
-    *moveList++ = piece::makeQuietPromotion(from, to, PieceType::BISHOP);
-    *moveList++ = piece::makeQuietPromotion(from, to, PieceType::ROOK);
-    *moveList++ = piece::makeQuietPromotion(from, to, PieceType::QUEEN);
+    *moveList++ = move::makeQuietPromotion(from, to, PieceType::KNIGHT);
+    *moveList++ = move::makeQuietPromotion(from, to, PieceType::BISHOP);
+    *moveList++ = move::makeQuietPromotion(from, to, PieceType::ROOK);
+    *moveList++ = move::makeQuietPromotion(from, to, PieceType::QUEEN);
     moveCounter += 4;
   }
 }
 
-template<PieceColour C, bool PROMOTIONS>
-void Board::generatePawnDoublePushes(piece::Move *moveList,
+template<PieceColour Colour, bool Promotions>
+void Board::generatePawnDoublePushes(Move *moveList,
                                      int &moveCounter,
                                      Bitboard pawnPositions,
                                      Bitboard emptySquares)
 {
-  Bitboard targets = piece::pawnDoublePushTarget<C>() & emptySquares;
-  Bitboard sources = piece::pawnSinglePushSource<C>(targets) & emptySquares;
-  sources = piece::pawnSinglePushSource<C>(sources) & pawnPositions;
+  Bitboard targets = pawns::pawnDoublePushTarget<Colour>() & emptySquares;
+  Bitboard sources = pawns::pawnSinglePushSource<Colour>(targets) & emptySquares;
+  sources = pawns::pawnSinglePushSource<Colour>(sources) & pawnPositions;
   while (sources)
   {
-    *moveList++ = piece::makeDoublePush(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *moveList++ = move::makeDoublePush(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     moveCounter++;
   }
 }
 
-template<PieceColour C, bool PROMOTIONS>
-void Board::generatePawnWestCaptures(piece::Move *moveList,
+template<PieceColour Colour, bool Promotions>
+void Board::generatePawnWestCaptures(Move *moveList,
                                      int &moveCounter,
                                      Bitboard pawnPositions)
 {
-  Bitboard opponentPieces = get_position(OppositeColour<C>::value);
-  pawnPositions = PROMOTIONS ? piece::promotablePawns<C>(pawnPositions) : piece::non_promotable_pawns<C>(pawnPositions);
-  Bitboard sources = piece::pawnWestAttackSource<C>(opponentPieces) & pawnPositions;
-  Bitboard targets = piece::pawnWestAttackTarget<C>(sources);
+  Bitboard opponentPieces = get_position(OppositeColour<Colour>::value);
+  pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
+  Bitboard sources = pawns::pawnWestAttackSource<Colour>(opponentPieces) & pawnPositions;
+  Bitboard targets = pawns::pawnWestAttackTarget<Colour>(sources);
 
-  while (sources && !PROMOTIONS)
+  while (sources && not Promotions)
   {
     Square targetSquare = bitboard::popLS1B(targets);
-    *moveList = piece::makeCapture(bitboard::popLS1B(sources), targetSquare);
+    *moveList = move::makeCapture(bitboard::popLS1B(sources), targetSquare);
     moveList->capturePiece = getPieceTypeOn(targetSquare);
     ++moveList;
     ++moveCounter;
   }
 
-  while (sources && PROMOTIONS)
+  while (sources && Promotions)
   {
     Square from = bitboard::popLS1B(sources);
     Square to = bitboard::popLS1B(targets);
-    *moveList++ = piece::makeCapturePromotion(from, to, PieceType::KNIGHT);
-    *moveList++ = piece::makeCapturePromotion(from, to, PieceType::BISHOP);
-    *moveList++ = piece::makeCapturePromotion(from, to, PieceType::ROOK);
-    *moveList++ = piece::makeCapturePromotion(from, to, PieceType::QUEEN);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::KNIGHT);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::BISHOP);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::ROOK);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::QUEEN);
     moveCounter += 4;
   }
 }
 
-template<PieceColour C, bool PROMOTIONS>
-void Board::generatePawnEastCaptures(piece::Move *moveList,
+template<PieceColour Colour, bool Promotions>
+void Board::generatePawnEastCaptures(Move *moveList,
                                      int &moveCounter,
                                      Bitboard pawnPositions)
 {
-  Bitboard opponentPieces = get_position(OppositeColour<C>::value);
-  pawnPositions = PROMOTIONS ? piece::promotablePawns<C>(pawnPositions) : piece::non_promotable_pawns<C>(pawnPositions);
-  Bitboard sources = piece::pawn_east_attack_source<C>(opponentPieces) & pawnPositions;
-  Bitboard targets = piece::pawn_east_attack_target<C>(sources);
-  while (sources && !PROMOTIONS)
+  Bitboard opponentPieces = get_position(OppositeColour<Colour>::value);
+  pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
+  Bitboard sources = pawns::pawnEastAttackSource<Colour>(opponentPieces) & pawnPositions;
+  Bitboard targets = pawns::pawnEastAttackTarget<Colour>(sources);
+  while (sources && !Promotions)
   {
     Square targetSquare = bitboard::popLS1B(targets);
-    *moveList = piece::makeCapture(bitboard::popLS1B(sources), targetSquare);
+    *moveList = move::makeCapture(bitboard::popLS1B(sources), targetSquare);
     moveList->capturePiece = getPieceTypeOn(targetSquare);
     ++moveList;
     ++moveCounter;
   }
 
-  while (sources && PROMOTIONS)
+  while (sources && Promotions)
   {
     Square from = bitboard::popLS1B(sources);
     Square to = bitboard::popLS1B(targets);
-    *moveList++ = piece::makeCapturePromotion(from, to, PieceType::KNIGHT);
-    *moveList++ = piece::makeCapturePromotion(from, to, PieceType::BISHOP);
-    *moveList++ = piece::makeCapturePromotion(from, to, PieceType::ROOK);
-    *moveList++ = piece::makeCapturePromotion(from, to, PieceType::QUEEN);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::KNIGHT);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::BISHOP);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::ROOK);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::QUEEN);
     moveCounter += 4;
   }
 }
 
-template<PieceColour C>
-void Board::generatePawnMoves(piece::Move *moveList,
+template<PieceColour Colour>
+void Board::generatePawnMoves(Move *moveList,
                               int &moveCounter,
                               Bitboard pawnPositions,
                               Bitboard emptySquares)
 {
   /* NOT PROMOTIONS             */
   /* ----------------------------- */
-  generatePawnSinglePushes<C, false>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
-  generatePawnDoublePushes<C, false>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
-  generatePawnWestCaptures<C, false>(&moveList[moveCounter], moveCounter, pawnPositions);
-  generatePawnEastCaptures<C, false>(&moveList[moveCounter], moveCounter, pawnPositions);
+  generatePawnSinglePushes<Colour, false>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
+  generatePawnDoublePushes<Colour, false>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
+  generatePawnWestCaptures<Colour, false>(&moveList[moveCounter], moveCounter, pawnPositions);
+  generatePawnEastCaptures<Colour, false>(&moveList[moveCounter], moveCounter, pawnPositions);
 
   /* PROMOTIONS                    */
   /* ----------------------------- */
-  generatePawnSinglePushes<C, true>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
-  generatePawnWestCaptures<C, true>(&moveList[moveCounter], moveCounter, pawnPositions);
-  generatePawnEastCaptures<C, true>(&moveList[moveCounter], moveCounter, pawnPositions);
+  generatePawnSinglePushes<Colour, true>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
+  generatePawnWestCaptures<Colour, true>(&moveList[moveCounter], moveCounter, pawnPositions);
+  generatePawnEastCaptures<Colour, true>(&moveList[moveCounter], moveCounter, pawnPositions);
 };
+
 } // namespace yak
 
 #endif // YAK_BOARD_H_

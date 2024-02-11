@@ -1,5 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <bitboard.h>
+#include "types.h"
 
 namespace yak { namespace bitboard {
 
@@ -496,7 +497,7 @@ TEST_CASE("BitboardTest: CanConvertSquareIndexToAlgebraicSquareNotation") {
 
     // Act & Assert
     for (int i = 0; i < 64; i++) {
-        std::string actual = to_algebraic(static_cast<Square>(i));
+        std::string actual = toAlgebraic(static_cast<Square>(i));
         CHECK(actual == expected[i]);
     }
 }
