@@ -6,11 +6,6 @@ namespace yak { namespace bitboard {
 
 TEST_CASE("Shift a bitboard by one square")
 {
-  constexpr Direction directions[8] = { Direction::NORTH, Direction::NORTH_EAST,
-                                        Direction::EAST, Direction::SOUTH_EAST,
-                                        Direction::SOUTH, Direction::SOUTH_WEST,
-                                        Direction::WEST, Direction::NORTH_WEST };
-
   const Bitboard initial_bb = static_bitboard<E4>::value;
   Bitboard shifted_bb, expected_bb;
 
@@ -66,186 +61,86 @@ TEST_CASE("Shift a bitboard by one square")
   CHECK(shifted_bb == expected_bb);
 }
 
-TEST_CASE("BitboardTest: SouthOne") {
-    // Arrange
-    Bitboard initial_bitboard = 0x000000000000ff00; // RANK 2
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 0x00000000000000ff; // RANK 1
-    // Act
-
-    shifted_bitboard = shift<Direction::SOUTH>(initial_bitboard);
-
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
+TEST_CASE("BitboardTest: Shifting off the board")
+{
+  CHECK(shift<Direction::SOUTH>(RANK_1) == Bitboard{0ULL});
+  CHECK(shift<Direction::NORTH>(RANK_8) == Bitboard{0ULL});
+  CHECK(shift<Direction::WEST>(FILE_A) == Bitboard{0ULL});
+  CHECK(shift<Direction::EAST>(FILE_H) == Bitboard{0ULL});
 }
 
-TEST_CASE("BitboardTest: SouthOneFromRank1") {
-    // Arrange
-    Bitboard initial_bitboard = 0x00000000000000ff; // RANK 1
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = EMPTY; // EMPTY BOARD
-    // Act
-    shifted_bitboard = shift<Direction::SOUTH>(initial_bitboard);
+TEST_CASE("BitboardTest: NorthOne")
+{
+  // Arrange
+  Bitboard initial_bitboard = 0x000000000000ff00; // RANK 2
+  Bitboard shifted_bitboard = 0;
+  Bitboard expected_bitboard = 0x0000000000ff0000; // RANK 3
 
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
+  // Act
+  shifted_bitboard = shift<Direction::NORTH>(initial_bitboard);
+
+  // Assert
+  CHECK(shifted_bitboard == expected_bitboard);
 }
 
-TEST_CASE("BitboardTest: NorthOne") {
-    // Arrange
-    Bitboard initial_bitboard = 0x000000000000ff00; // RANK 2
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 0x0000000000ff0000; // RANK 3
+TEST_CASE("BitboardTest: EastOne")
+{
+  // Arrange
+  Bitboard initial_bitboard = 0x0202020202020202; // B FILE
+  Bitboard shifted_bitboard = 0;
+  Bitboard expected_bitboard = 0x0404040404040404; // C FILE
 
-    // Act
-    shifted_bitboard = shift<Direction::NORTH>(initial_bitboard);
+  // Act
+  shifted_bitboard = shift<Direction::EAST>(initial_bitboard);
 
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
+  // Assert
+  CHECK(shifted_bitboard == expected_bitboard);
 }
 
-TEST_CASE("BitboardTest: NorthOneFromRank8") {
-    // Arrange
-    Bitboard initial_bitboard = 0xff00000000000000; // RANK 8
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 0; // EMPTY BOARD
+TEST_CASE("BitboardTest: NorthEastOneFromMiddleOfBoard")
+{
+  CHECK(shift<Direction::WEST>(FILE_B) == FILE_A);
 
-    // Act
-    shifted_bitboard = shift<Direction::NORTH>(initial_bitboard);
 
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
+  CHECK(shift<Direction::NORTH_EAST>(static_bitboard<A2>::value) == static_bitboard<B3>::value);
+
+  CHECK(shift<Direction::NORTH_WEST>(FILE_A) == EMPTY);
+  CHECK(shift<Direction::SOUTH_WEST>(FILE_A) == EMPTY);
+
+
+  CHECK(shift<Direction::SOUTH_EAST>(static_bitboard<A2>::value) == static_bitboard<B1>::value);
 }
 
-TEST_CASE("BitboardTest: EastOne") {
-    // Arrange
-    Bitboard initial_bitboard = 0x0202020202020202; // B FILE
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 0x0404040404040404; // C FILE
+TEST_CASE("BitboardTest: PopMS1B")
+{
+  // Arrange
+  Bitboard initial = 0xff00000000000000;
+  Bitboard expected = 0x7f00000000000000;
 
-    // Act
-    shifted_bitboard = shift<Direction::EAST>(initial_bitboard);
+  // Act
+  Square MS1B_index = popMS1B(initial);
 
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
+  // Assert
+  CHECK(MS1B_index == 63);
+  CHECK(initial == expected);
 }
 
-TEST_CASE("BitboardTest: EastOneFromHFile") {
-    // Arrange
-    Bitboard initial_bitboard = 0x8080808080808080; // H FILE
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 0; // EMPTY BOARD
+TEST_CASE("BitboardTest: Pop MS1B with value one")
+{
+  // Arrange
+  Bitboard initial =  0x0000000000000001;
+  Bitboard expected = 0x0000000000000000;
 
-    // Act
-    shifted_bitboard = shift<Direction::EAST>(initial_bitboard);
+  // Act
+  Square MS1B_index = popMS1B(initial);
 
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
+  // Assert
+  CHECK(MS1B_index == 0);
+  CHECK(initial == expected);
 }
 
-TEST_CASE("BitboardTest: WestOne") {
-    // Arrange
-    Bitboard initial_bitboard = FILE_B;
-    Bitboard expected_bitboard = FILE_A;
-
-    // Act
-    Bitboard shifted_bitboard = shift<Direction::WEST>(initial_bitboard);
-
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
-}
-
-TEST_CASE("BitboardTest: WestOneFromAFile") {
-    // Arrange
-    Bitboard initial_bitboard = FILE_A; // 0x0101010101010101; // A FILE
-    Bitboard expected_bitboard = EMPTY; // EMPTY BOARD
-
-    // Act
-    Bitboard shifted_bitboard = shift<Direction::WEST>(initial_bitboard);
-
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
-}
-
-TEST_CASE("BitboardTest: NorthEastOneFromMiddleOfBoard") {
-    // Arrange
-    Bitboard initial_bitboard = static_bitboard<A2>::value; // A2
-    Bitboard expected_bitboard = static_bitboard<B3>::value; // A2 should go to B3 (square 17)
-
-    // Act
-    Bitboard shifted_bitboard = shift<Direction::NORTH_EAST>(initial_bitboard);
-
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
-}
-
-TEST_CASE("BitboardTest: SouthEastOneFromMiddleOfBoard") {
-    // Arrange
-    Bitboard initial = static_bitboard<A2>::value; // A2
-    Bitboard expected = static_bitboard<B1>::value; // A2 should go to B1 (square 1)
-
-    // Act
-    Bitboard actual =  shift<Direction::SOUTH_EAST>(initial);
-
-    // Assert
-    CHECK(actual == expected);
-}
-
-TEST_CASE("BitboardTest: NorthWestOneFromMiddleOfBoard") {
-    // Arrange
-    Bitboard initial_bitboard = 0x0101010101010101; // A FILE
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 0; // EMPTY BOARD
-
-    //Act
-    shifted_bitboard = shift<Direction::NORTH_WEST>(initial_bitboard);
-
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
-}
-
-TEST_CASE("BitboardTest: SouthWestOneFromMiddleOfBoard") {
-    // Arrange
-    Bitboard initial_bitboard = 0x0101010101010101; // A FILE
-    Bitboard shifted_bitboard = 0;
-    Bitboard expected_bitboard = 0; // EMPTY BOARD
-
-    // Act
-    shifted_bitboard = shift<Direction::SOUTH_WEST>(initial_bitboard);
-
-    // Assert
-    CHECK(shifted_bitboard == expected_bitboard);
-}
-
-TEST_CASE("BitboardTest: PopMS1B") {
-    // Arrange
-    Bitboard initial = 0xff00000000000000;
-    Bitboard expected = 0x7f00000000000000;
-
-    // Act
-    Square MS1B_index = popMS1B(initial);
-
-    // Assert
-    CHECK(MS1B_index == 63);
-    CHECK(initial == expected);
-
-}
-
-TEST_CASE("BitboardTest: PopMS1BWithValueOne") {
-    // Arrange
-    Bitboard initial =  0x0000000000000001;
-    Bitboard expected = 0x0000000000000000;
-
-    // Act
-    Square MS1B_index = popMS1B(initial);
-
-    // Assert
-    CHECK(MS1B_index == 0);
-    CHECK(initial == expected);
-
-}
-
-TEST_CASE("BitboardTest: PopMS1BWithOnlyOneSetBit") {
+TEST_CASE("BitboardTest: Pop MS1B with only one set bit")
+{
   // Arrange
   Bitboard expected = 0x0000000000000000;
   std::vector<Bitboard> actual;
@@ -264,28 +159,28 @@ TEST_CASE("BitboardTest: PopMS1BWithOnlyOneSetBit") {
   }
 }
 
-TEST_CASE("BitboardTest: PopLS1B") {
-    // Arrange
-    Bitboard initial = 0xff00000000000000;
-    Bitboard expected = 0xfe00000000000000;
+TEST_CASE("BitboardTest: Pop LS1B")
+{
+  // Arrange
+  Bitboard initial = 0xff00000000000000;
+  Bitboard expected = 0xfe00000000000000;
 
-    // Act
-    Square MS1B_index = popLS1B(initial);
+  // Act
+  Square MS1B_index = popLS1B(initial);
 
-    // Assert
-    CHECK(MS1B_index == 56);
-    CHECK(initial == expected);
-
+  // Assert
+  CHECK(MS1B_index == 56);
+  CHECK(initial == expected);
 }
 
-TEST_CASE("BitboardTest: ScanForwardOnEmptyBoardReturnsEmptyStack") {
+TEST_CASE("BitboardTest: Scan forward on empty board returns empty vector") {
     // Arrange
     Bitboard initial_bitboard = 0;
     // Act
     std::vector<Square> serialised_bitboard = scanForward(initial_bitboard);
 
     // Assert
-    CHECK(serialised_bitboard.size() == 0);
+    CHECK(serialised_bitboard.empty());
 }
 
 TEST_CASE("BitboardTest: ScanForwardForPieceOnE4") {
