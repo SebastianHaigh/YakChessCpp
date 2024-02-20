@@ -269,8 +269,8 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
   }
 
   // Bitboards that will be used to update the board representation
-  const Bitboard toBitboard = bitboard::toBitboard(move.to);
-  const Bitboard fromBitboard = bitboard::toBitboard(move.from);
+  const Bitboard toBitboard = bitboard::createBitboard(move.to);
+  const Bitboard fromBitboard = bitboard::createBitboard(move.from);
   const Bitboard fromToBitboard = toBitboard ^ fromBitboard;
 
   // TODO (haigh) Change get piece type on to maintain a map of all the piece positions
@@ -310,8 +310,8 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
 template<PieceColour C>
 Board::MoveResult Board::processEp(const Move &move)
 {
-  const Bitboard toBitboard = bitboard::toBitboard(move.to);
-  const Bitboard fromBitboard = bitboard::toBitboard(move.from);
+  const Bitboard toBitboard = bitboard::createBitboard(move.to);
+  const Bitboard fromBitboard = bitboard::createBitboard(move.from);
   const Bitboard fromToBitboard = toBitboard ^ fromBitboard;
   m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= fromToBitboard;
   m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;

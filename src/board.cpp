@@ -63,7 +63,7 @@ Bitboard Board::getPosition(PieceColour pieceColour, PieceType pieceType)
 
 PieceType Board::getPieceTypeOn(Square square)
 {
-  const Bitboard square_bb = bitboard::toBitboard(square);
+  const Bitboard square_bb = bitboard::createBitboard(square);
 
   for (int i = 0; i < 6; i++)
   {
@@ -77,7 +77,7 @@ PieceType Board::getPieceTypeOn(Square square)
 
 PieceColour Board::getPieceColourOn(Square square)
 {
-  const Bitboard square_bb = bitboard::toBitboard(square);
+  const Bitboard square_bb = bitboard::createBitboard(square);
 
   for (int i = 0; i < 2; i++)
   {

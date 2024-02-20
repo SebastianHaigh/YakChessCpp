@@ -103,7 +103,7 @@ std::string to_string(Bitboard board)
   {
     for (File file = 0; file < 8; file++)
     {
-      boardVector[rank][file] = (board & toBitboard(file, rank)) > 0;
+      boardVector[rank][file] = (board & createBitboard(file, rank)) > 0;
     }
   }
 

@@ -126,7 +126,7 @@ public:
 
   inline Bitboard epTarget() const
   {
-    return bitboard::toBitboard(m_epSquare);
+    return bitboard::createBitboard(m_epSquare);
   }
 
   inline void setCaptured(PieceType type)
