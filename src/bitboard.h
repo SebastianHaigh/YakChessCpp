@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <iostream>
+#include <type_traits>
 #include <vector>
 #include "types.h"
 
@@ -192,9 +193,9 @@ struct static_bitboard<S1, S2>
 };
 
 template<typename... Squares>
-constexpr auto createBitboard(Squares&& ...squares) -> Bitboard
+constexpr auto createBitboard(Squares ...squares) -> Bitboard
 {
-  static_assert((... && std::is_same_v<Squares, Square>));
+  static_assert((... && (std::is_same_v<std::decay_t<Squares>, Square>)));
 
   Bitboard board{0ULL};
 
@@ -203,10 +204,8 @@ constexpr auto createBitboard(Squares&& ...squares) -> Bitboard
   return board;
 }
 
-
 void print_board(Bitboard board);
 std::string to_string(Bitboard board);
-
 
 } // namespace yak::bitboard
 

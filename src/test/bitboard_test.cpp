@@ -412,29 +412,6 @@ TEST_CASE("BitboardTest: SetSquareCanCorrectlySetAnUnsetSquareOnBitboardWithRank
   CHECK(actual == expected);
 }
 
-TEST_CASE("BitboardTest: SquareToBitboardDetectsE4") {
-    // Arrange
-    Square square{ E4 }; // E4
-    Bitboard expected = static_bitboard<E4>::value;
-
-    // Act
-    Bitboard actual = toBitboard(square);
-
-    // Assert
-    CHECK(actual == expected);
-}
-
-TEST_CASE("BitboardTest: AlgebraicToBitboardDetectsE4") {
-    // Arrange
-    std::string square = "e4";
-    Bitboard expected = static_bitboard<E4>::value;
-
-    // Act
-    Bitboard actual = toBitboard(square);
-
-    // Assert
-    CHECK(actual == expected);
-}
 TEST_CASE("BitboardTest: CanConvertAlgebraicSquareNotationToSquareIndex") {
     // Arrange
     Square expected{A1}; // Start at A1

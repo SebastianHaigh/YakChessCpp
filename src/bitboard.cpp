@@ -73,7 +73,7 @@ void print_board(Bitboard board)
   {
     for (File file = 0; file < 8; file++)
     {
-      boardVector[rank][file] = (board & toBitboard(file, rank)) > 0;
+      boardVector[rank][file] = (board & createBitboard(static_cast<Square>(squareIndex(file, rank)))) > 0;
     }
   }
 
