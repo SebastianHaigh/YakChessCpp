@@ -45,10 +45,10 @@ template<PieceType Type>
 class SlidingPieceMap
 {
 public:
-  auto attacks(Square square, Bitboard occupied) -> Bitboard
-  {
-    m_impl.attacks(square, occupied);
-  }
+  /* auto attacks(Square square, Bitboard occupied) -> Bitboard */
+  /* { */
+  /*   /1* m_impl.attacks(square, occupied); *1/ */
+  /* } */
 
 private:
 
