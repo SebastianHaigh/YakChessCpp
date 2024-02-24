@@ -22,7 +22,7 @@ public:
   void update(const Move& move);
   const Move* const pop();
 
-  bool loadFen(const std::string& fen);
+  bool loadFen(std::string_view fen);
 
 private:
   GameState* m_currentState;

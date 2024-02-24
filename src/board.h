@@ -93,7 +93,7 @@ class Board
 {
 public:
   Board() = default;
-  Board(const std::string &fen);
+  Board(std::string_view fen);
 
   Board(const Board&) = delete;
   Board& operator=(const Board&) = delete;
@@ -242,7 +242,7 @@ private:
                          Bitboard emptySquares);
 
   std::vector<Move> generateCastlingMoves(std::vector<Move> moves);
-  void parseFen(const std::string &fen);
+  void parseFen(std::string_view fen);
   std::string rankToFen(Rank rank);
   std::string rankToBoardFen(Rank rank);
 };

@@ -53,7 +53,7 @@ const Move* const GameStateManager::pop()
   return &m_currentState->m_move;
 }
 
-bool GameStateManager::loadFen(const std::string& fen)
+bool GameStateManager::loadFen(std::string_view fen)
 {
   // Remove all current states
   GameState* state = m_currentState;
@@ -99,7 +99,7 @@ bool GameStateManager::loadFen(const std::string& fen)
   }
 
   int lengthCastlingRights = startOfEpTarget - startOfCastlingRights;
-  std::string castling = fen.substr(startOfCastlingRights + 1, lengthCastlingRights);
+  auto castling = fen.substr(startOfCastlingRights + 1, lengthCastlingRights);
 
   if (castling.empty() || (castling.size() == 1 && castling[0] == '-'))
   {

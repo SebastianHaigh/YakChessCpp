@@ -9,12 +9,12 @@
 
 namespace yak {
 
-Board::Board(const std::string &fen)
+Board::Board(std::string_view fen)
 {
   parseFen(fen);
 }
 
-void Board::parseFen(const std::string &fen)
+void Board::parseFen(std::string_view fen)
 {
   auto endOfPiecePlacement = fen.find_first_of(" ");
 
