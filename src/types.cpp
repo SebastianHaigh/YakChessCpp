@@ -60,13 +60,13 @@ Square squareIndex(std::string_view square)
 
 std::string toAlgebraic(Square square)
 {
-  static constexpr std::string files{"abcdefgh"};
+  static constexpr std::string_view files{"abcdefgh"};
   return files[fileIndex(square)] + std::to_string(rankIndex(square) + 1);
 }
 
 std::string toAlgebraic(File file_index, Rank rank_index)
 {
-  static constexpr std::string files{"abcdefgh"};
+  static constexpr std::string_view files{"abcdefgh"};
   return files[file_index] + std::to_string(rank_index + 1);
 }
 
