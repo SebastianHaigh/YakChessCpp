@@ -1,15 +1,17 @@
 #ifndef MAGIC_BITBOARDS_H_
 #define MAGIC_BITBOARDS_H_
 
-#include <attackmaps.h>
-#include <bitboard.h>
+#include "attackmaps.h"
+#include "bitboard.h"
+#include "types.h"
+
+#include <stdlib.h>
 
 #include <algorithm>
-#include <optional>
-#include <types.h>
-#include <cstdint>
 #include <array>
-#include <span>
+#include <optional>
+#include <stdexcept>
+#include <string>
 
 namespace yak::magic {
 

@@ -1,8 +1,11 @@
 #include <catch2/catch_test_macros.hpp>
+
 #include <bitboard.h>
-#include <vector>
+#include <types.h>
+
 #include <array>
-#include "types.h"
+#include <string>
+#include <vector>
 
 namespace yak::bitboard {
 

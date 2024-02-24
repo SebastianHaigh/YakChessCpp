@@ -1,13 +1,12 @@
 #ifndef GENERATION_PIECES_H_
 #define GENERATION_PIECES_H_
 
-// Can this be moved into the board?
-// TODO I need to update this method so that it can save the piece to be capture if there is a capture
 #include "bitboard.h"
 #include "move.h"
 #include "pieces.h"
 #include "attackmaps.h"
 #include "pawns.h"
+#include "types.h"
 
 namespace yak::move {
 

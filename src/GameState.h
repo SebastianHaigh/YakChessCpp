@@ -2,8 +2,10 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
+
 #include "bitboard.h"
-#include "pieces.h"
+#include "types.h"
 
 namespace yak {
 

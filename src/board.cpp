@@ -1,10 +1,10 @@
-#include <board.h>
+#include "board.h"
 
-#include <stdexcept>
-#include <cassert>
+#include <ctype.h>
+#include <algorithm>
+
 #include "move.h"
 #include "pieces.h"
-#include "attackmaps.h"
 #include "generation.h"
 
 namespace yak {

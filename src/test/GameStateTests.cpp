@@ -1,8 +1,7 @@
-#include "GameState.h"
-#include "bitboard.h"
-#include "pieces.h"
 #include <catch2/catch_test_macros.hpp>
-#include <cstdint>
+
+#include <GameState.h>
+#include <types.h>
 
 namespace yak {
 

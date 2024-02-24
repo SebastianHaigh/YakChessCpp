@@ -1,13 +1,14 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <memory>
-#include <vector>
-#include <utility>
-
+#include <attackmaps.h>
 #include <pieces.h>
 #include <bitboard.h>
-#include "generation.h"
+#include <generation.h>
 #include <types.h>
+#include <pawns.h>
+
+#include <vector>
+#include <string>
 
 namespace yak {
 

@@ -1,8 +1,8 @@
 #ifndef YAK_BITBOARD_H_
 #define YAK_BITBOARD_H_
 
-#include <stdint.h>
-#include <iostream>
+#include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 #include "types.h"

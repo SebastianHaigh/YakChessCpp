@@ -1,8 +1,11 @@
-#include "types.h"
 #include <catch2/catch_test_macros.hpp>
+
 #include <attackmaps.h>
+#include <types.h>
 #include <bitboard.h>
-#include <utility>
+
+#include <array>
+#include <vector>
 
 namespace yak::attackmap {
 

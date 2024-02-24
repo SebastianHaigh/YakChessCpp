@@ -1,8 +1,9 @@
 #ifndef YAK_BOARD_H_
 #define YAK_BOARD_H_
 
-#include <iostream>
 #include <string>
+#include <string_view>
+#include <vector>
 
 #include "GameState.h"
 #include "attackmaps.h"
@@ -10,6 +11,7 @@
 #include "pieces.h"
 #include "bitboard.h"
 #include "pawns.h"
+#include "types.h"
 
 namespace yak {
 

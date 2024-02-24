@@ -1,11 +1,10 @@
 #ifndef YAK_ATTACK_MAPS_H_
 #define YAK_ATTACK_MAPS_H_
 
-#include <bitboard.h>
-#include <types.h>
+#include "bitboard.h"
+#include "types.h"
 
-#include <algorithm>
-#include <stdint.h>
+#include <type_traits>
 #include <array>
 
 namespace yak::attackmap {

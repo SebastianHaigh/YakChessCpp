@@ -1,5 +1,7 @@
-#include <bitboard.h>
+#include "bitboard.h"
+
 #include <string>
+#include <iostream>
 
 namespace yak::bitboard {
 

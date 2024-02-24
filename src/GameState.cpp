@@ -1,6 +1,5 @@
 #include "GameState.h"
-#include "bitboard.h"
-#include "board.h"
+
 #include "types.h"
 
 namespace yak {

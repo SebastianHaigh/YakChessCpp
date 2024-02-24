@@ -1,13 +1,15 @@
-#include "bitboard.h"
-#include "types.h"
 #include <catch2/catch_test_macros.hpp>
-
 #include "catch2/benchmark/catch_benchmark.hpp"
-
 #define CATCH_CONFIG_ENABLE_BENCHMARKING
+
+#include <bitboard.h>
+#include <types.h>
 #include <MagicBitboards.h>
+
+#include <array>
 #include <iostream>
 #include <stdexcept>
+#include <memory>
 
 namespace yak::magic {
 

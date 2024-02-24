@@ -6,14 +6,8 @@
 #include "MagicBitboards.h"
 #include "types.h"
 
-#include <iostream>
-#include <stdexcept>
-#include <vector>
-#include <memory>
-#include <stack>
-#include <stdint.h>
-#include <stdio.h>
-#include <cassert>
+#include <array>
+#include <string>
 
 #define MAGIC
 namespace yak::piece {
