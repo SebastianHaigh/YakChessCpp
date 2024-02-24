@@ -204,19 +204,6 @@ constexpr auto createBitboard(Squares ...squares) -> Bitboard
   return board;
 }
 
-template<typename Rank, typename File>
-constexpr auto createBitboard(Rank rank, File file) -> Bitboard
-{
-  static_assert(std::is_same_v<std::decay_t<Rank>, Rank>);
-  static_assert(std::is_same_v<std::decay_t<File>, File>);
-
-  Bitboard board{0ULL};
-
-  setSquare(board, rank, file);
-
-  return board;
-}
-
 void print_board(Bitboard board);
 std::string to_string(Bitboard board);
 

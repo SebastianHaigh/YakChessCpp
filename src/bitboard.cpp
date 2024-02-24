@@ -23,7 +23,7 @@ void setSquare(Bitboard& board, Square const& square)
   board |= pieceToSet << square;
 }
 
-void setSquare(Bitboard &board, const Rank& rank, const File& file)
+void setSquare(Bitboard& board, const Rank& rank, const File& file)
 {
   setSquare(board, squareIndex(file, rank));
 }
@@ -103,7 +103,7 @@ std::string to_string(Bitboard board)
   {
     for (File file = 0; file < 8; file++)
     {
-      boardVector[rank][file] = (board & createBitboard(file, rank)) > 0;
+      boardVector[rank][file] = (board & createBitboard(squareIndex(rank, file))) > 0;
     }
   }
 
