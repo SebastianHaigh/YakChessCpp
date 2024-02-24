@@ -4,261 +4,99 @@
 #include <iostream>
 #include <string>
 
+#include "GameState.h"
+#include "attackmaps.h"
+#include "move.h"
 #include "pieces.h"
 #include "bitboard.h"
+#include "pawns.h"
 
 namespace yak {
 
-/*
- * \brief Encodes and maintains castling rights for the game state.
- */
-class CastlingRights
-{
-private:
-  bool black[2]{0};
-  bool white[2]{0};
-  bool rights[4]{0};
-public:
-  /* \brief Default constructor. */
-  CastlingRights()
-  {
-  };
-
-  /*!
-   * \brief Construct castling rights from fen.
-   * \param[in] fen - std::string containing the castling rights in fen format
-   */
-  CastlingRights(std::string fen);
-
-  /*!
-   * \brief Check if a side can castle in the king m_side.
-   * \param[in] colour - the colour of the side to check the rights for.
-   * \return true if colour can castle, false otherwise.
-   */
-  bool kingSide(PieceColour colour);
-
-  /*!
-   * \brief Check if a side can castle in the queen m_side.
-   * \param[in] colour - the colour of the m_side to check the rights for.
-   * \return true if colour can castle, false otherwise.
-   */
-  bool queenSide(PieceColour colour);
-
-  /*!
-   * \brief Update castling rights based on a move.
-   * \param[in] move - a move that may update the rights.
-   * \param[in] side - the side that is making the move.
-   */
-  void update(const piece::Move &move, PieceColour side);
-
-  /*!
-   * \brief Get the current castling rights in fen format.
-   * \return std::string containing the fen of the current castling rights.
-   */
-  std::string fen();
-};
-
-/*!
- * \brief Holds all of the games state except for piece positions.
- */
-class GameState
-{
-public:
-  /*! \brief Default constructor */
-  GameState();
-
-  /*!
-   * \brief Construct from fen.
-   * \param[in] fen - the fen string of the game state to be initialised.
-   */
-  explicit GameState(const std::string& fen);
-
-  /*!
-   * \brief Return the current game state in FEN notation.
-   * \return std::string in FEN notation.
-   */
-  std::string toFen();
-
-  /*!
-   * \brief Update the game state based on a given move.
-   * \param[in] move - The move to be made.
-   */
-  void update(const piece::Move &move);
-
-  /*!
-   * \brief Check if a side can castle on the king m_side.
-   * \param[in] colour - The colour of the side to check.
-   * \return true if the m_side can castle on the king side, false otherwise.
-   */
-  bool canKingSideCastle(PieceColour colour);
-
-  /*!
-   * \brief Check if the current side to move can king side castle.
-   * \return true if the side to move can king side castle, false otherwise.
-   */
-  bool canKingSideCastle();
-
-  /*!
-   * \brief Check if a side can castle on the queen side.
-   * \param[in] colour - The colour of the side to check.
-   * \return true if the side can castle on the queen side, false otherwise.
-   */
-  bool canQueenSideCastle(PieceColour colour);
-
-  /*!
-   * \brief Check if the current side to move can queen side castle.
-   * \return true if the side to move can queen side castle, false otherwise.
-   */
-  bool canQueenSideCastle();
-
-  template<PieceType T>
-  bool can_castle()
-  {
-    return (T == PieceType::KING) ? canKingSideCastle() :
-           (T == PieceType::QUEEN) ? canQueenSideCastle() : false;
-  }
-
-  /*! \brief Change the side to move. */
-  void toggleSideToMove();
-
-  inline PieceColour sideToMove() const
-  {
-    return m_side;
-  }
-
-  PieceColour sideNotToMove() const;
-
-  Square epTargetSquare() const;
-
-  Bitboard epTarget() const;
-
-private:
-  CastlingRights m_castlingRights;
-  PieceColour m_side;
-  int m_moveClock = 1;
-  bool m_hasEpTarget = false;
-  Square m_epSquare = NULL_SQUARE;
-  void parseFen(const std::string& fen);
-};
-
 template<PieceType T, PieceColour C>
-struct KingCastleTarget
-{
+struct KingCastleTarget {
   static constexpr Bitboard value{0};
 };
 
-template<>
-struct KingCastleTarget<PieceType::KING, PieceColour::WHITE>
-{
+template<> struct KingCastleTarget<PieceType::KING, PieceColour::WHITE> {
   static constexpr Bitboard value = bitboard::static_bitboard<G1>::value;
 };
 
-template<>
-struct KingCastleTarget<PieceType::KING, PieceColour::BLACK>
-{
+template<> struct KingCastleTarget<PieceType::KING, PieceColour::BLACK> {
   static constexpr Bitboard value = bitboard::static_bitboard<G8>::value;
 };
 
-template<>
-struct KingCastleTarget<PieceType::QUEEN, PieceColour::WHITE>
-{
+template<> struct KingCastleTarget<PieceType::QUEEN, PieceColour::WHITE> {
   static constexpr Bitboard value = bitboard::static_bitboard<C1>::value;
 };
 
-template<>
-struct KingCastleTarget<PieceType::QUEEN, PieceColour::BLACK>
-{
+template<> struct KingCastleTarget<PieceType::QUEEN, PieceColour::BLACK> {
   static constexpr Bitboard value = bitboard::static_bitboard<C8>::value;
 };
 
 template<PieceType T, PieceColour C>
-struct RookCastleSource
-{
+struct RookCastleSource {
   static constexpr Bitboard value{0};
 };
 
-template<>
-struct RookCastleSource<PieceType::KING, PieceColour::WHITE>
-{
+template<> struct RookCastleSource<PieceType::KING, PieceColour::WHITE> {
   static constexpr Bitboard value = bitboard::static_bitboard<H1>::value;
 };
 
-template<>
-struct RookCastleSource<PieceType::KING, PieceColour::BLACK>
-{
+template<> struct RookCastleSource<PieceType::KING, PieceColour::BLACK> {
   static constexpr Bitboard value = bitboard::static_bitboard<H8>::value;
 };
 
-template<>
-struct RookCastleSource<PieceType::QUEEN, PieceColour::WHITE>
-{
+template<> struct RookCastleSource<PieceType::QUEEN, PieceColour::WHITE> {
   static constexpr Bitboard value = bitboard::static_bitboard<A1>::value;
 };
 
-template<>
-struct RookCastleSource<PieceType::QUEEN, PieceColour::BLACK>
-{
+template<> struct RookCastleSource<PieceType::QUEEN, PieceColour::BLACK> {
   static constexpr Bitboard value = bitboard::static_bitboard<A8>::value;
 };
 
 template<PieceType T, PieceColour C>
-struct RookCastleTarget
-{
+struct RookCastleTarget {
   static constexpr Bitboard value{0};
 };
 
-template<>
-struct RookCastleTarget<PieceType::KING, PieceColour::WHITE>
-{
+template<> struct RookCastleTarget<PieceType::KING, PieceColour::WHITE> {
   static constexpr Bitboard value = bitboard::static_bitboard<F1>::value;
 };
 
-template<>
-struct RookCastleTarget<PieceType::KING, PieceColour::BLACK>
-{
+template<> struct RookCastleTarget<PieceType::KING, PieceColour::BLACK> {
   static constexpr Bitboard value = bitboard::static_bitboard<F8>::value;
 };
 
-template<>
-struct RookCastleTarget<PieceType::QUEEN, PieceColour::WHITE>
-{
+template<> struct RookCastleTarget<PieceType::QUEEN, PieceColour::WHITE> {
   static constexpr Bitboard value = bitboard::static_bitboard<D1>::value;
 };
 
-template<>
-struct RookCastleTarget<PieceType::QUEEN, PieceColour::BLACK>
-{
+template<> struct RookCastleTarget<PieceType::QUEEN, PieceColour::BLACK> {
   static constexpr Bitboard value = bitboard::static_bitboard<D8>::value;
 };
 
 template<PieceColour C>
-struct OppositeColour
-{
+struct OppositeColour {
   static constexpr PieceColour value = PieceColour::NULL_COLOUR;
 };
 
-template<>
-struct OppositeColour<PieceColour::WHITE>
-{
+template<> struct OppositeColour<PieceColour::WHITE> {
   static constexpr PieceColour value = PieceColour::BLACK;
 };
 
-template<>
-struct OppositeColour<PieceColour::BLACK>
-{
+template<> struct OppositeColour<PieceColour::BLACK> {
   static constexpr PieceColour value = PieceColour::WHITE;
 };
 
 class Board
 {
 public:
-  Board() : m_pieceTypeBitboard{ 0 }, m_colourBitboard{ 0 }, m_previousMoveF(piece::Move())
-  {
-  }
-  Board(const std::string &fen) : m_pieceTypeBitboard{ 0 }, m_colourBitboard{ 0 }, m_previousMoveF(piece::Move())
-  {
-    parseFen(fen);
-  }
+  Board() = default;
+  Board(std::string_view fen);
+
+  Board(const Board&) = delete;
+  Board& operator=(const Board&) = delete;
 
   PieceType getPieceTypeOn(Square square);
   PieceColour getPieceColourOn(Square square);
@@ -266,11 +104,17 @@ public:
   Bitboard occupiedSquares();
   Bitboard emptySquares();
 
-  std::vector<piece::Move> generateMoves();
-  void makeMove(PieceType type, PieceColour colour, Square from, Square to);
-  //void makeMove(Move move);
-  void makeMove(const piece::Move &move);
-  void undoMove();
+  enum class MoveResult
+  {
+    SUCCESS = 0,
+    NO_PIECE_TO_MOVE,
+    NO_PIECE_TO_CAPTURE,
+    INVALID_TO_OR_FROM,
+  };
+
+  std::vector<Move> generateMoves();
+  MoveResult makeMove(const Move &move);
+  MoveResult undoMove();
 
   /**
    * \brief Check if the king of the current m_side to move is in check/
@@ -281,21 +125,6 @@ public:
   bool isCheckmate();
 
   std::string toFen();
-
-  Bitboard epTarget()
-  {
-    return m_currentState.epTarget();
-  }
-
-  Square ep_target_square()
-  {
-    return m_currentState.epTargetSquare();
-  }
-
-  PieceColour to_move()
-  {
-    return m_currentState.sideToMove();
-  }
 
   Bitboard attacked_by(PieceColour colour)
   {
@@ -310,20 +139,14 @@ public:
    * \param[in] type - The type of piece.
    * \return A bitboard containing the piece positions.
    */
-  Bitboard get_position(PieceType type)
-  {
-    return m_pieceTypeBitboard[static_cast<int>(type)];
-  }
+  Bitboard get_position(PieceType type);
 
   /**
    * \brief Get the bitboard for a particular colour.
    * \param[in] colour - The colour of the m_side.
    * \return A bitboard containing the piece positions.
    */
-  Bitboard get_position(PieceColour colour)
-  {
-    return m_colourBitboard[static_cast<int>(colour)];
-  }
+  Bitboard get_position(PieceColour colour);
 
   /**
    * \brief Get the bitboard for a particular colour and piece type.
@@ -331,31 +154,21 @@ public:
    * \param[in] pieceType - The type of piece.
    * \return A bitboard containing the piece positions.
    */
-  Bitboard getPosition(PieceColour pieceColour, PieceType pieceType)
-  {
-    return get_position(pieceType) & get_position(pieceColour);
-  }
+  Bitboard getPosition(PieceColour pieceColour, PieceType pieceType);
+
+  template<PieceType T>
+  int generatePieceMoves(Move *moveList,
+                         PieceColour colour);
 
 private:
+  Bitboard m_pieceTypeBitboard[6] = { 0, 0, 0, 0, 0, 0 };
+  Bitboard m_colourBitboard[2] { 0, 0 };
 
-  Bitboard m_pieceTypeBitboard[6];
-  Bitboard m_colourBitboard[2];
-
-  /* \brief The current GameState */
-  GameState m_currentState;
-
-  /* \brief A record of the GameState before the last move, for undoing moves. */
-  GameState m_previousState;
+  GameStateManager m_state;
 
   attackmap::RookMap m_rookAtks;      /* \brief Attack map for Rooks */
   attackmap::BishopMap m_bishopAtks;    /* \brief Attack map for Bishops */
   attackmap::QueenMap m_queenAtks;    /* \brief Attack map for Queens */
-
-  /* \brief The last move to have been made on this board. */
-  piece::Move m_previousMoveF;
-
-  /* \brief The piece captured on the last move, NULL_PIECE if last move was not a capture. */
-  PieceType m_previousCapturedPiece = PieceType::NULL_PIECE;
 
   /*!
    * \brief Executes a move on the underlying board representation.
@@ -364,7 +177,7 @@ private:
    * \param[in] undo - If true this will process an undo move.
    */
   template<PieceColour C>
-  void processMove(const piece::Move &move, bool undo);
+  MoveResult processMove(const Move &move, bool undo);
 
   /*!
    * \brief Executes a castling move on the underlying board representation.
@@ -373,10 +186,10 @@ private:
    * \param[in] move - The move to be executed.
    */
   template<PieceType T, PieceColour C>
-  void processCastle(const piece::Move &move);
+  MoveResult processCastle(const Move &move);
 
   template<PieceColour C>
-  void processEp(const piece::Move &move);
+  MoveResult processEp(const Move &move);
 
   /*!
    * \brief Returns all of the squares attacked by pawns of a given colour.
@@ -400,118 +213,304 @@ private:
    */
   Bitboard allAttacks(PieceColour colour);
 
-  std::vector<piece::Move> generateCastlingMoves(std::vector<piece::Move> moves);
-  void parseFen(const std::string &fen);
+  template<PieceColour C, bool PROMOTIONS>
+  void generatePawnSinglePushes(Move *move_list,
+                                int &move_counter,
+                                Bitboard pawn_positions,
+                                Bitboard empty_squares);
+
+  template<PieceColour C, bool PROMOTIONS>
+  void generatePawnDoublePushes(Move *moveList,
+                                int &moveCounter,
+                                Bitboard pawnPositions,
+                                Bitboard emptySquares);
+
+  template<PieceColour C, bool PROMOTIONS>
+  void generatePawnWestCaptures(Move *moveList,
+                                int &moveCounter,
+                                Bitboard pawnPositions);
+
+  template<PieceColour C, bool PROMOTIONS>
+  void generatePawnEastCaptures(Move *moveList,
+                                int &moveCounter,
+                                Bitboard pawnPositions);
+
+  template<PieceColour C>
+  void generatePawnMoves(Move *moveList,
+                         int &moveCounter,
+                         Bitboard pawnPositions,
+                         Bitboard emptySquares);
+
+  std::vector<Move> generateCastlingMoves(std::vector<Move> moves);
+  void parseFen(std::string_view fen);
   std::string rankToFen(Rank rank);
+  std::string rankToBoardFen(Rank rank);
 };
 
 template<PieceColour C>
-void Board::processMove(const piece::Move &move, bool undo)
+Board::MoveResult Board::processMove(const Move &move, bool undo)
 {
-
   // If the move to be processed is a castle then we can handle this here and then exit.
   if (move.castle == PieceType::KING)
+  {
     return processCastle<PieceType::KING, C>(move);
+  }
   else if (move.castle == PieceType::QUEEN)
+  {
     return processCastle<PieceType::QUEEN, C>(move);
+  }
 
-  if (move.en_passant)
+  /* if (move.to == move.from) return MoveResult::INVALID_TO_OR_FROM; */
+
+  // Same for en passant
+  if (move.enPassant)
+  {
     return processEp<C>(move);
+  }
 
   // Bitboards that will be used to update the board representation
-  Bitboard to_bitboard = bitboard::toBitboard(move.to);
-  Bitboard from_bitboard = bitboard::toBitboard(move.from);
-  Bitboard from_to_bitboard = to_bitboard ^ from_bitboard;
+  const Bitboard toBitboard = bitboard::createBitboard(move.to);
+  const Bitboard fromBitboard = bitboard::createBitboard(move.from);
+  const Bitboard fromToBitboard = toBitboard ^ fromBitboard;
 
-  // Determine the piece type that is to be moved.
-  int piece_to_move = 0;
-  Bitboard piece_check_bb = undo ? to_bitboard : from_bitboard;
-  while (!(piece_check_bb & m_pieceTypeBitboard[piece_to_move]))
-    piece_to_move++;
+  // TODO (haigh) Change get piece type on to maintain a map of all the piece positions
+  const PieceType pieceToMove = getPieceTypeOn(undo ? move.to : move.from);
 
-  // Determine the piece type to be captured
-  int piece_to_capture = 0;
-  if (move.capture && !undo)
-  {
-    // If this is a make rather than unmake we need to determine the type of the piece to capture.
-    while (!(to_bitboard & m_pieceTypeBitboard[piece_to_capture]))
-      piece_to_capture++;
-    m_previousCapturedPiece = PieceType(piece_to_capture);
-  }
-  else if (move.capture && undo)
-  {
-    piece_to_capture = static_cast<int>(m_previousCapturedPiece);
-  }
+  if (pieceToMove == PieceType::NULL_PIECE) return MoveResult::NO_PIECE_TO_MOVE;
 
-  int colour_to_move = static_cast<int>(C);
-  int opposing_colour = static_cast<int>(OppositeColour<C>::value);
+  int colourToMove = static_cast<int>(C);
+  int opposingColour = static_cast<int>(OppositeColour<C>::value);
 
   // Make the basic move.
-  m_pieceTypeBitboard[piece_to_move] ^= from_to_bitboard;
-  m_colourBitboard[colour_to_move] ^= from_to_bitboard;
+  m_pieceTypeBitboard[static_cast<int>(pieceToMove)] ^= fromToBitboard;
+  m_colourBitboard[colourToMove] ^= fromToBitboard;
 
   // If the move is a capture, remove the captured piece.
   if (move.capture)
   {
-    Bitboard capture_square = to_bitboard;
-    if (move.en_passant)
-      capture_square = m_currentState.epTarget();
+    PieceType pieceToCapture = move.capturePiece;
+    Bitboard captureSquare = (move.enPassant ? m_state->epTarget() : toBitboard);
 
-    m_pieceTypeBitboard[piece_to_capture] ^= capture_square;
-    m_colourBitboard[opposing_colour] ^= capture_square;
+    m_pieceTypeBitboard[static_cast<int>(pieceToCapture)] ^= captureSquare;
+    m_colourBitboard[opposingColour] ^= captureSquare;
   }
 
   // If the move is a promotion, swap the moved piece for a piece of the promoted type.
   if (move.promotion != PieceType::NULL_PIECE)
   {
-    m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= to_bitboard;
-    m_colourBitboard[colour_to_move] ^= to_bitboard;
-    m_pieceTypeBitboard[static_cast<int>(move.promotion)] ^= to_bitboard;
-    m_colourBitboard[colour_to_move] ^= to_bitboard;
+    m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= toBitboard;
+    m_colourBitboard[colourToMove] ^= toBitboard;
+    m_pieceTypeBitboard[static_cast<int>(move.promotion)] ^= toBitboard;
+    m_colourBitboard[colourToMove] ^= toBitboard;
   }
 
-  if (undo)
-  {
-    m_previousCapturedPiece = PieceType::NULL_PIECE;
-  }
-
+  return MoveResult::SUCCESS;
 }
 
 template<PieceColour C>
-void Board::processEp(const piece::Move &move)
+Board::MoveResult Board::processEp(const Move &move)
 {
-  Bitboard to_bitboard = bitboard::toBitboard(move.to);
-  Bitboard from_bitboard = bitboard::toBitboard(move.from);
-  Bitboard from_to_bitboard = to_bitboard ^ from_bitboard;
-  m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= from_to_bitboard;
-  m_colourBitboard[static_cast<int>(C)] ^= from_to_bitboard;
+  const Bitboard toBitboard = bitboard::createBitboard(move.to);
+  const Bitboard fromBitboard = bitboard::createBitboard(move.from);
+  const Bitboard fromToBitboard = toBitboard ^ fromBitboard;
+  m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= fromToBitboard;
+  m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;
 
   // get the ep target square from move.to square.
   // This is better than using the Boards m_epSquare because
   // it will give the same result when the move is undo'd.
-  Bitboard capture_square = piece::pawnSinglePushSource<C>(to_bitboard);
-  m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= capture_square;
-  m_colourBitboard[static_cast<int>(OppositeColour<C>::value)] ^= capture_square;
+  Bitboard captureSquare = pawns::pawnSinglePushSource<C>(toBitboard);
+  m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= captureSquare;
+  m_colourBitboard[static_cast<int>(OppositeColour<C>::value)] ^= captureSquare;
 
+  // TODO (haigh) Can this fail?
+  return MoveResult::SUCCESS;
 }
 
 template<PieceType T, PieceColour C>
-void Board::processCastle(const piece::Move &move)
+Board::MoveResult Board::processCastle(const Move &move)
 {
-
-  if (m_currentState.can_castle<T>())
+  if (m_state->can_castle<T>())
   {
     // Move the king
-    Bitboard from_to_bitboard = getPosition(C, PieceType::KING) ^ KingCastleTarget<T, C>::value;
-    m_pieceTypeBitboard[static_cast<int>(PieceType::KING)] ^= from_to_bitboard;
-    m_colourBitboard[static_cast<int>(C)] ^= from_to_bitboard;
+    Bitboard fromToBitboard = getPosition(C, PieceType::KING) ^ KingCastleTarget<T, C>::value;
+    m_pieceTypeBitboard[static_cast<int>(PieceType::KING)] ^= fromToBitboard;
+    m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;
 
     // Move the rook
-    from_to_bitboard = RookCastleSource<T, C>::value ^ RookCastleTarget<T, C>::value;
-    m_pieceTypeBitboard[static_cast<int>(PieceType::ROOK)] ^= from_to_bitboard;
-    m_colourBitboard[static_cast<int>(C)] ^= from_to_bitboard;
+    fromToBitboard = RookCastleSource<T, C>::value ^ RookCastleTarget<T, C>::value;
+    m_pieceTypeBitboard[static_cast<int>(PieceType::ROOK)] ^= fromToBitboard;
+    m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;
+  }
+
+  // TODO (haigh) Can this fail?
+  return MoveResult::SUCCESS;
+}
+
+template<PieceType T>
+int Board::generatePieceMoves(Move *moveList,
+                              PieceColour colour)
+{
+  int moveCounter{ 0 };
+
+  Bitboard piecePositions = getPosition(colour, T);
+
+  while (piecePositions)
+  {
+    Square from = bitboard::popLS1B(piecePositions);
+    Bitboard atk_bb = (T == PieceType::KNIGHT) ? piece::KnightMap::attacks(from) :
+      (T == PieceType::BISHOP) ? attackmap::BishopMap::attacks(from, ~emptySquares()) :
+      (T == PieceType::ROOK) ? attackmap::RookMap::attacks(from, ~emptySquares()) :
+      (T == PieceType::QUEEN) ? attackmap::QueenMap::attacks(from, ~emptySquares()) :
+      (T == PieceType::KING) ? piece::KingMap::attacks(from) : Bitboard{0};
+
+    Bitboard quiet = atk_bb & emptySquares();
+    while (quiet)
+    {
+      *moveList++ = move::makeQuiet(from, bitboard::popLS1B(quiet));
+      ++moveCounter;
+    }
+
+    Bitboard capture = atk_bb & get_position(piece::otherColour(colour));
+    while (capture)
+    {
+      Square captureSquare = bitboard::popLS1B(capture);
+      PieceType capturePiece = getPieceTypeOn(captureSquare);
+
+      *moveList = move::makeCapture(from, captureSquare);
+      moveList->capturePiece = capturePiece;
+      ++moveList;
+      ++moveCounter;
+    }
+  }
+
+  return moveCounter;
+}
+
+template<PieceColour Colour, bool Promotions>
+void Board::generatePawnSinglePushes(Move *moveList,
+                                     int &moveCounter,
+                                     Bitboard pawnPositions,
+                                     Bitboard emptySquares)
+{
+  pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
+  Bitboard sources = pawns::pawnSinglePushSource<Colour>(emptySquares) & pawnPositions;
+  Bitboard targets = pawns::pawnSinglePushTarget<Colour>(sources);
+
+  while (sources && not Promotions)
+  {
+    *moveList++ = move::makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    moveCounter++;
+  }
+
+  while (sources && Promotions)
+  {
+    const Square from = bitboard::popLS1B(sources);
+    const Square to = bitboard::popLS1B(targets);
+    *moveList++ = move::makeQuietPromotion(from, to, PieceType::KNIGHT);
+    *moveList++ = move::makeQuietPromotion(from, to, PieceType::BISHOP);
+    *moveList++ = move::makeQuietPromotion(from, to, PieceType::ROOK);
+    *moveList++ = move::makeQuietPromotion(from, to, PieceType::QUEEN);
+    moveCounter += 4;
   }
 }
+
+template<PieceColour Colour, bool Promotions>
+void Board::generatePawnDoublePushes(Move *moveList,
+                                     int &moveCounter,
+                                     Bitboard pawnPositions,
+                                     Bitboard emptySquares)
+{
+  Bitboard targets = pawns::pawnDoublePushTarget<Colour>() & emptySquares;
+  Bitboard sources = pawns::pawnSinglePushSource<Colour>(targets) & emptySquares;
+  sources = pawns::pawnSinglePushSource<Colour>(sources) & pawnPositions;
+  while (sources)
+  {
+    *moveList++ = move::makeDoublePush(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    moveCounter++;
+  }
+}
+
+template<PieceColour Colour, bool Promotions>
+void Board::generatePawnWestCaptures(Move *moveList,
+                                     int &moveCounter,
+                                     Bitboard pawnPositions)
+{
+  Bitboard opponentPieces = get_position(OppositeColour<Colour>::value);
+  pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
+  Bitboard sources = pawns::pawnWestAttackSource<Colour>(opponentPieces) & pawnPositions;
+  Bitboard targets = pawns::pawnWestAttackTarget<Colour>(sources);
+
+  while (sources && not Promotions)
+  {
+    Square targetSquare = bitboard::popLS1B(targets);
+    *moveList = move::makeCapture(bitboard::popLS1B(sources), targetSquare);
+    moveList->capturePiece = getPieceTypeOn(targetSquare);
+    ++moveList;
+    ++moveCounter;
+  }
+
+  while (sources && Promotions)
+  {
+    Square from = bitboard::popLS1B(sources);
+    Square to = bitboard::popLS1B(targets);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::KNIGHT);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::BISHOP);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::ROOK);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::QUEEN);
+    moveCounter += 4;
+  }
+}
+
+template<PieceColour Colour, bool Promotions>
+void Board::generatePawnEastCaptures(Move *moveList,
+                                     int &moveCounter,
+                                     Bitboard pawnPositions)
+{
+  Bitboard opponentPieces = get_position(OppositeColour<Colour>::value);
+  pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
+  Bitboard sources = pawns::pawnEastAttackSource<Colour>(opponentPieces) & pawnPositions;
+  Bitboard targets = pawns::pawnEastAttackTarget<Colour>(sources);
+  while (sources && !Promotions)
+  {
+    Square targetSquare = bitboard::popLS1B(targets);
+    *moveList = move::makeCapture(bitboard::popLS1B(sources), targetSquare);
+    moveList->capturePiece = getPieceTypeOn(targetSquare);
+    ++moveList;
+    ++moveCounter;
+  }
+
+  while (sources && Promotions)
+  {
+    Square from = bitboard::popLS1B(sources);
+    Square to = bitboard::popLS1B(targets);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::KNIGHT);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::BISHOP);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::ROOK);
+    *moveList++ = move::makeCapturePromotion(from, to, PieceType::QUEEN);
+    moveCounter += 4;
+  }
+}
+
+template<PieceColour Colour>
+void Board::generatePawnMoves(Move *moveList,
+                              int &moveCounter,
+                              Bitboard pawnPositions,
+                              Bitboard emptySquares)
+{
+  /* NOT PROMOTIONS             */
+  /* ----------------------------- */
+  generatePawnSinglePushes<Colour, false>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
+  generatePawnDoublePushes<Colour, false>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
+  generatePawnWestCaptures<Colour, false>(&moveList[moveCounter], moveCounter, pawnPositions);
+  generatePawnEastCaptures<Colour, false>(&moveList[moveCounter], moveCounter, pawnPositions);
+
+  /* PROMOTIONS                    */
+  /* ----------------------------- */
+  generatePawnSinglePushes<Colour, true>(&moveList[moveCounter], moveCounter, pawnPositions, emptySquares);
+  generatePawnWestCaptures<Colour, true>(&moveList[moveCounter], moveCounter, pawnPositions);
+  generatePawnEastCaptures<Colour, true>(&moveList[moveCounter], moveCounter, pawnPositions);
+};
 
 } // namespace yak
 

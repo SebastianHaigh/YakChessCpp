@@ -1,14 +1,14 @@
 #ifndef YAK_ATTACK_MAPS_H_
 #define YAK_ATTACK_MAPS_H_
 
+#include <bitboard.h>
+#include <types.h>
+
+#include <algorithm>
 #include <stdint.h>
-#include "bitboard.h"
-#include <stack>
 #include <array>
 
-namespace yak {
-
-namespace attackmap {
+namespace yak::attackmap {
 
 /* ------------------------------------------------------------------ */
 /* GENERATE STATIC TABLE FOR RAY MAP LOOKUP                           */
@@ -60,7 +60,7 @@ template<> struct isPositiveRay<Direction::SOUTH_EAST> : std::false_type {};
 template<> struct isPositiveRay<Direction::SOUTH_WEST> : std::false_type {};
 
 template<Direction D>
-Bitboard blocked_ray(Square square, Bitboard occupied)
+constexpr Bitboard blockedRay(Square square, Bitboard occupied)
 {
   constexpr std::array<Bitboard, 64> thisDirectionRayMap = rayMap<D>::value;
 
@@ -71,12 +71,9 @@ Bitboard blocked_ray(Square square, Bitboard occupied)
     return thisDirectionRayMap[square];
   }
 
-  Square blockerSquare{ 0};
-
-  if (isPositiveRay<D>::value)
-    blockerSquare = bitboard::LS1B(piecesInRay);
-  else
-    blockerSquare = bitboard::MS1B(piecesInRay);
+  const Square blockerSquare = (isPositiveRay<D>::value)
+                               ? bitboard::LS1B(piecesInRay)
+                               : bitboard::MS1B(piecesInRay);
 
   return thisDirectionRayMap[square] ^ thisDirectionRayMap[blockerSquare];
 }
@@ -111,45 +108,6 @@ public:
   static Bitboard attacks(Square square, Bitboard occupiedSquares);
 };
 
-/**
- * \brief Attack map for a knight on a given square.
- * \tparam S - The square the the knight is on.
- */
-template<Square S>
-struct knight_map
-{
-  static constexpr Bitboard
-    value = bitboard::shift<Direction::NORTH>(bitboard::shift<Direction::NORTH_EAST>(bitboard::static_bitboard<S>::value))
-    | bitboard::shift<Direction::NORTH>(bitboard::shift<Direction::NORTH_WEST>(bitboard::static_bitboard<S>::value))
-    | bitboard::shift<Direction::EAST>(bitboard::shift<Direction::NORTH_EAST>(bitboard::static_bitboard<S>::value))
-    | bitboard::shift<Direction::EAST>(bitboard::shift<Direction::SOUTH_EAST>(bitboard::static_bitboard<S>::value))
-    | bitboard::shift<Direction::SOUTH>(bitboard::shift<Direction::SOUTH_EAST>(bitboard::static_bitboard<S>::value))
-    | bitboard::shift<Direction::SOUTH>(bitboard::shift<Direction::SOUTH_WEST>(bitboard::static_bitboard<S>::value))
-    | bitboard::shift<Direction::WEST>(bitboard::shift<Direction::SOUTH_WEST>(bitboard::static_bitboard<S>::value))
-    | bitboard::shift<Direction::WEST>(bitboard::shift<Direction::NORTH_WEST>(bitboard::static_bitboard<S>::value));
-};
-
-/**
- * \brief Attack map for a king on a given square.
- * \tparam S - The square the the king is on.
- */
-template<Square S>
-struct king_map
-{
-  static constexpr Bitboard value = bitboard::shift<Direction::NORTH>(bitboard::static_bitboard<S>::value)
-    | bitboard::shift<Direction::EAST>(bitboard::static_bitboard<S>::value)
-    | bitboard::shift<Direction::SOUTH>(bitboard::static_bitboard<S>::value)
-    | bitboard::shift<Direction::WEST>(bitboard::static_bitboard<S>::value)
-    | bitboard::shift<Direction::NORTH_EAST>(bitboard::static_bitboard<S>::value)
-    | bitboard::shift<Direction::NORTH_WEST>(bitboard::static_bitboard<S>::value)
-    | bitboard::shift<Direction::SOUTH_EAST>(bitboard::static_bitboard<S>::value)
-    | bitboard::shift<Direction::SOUTH_WEST>(bitboard::static_bitboard<S>::value);
-};
-
-} // namespace attackmap
-
-} // namespace yak
-
-
+} // namespace yak::attackmap
 
 #endif // YAK_ATTACK_MAPS_H_
