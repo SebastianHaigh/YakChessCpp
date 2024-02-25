@@ -116,9 +116,9 @@ std::vector<Move> Board::generateMoves()
                                           emptySquares());
 
     move::generateEpCaptures<PieceColour::WHITE>(&enPassantMove,
-                                           moveCounter,
-                                           getPosition(thisSide, PieceType::PAWN),
-                                           m_state->epTarget());
+                                                 moveCounter,
+                                                 getPosition(thisSide, PieceType::PAWN),
+                                                 m_state->epTarget());
   }
   else
   {
@@ -128,9 +128,9 @@ std::vector<Move> Board::generateMoves()
                                           emptySquares());
 
     move::generateEpCaptures<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
-                                           moveCounter,
-                                           getPosition(thisSide, PieceType::PAWN),
-                                           m_state->epTarget());
+                                                 moveCounter,
+                                                 getPosition(thisSide, PieceType::PAWN),
+                                                 m_state->epTarget());
   }
 
   moveCounter += generatePieceMoves<PieceType::KNIGHT>(&psuedoLegalMoveList[moveCounter],
