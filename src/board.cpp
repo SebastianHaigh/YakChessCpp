@@ -349,62 +349,17 @@ Bitboard Board::pawnAttacks(PieceColour colour)
                                         : pawns::pawnAttacks<PieceColour::WHITE>(pawnsBitboard);
 }
 
-Bitboard Board::pieceAttacks(PieceType pieceType, PieceColour pieceColour)
-{
-  switch (pieceType)
-  {
-    case PieceType::KNIGHT:
-    {
-      return piece::pieceAttacks<PieceType::KNIGHT>(getPosition(pieceColour, pieceType),
-                                                        occupiedSquares());
-    }
-
-    case PieceType::BISHOP:
-    {
-      return piece::pieceAttacks<PieceType::BISHOP>(getPosition(pieceColour, pieceType),
-                                                        occupiedSquares());
-    }
-
-    case PieceType::ROOK:
-    {
-      return piece::pieceAttacks<PieceType::ROOK>(getPosition(pieceColour, pieceType),
-                                                      occupiedSquares());
-    }
-
-    case PieceType::QUEEN:
-    {
-      return piece::pieceAttacks<PieceType::QUEEN>(getPosition(pieceColour, pieceType),
-                                                       occupiedSquares());
-    }
-
-    case PieceType::KING:
-    {
-      return piece::pieceAttacks<PieceType::KING>(getPosition(pieceColour, pieceType),
-                                                      occupiedSquares());
-    }
-
-    case PieceType::PAWN:
-    case PieceType::NULL_PIECE:
-    default:
-    {
-      break;
-    }
-  }
-  // If the wrong piece has been provided then we return 0, i.e., this piece attacks no squares.
-  return Bitboard{0};
-}
-
 Bitboard Board::allAttacks(PieceColour colour)
 {
-  Bitboard attacked_squares{0};
-  Bitboard friendly_pieces = get_position(colour);
-  attacked_squares |= (pawnAttacks(colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::KNIGHT, colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::BISHOP, colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::ROOK, colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::QUEEN, colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::KING, colour) & ~friendly_pieces);
-  return attacked_squares;
+  Bitboard attacked_bb{0};
+  Bitboard friendly_bb = get_position(colour);
+  attacked_bb |= (pawnAttacks(colour) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::KNIGHT>(getPosition(colour, PieceType::KNIGHT), occupiedSquares()) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::BISHOP>(getPosition(colour, PieceType::BISHOP), occupiedSquares()) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::ROOK>(getPosition(colour, PieceType::ROOK), occupiedSquares()) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::QUEEN>(getPosition(colour, PieceType::QUEEN), occupiedSquares()) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::KING>(getPosition(colour, PieceType::KING), occupiedSquares()) & ~friendly_bb);
+  return attacked_bb;
 }
 
 } // namespace yak

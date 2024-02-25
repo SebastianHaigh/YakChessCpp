@@ -201,14 +201,6 @@ private:
   Bitboard pawnAttacks(PieceColour colour);
 
   /*!
-   * \brief Returns all of the squares attacked by a particular type of piece.
-   * \param[in] pieceType - The type of piece.
-   * \param[in] pieceColour - The colour of the piece.
-   * \return A bitboard of all the attacked squares.
-   */
-  Bitboard pieceAttacks(PieceType pieceType, PieceColour pieceColour);
-
-  /*!
    * \brief Returns all of the squares attacked by a single m_side.
    * \param[in] colour - The colour of the m_side.
    * \return A bitboard of all the attacked squares.
