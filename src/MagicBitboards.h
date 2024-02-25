@@ -193,6 +193,7 @@ struct MagicReturn
   std::array<Bitboard, numPermutations> m_map;
   Bitboard m_magic;
   Bitboard m_mask;
+  int m_numBits;
 };
 
 template<PieceType Type>
@@ -248,7 +249,7 @@ constexpr auto findMagic(Square square) -> std::optional<MagicReturn>
 
     if (not failure)
     {
-      return MagicReturn{ used, potentialMagic, mask };
+      return MagicReturn{ used, potentialMagic, mask, numBits };
     }
   }
 

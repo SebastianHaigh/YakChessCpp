@@ -25,11 +25,11 @@ public:
   {
     if (square > H8) [[unlikely]] return 0;
 
-    auto const& magic = m_magics[square];
+    auto const& magic = m_magics[static_cast<int>(square)];
 
     return magic.m_map[magic::transform(occupied & magic.m_mask,
                                         magic.m_magic,
-                                        bitboard::countSetBits(occupied & magic.m_mask))];
+                                        magic.m_numBits)];
   }
 private:
   std::array<magic::MagicReturn, 64> m_magics;
