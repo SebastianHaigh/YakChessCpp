@@ -1,18 +1,17 @@
 #include "Perft.h"
-#include "bitboard.h"
-#include "board.h"
+
+#include <board.h>
+#include <types.h>
+
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace yak {
 
-PerftResult perft(int depth)
+PerftResult perft(Board& board, int depth)
 {
   PerftResult result{};
-
-  const std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
-  Board board{startingFen};
 
   return perftHelper(board, depth);
 }

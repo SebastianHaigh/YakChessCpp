@@ -163,15 +163,6 @@ public:
                          PieceColour colour);
 
 private:
-  Bitboard m_pieceTypeBitboard[6] = { 0, 0, 0, 0, 0, 0 };
-  Bitboard m_colourBitboard[2] { 0, 0 };
-
-  GameStateManager m_state;
-
-  attackmap::RookMap m_rookAtks;      /* \brief Attack map for Rooks */
-  attackmap::BishopMap m_bishopAtks;    /* \brief Attack map for Bishops */
-  attackmap::QueenMap m_queenAtks;    /* \brief Attack map for Queens */
-
   /*!
    * \brief Executes a move on the underlying board representation.
    * \tparam C - Colour of the m_side on which to execute the move.
@@ -239,6 +230,18 @@ private:
   void parseFen(std::string_view fen);
   std::string rankToFen(Rank rank);
   std::string rankToBoardFen(Rank rank);
+
+  Bitboard m_pieceTypeBitboard[6] = { 0, 0, 0, 0, 0, 0 };
+  Bitboard m_colourBitboard[2] { 0, 0 };
+
+  GameStateManager m_state;
+
+  attackmap::RookMap m_rookAtks;      /* \brief Attack map for Rooks */
+  attackmap::BishopMap m_bishopAtks;    /* \brief Attack map for Bishops */
+  attackmap::QueenMap m_queenAtks;    /* \brief Attack map for Queens */
+
+  piece::SlidingPieceMap<PieceType::ROOK> m_rookMap;
+  piece::SlidingPieceMap<PieceType::BISHOP> m_bishopMap;
 };
 
 template<PieceColour C>
@@ -352,10 +355,16 @@ int Board::generatePieceMoves(Move *moveList,
   while (piecePositions)
   {
     Square from = bitboard::popLS1B(piecePositions);
+    /* Bitboard atk_bb = (T == PieceType::KNIGHT) ? piece::KnightMap::attacks(from) : */
+    /*   (T == PieceType::BISHOP) ? attackmap::BishopMap::attacks(from, ~emptySquares()) : */
+    /*   (T == PieceType::ROOK) ? attackmap::RookMap::attacks(from, ~emptySquares()) : */
+    /*   (T == PieceType::QUEEN) ? attackmap::QueenMap::attacks(from, ~emptySquares()) : */
+    /*   (T == PieceType::KING) ? piece::KingMap::attacks(from) : Bitboard{0}; */
+
     Bitboard atk_bb = (T == PieceType::KNIGHT) ? piece::KnightMap::attacks(from) :
-      (T == PieceType::BISHOP) ? attackmap::BishopMap::attacks(from, ~emptySquares()) :
-      (T == PieceType::ROOK) ? attackmap::RookMap::attacks(from, ~emptySquares()) :
-      (T == PieceType::QUEEN) ? attackmap::QueenMap::attacks(from, ~emptySquares()) :
+      (T == PieceType::BISHOP) ? m_bishopMap.attacks(from, ~emptySquares()) :
+      (T == PieceType::ROOK) ? m_rookMap.attacks(from, ~emptySquares()) :
+      (T == PieceType::QUEEN) ? (m_bishopMap.attacks(from, ~emptySquares()) | m_rookMap.attacks(from, ~emptySquares())) :
       (T == PieceType::KING) ? piece::KingMap::attacks(from) : Bitboard{0};
 
     Bitboard quiet = atk_bb & emptySquares();

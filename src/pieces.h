@@ -10,6 +10,7 @@
 #include <string>
 
 #define MAGIC
+
 namespace yak::piece {
 
 template<PieceType Type>
@@ -39,10 +40,12 @@ template<PieceType Type>
 class SlidingPieceMap
 {
 public:
-  /* auto attacks(Square square, Bitboard occupied) -> Bitboard */
-  /* { */
-  /*   /1* m_impl.attacks(square, occupied); *1/ */
-  /* } */
+  SlidingPieceMap() = default;
+
+  auto attacks(Square square, Bitboard occupied) -> Bitboard
+  {
+    return m_impl.attacks(square, occupied);
+  }
 
 private:
 
@@ -51,8 +54,6 @@ private:
 #else
 #endif
 };
-
-
 
 /**
  * \brief Attack map for a knight on a given square.
@@ -146,29 +147,51 @@ public:
 
 static SlidingPieceMap<PieceType::BISHOP> bishopMap{};
 static SlidingPieceMap<PieceType::ROOK> rookMap{};
+
 /**
  * \brief Get all of the squares attacked by a piece type.
  * \tparam TYPE - The piece type.
  * \param[in] piecePositions - Bitboard of the piece positions.
  * \return Bitboard of the squares attacked by the piece type.
  */
-template<PieceType TYPE>
+template<PieceType Type>
 Bitboard pieceAttacks(Bitboard piecePositions, Bitboard occupiedSquares)
 {
-  Bitboard atk_bb{0};
+  // TODO (haigh) move this function to board
+  Bitboard atk_bb{ 0 };
+
   while (piecePositions)
   {
-    if (TYPE == PieceType::KNIGHT)
+    if constexpr (Type == PieceType::KNIGHT)
+    {
       atk_bb |= KnightMap::attacks(bitboard::popLS1B(piecePositions));
-    if (TYPE == PieceType::KING)
+    }
+
+    else if constexpr (Type == PieceType::KING)
+    {
       atk_bb |= KingMap::attacks(bitboard::popLS1B(piecePositions));
-    if (TYPE == PieceType::BISHOP)
-      atk_bb |= attackmap::BishopMap::attacks(bitboard::popLS1B(piecePositions), occupiedSquares);
-    if (TYPE == PieceType::ROOK)
-      atk_bb |= attackmap::RookMap::attacks(bitboard::popLS1B(piecePositions), occupiedSquares);
-    if (TYPE == PieceType::QUEEN)
-      atk_bb |= attackmap::QueenMap::attacks(bitboard::popLS1B(piecePositions), occupiedSquares);
+    }
+
+    else if constexpr (Type == PieceType::BISHOP)
+    {
+      atk_bb |= bishopMap.attacks(bitboard::popLS1B(piecePositions), occupiedSquares);
+    }
+
+    else if constexpr (Type == PieceType::ROOK)
+    {
+      atk_bb |= rookMap.attacks(bitboard::popLS1B(piecePositions), occupiedSquares);
+    }
+
+    else if constexpr (Type == PieceType::QUEEN)
+    {
+      Square square{ bitboard::popLS1B(piecePositions) };
+      atk_bb |= bishopMap.attacks(square, occupiedSquares);
+      atk_bb |= rookMap.attacks(square, occupiedSquares);
+    }
+
+    // TODO (haigh) add failure else case
   }
+
   return atk_bb;
 }
 template<PieceType Type>
