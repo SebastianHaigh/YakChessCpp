@@ -242,6 +242,9 @@ private:
 
   piece::SlidingPieceMap<PieceType::ROOK> m_rookMap;
   piece::SlidingPieceMap<PieceType::BISHOP> m_bishopMap;
+
+  Move m_psuedoLegalMoveListBuffer[sizeof(Move) * 330];
+  int m_psudeoLegalMovePointer{ 0 };
 };
 
 template<PieceColour C>

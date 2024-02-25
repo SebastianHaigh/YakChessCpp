@@ -1,11 +1,11 @@
 #include "board.h"
 
 #include <ctype.h>
-#include <algorithm>
 
-#include "move.h"
-#include "pieces.h"
-#include "generation.h"
+#include <bitboard.h>
+#include <move.h>
+#include <pieces.h>
+#include <generation.h>
 
 namespace yak {
 
@@ -101,61 +101,61 @@ Bitboard Board::emptySquares()
 
 std::vector<Move> Board::generateMoves()
 {
-  Move psuedoLegalMoveList[330];
+  m_psudeoLegalMovePointer = 0;
   Move enPassantMove;
-  int moveCounter{0};
 
   const PieceColour thisSide = m_state->sideToMove();
   const PieceColour otherSide = m_state->sideNotToMove();
 
   if (thisSide == PieceColour::WHITE)
   {
-    generatePawnMoves<PieceColour::WHITE>(&psuedoLegalMoveList[moveCounter],
-                                          moveCounter,
+    generatePawnMoves<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                          m_psudeoLegalMovePointer,
                                           getPosition(thisSide, PieceType::PAWN),
                                           emptySquares());
 
-    move::generateEpCaptures<PieceColour::WHITE>(&enPassantMove,
-                                                 moveCounter,
+    move::generateEpCaptures<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                 m_psudeoLegalMovePointer,
                                                  getPosition(thisSide, PieceType::PAWN),
                                                  m_state->epTarget());
   }
   else
   {
-    generatePawnMoves<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
-                                          moveCounter,
+    generatePawnMoves<PieceColour::BLACK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                          m_psudeoLegalMovePointer,
                                           getPosition(thisSide, PieceType::PAWN),
                                           emptySquares());
 
-    move::generateEpCaptures<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
-                                                 moveCounter,
+    move::generateEpCaptures<PieceColour::BLACK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                 m_psudeoLegalMovePointer,
                                                  getPosition(thisSide, PieceType::PAWN),
                                                  m_state->epTarget());
   }
 
-  moveCounter += generatePieceMoves<PieceType::KNIGHT>(&psuedoLegalMoveList[moveCounter],
-                                                       thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::KNIGHT>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                    thisSide);
 
-  moveCounter += generatePieceMoves<PieceType::KING>(&psuedoLegalMoveList[moveCounter],
-                                                     thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::KING>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                  thisSide);
 
-  moveCounter += generatePieceMoves<PieceType::BISHOP>(&psuedoLegalMoveList[moveCounter],
-                                                       thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::BISHOP>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                    thisSide);
 
-  moveCounter += generatePieceMoves<PieceType::ROOK>(&psuedoLegalMoveList[moveCounter],
-                                                     thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::ROOK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                  thisSide);
 
-  moveCounter += generatePieceMoves<PieceType::QUEEN>(&psuedoLegalMoveList[moveCounter],
-                                                      thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::QUEEN>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                   thisSide);
 
   std::vector<Move> legal_moves;
-  for (int i = 0; i < moveCounter; i++)
+  legal_moves.reserve(m_psudeoLegalMovePointer);
+  for (int i = 0; i < m_psudeoLegalMovePointer; i++)
   {
-    makeMove(psuedoLegalMoveList[i]);
+    makeMove(m_psuedoLegalMoveListBuffer[i]);
     // TODO (haigh) not safe, check for null here
     if (!isCheck(m_state->getPrevState()->sideToMove()))
     {
-      legal_moves.push_back(psuedoLegalMoveList[i]);
+      legal_moves.push_back(m_psuedoLegalMoveListBuffer[i]);
     }
     undoMove();
   }

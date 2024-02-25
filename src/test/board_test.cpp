@@ -10,6 +10,7 @@
 #include <stddef.h>
 #include <string_view>
 #include <vector>
+
 namespace yak {
 
 static constexpr std::string_view STANDARD_STARTING_FEN{ "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" };
