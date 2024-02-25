@@ -5,31 +5,6 @@
 
 namespace yak::bitboard {
 
-auto popLS1B(Bitboard& board) -> Square
-{
-  Square idx = LS1B(board);
-  board &= board - 1;
-  return idx;
-}
-
-auto popMS1B(Bitboard& board) -> Square
-{
-  Square idx = MS1B(board);
-  board &= ~(Bitboard{1} << idx);
-  return idx;
-}
-
-void setSquare(Bitboard& board, Square const& square)
-{
-  Bitboard pieceToSet{1};
-  board |= pieceToSet << square;
-}
-
-void setSquare(Bitboard& board, const Rank& rank, const File& file)
-{
-  setSquare(board, squareIndex(file, rank));
-}
-
 std::vector<Square> scanBackward(Bitboard board)
 {
   std::vector<Square> serialisedBoard;
@@ -51,21 +26,6 @@ std::vector<Square> scanForward(Bitboard board)
   }
   return serialisedBoard;
 }
-
-/* Bitboard toBitboard(const Square& square) */
-/* { */
-/*   return Bitboard(1) << square; */
-/* } */
-
-/* Bitboard toBitboard(const File& file, const Rank& rank) */
-/* { */
-/*   return toBitboard(squareIndex(file, rank)); */
-/* }; */
-
-/* Bitboard toBitboard(std::string_view square) */
-/* { */
-/*   return Bitboard(1) << squareIndex(square); */
-/* } */
 
 void print_board(Bitboard board)
 {
