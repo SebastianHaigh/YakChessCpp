@@ -14,8 +14,8 @@ namespace yak::move {
 inline Move makeQuiet(Square from, Square to)
 {
   Move move;
-  move.from = from;
-  move.to = to;
+  setFrom(move, from);
+  setTo(move, to);
   return move;
 }
 
@@ -31,8 +31,8 @@ inline Move makeQuiet(Square from, Square to)
 inline Move makeDoublePush(Square from, Square to)
 {
   Move move;
-  move.from = from;
-  move.to = to;
+  setFrom(move, from);
+  setTo(move, to);
   move.doublePush = true;
   return move;
 }
@@ -46,8 +46,8 @@ inline Move makeDoublePush(Square from, Square to)
 inline Move makeCapture(Square from, Square to)
 {
   Move move;
-  move.from = from;
-  move.to = to;
+  setFrom(move, from);
+  setTo(move, to);
   move.capture = true;
   return move;
 };
@@ -61,8 +61,8 @@ inline Move makeCapture(Square from, Square to)
 inline Move makeEpCapture(Square from, Square to)
 {
   Move move;
-  move.from = from;
-  move.to = to;
+  setFrom(move, from);
+  setTo(move, to);
   move.capture = true;
   move.enPassant = true;
   return move;
@@ -78,8 +78,8 @@ inline Move makeEpCapture(Square from, Square to)
 inline Move makeQuietPromotion(Square from, Square to, PieceType type)
 {
   Move move;
-  move.from = from;
-  move.to = to;
+  setFrom(move, from);
+  setTo(move, to);
   move.promotion = type;
   return move;
 };
@@ -94,8 +94,8 @@ inline Move makeQuietPromotion(Square from, Square to, PieceType type)
 inline Move makeCapturePromotion(Square from, Square to, PieceType type)
 {
   Move move;
-  move.from = from;
-  move.to = to;
+  setFrom(move, from);
+  setTo(move, to);
   move.capture = true;
   move.promotion = type;
   return move;

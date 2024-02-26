@@ -205,10 +205,13 @@ GameState* GameState::update(const Move &move)
   bool isWhiteCastle = isCastle && m_side;
   bool isBlackCastle = isCastle && not m_side;
 
-  bool removesWhiteK = ((move.from == WHITE_KING_SQUARE) || (move.from == WHITE_KINGS_ROOK) || (move.to == WHITE_KINGS_ROOK));
-  bool removesWhiteQ = ((move.from == WHITE_KING_SQUARE) || (move.from == WHITE_QUEENS_ROOK) || (move.to == WHITE_QUEENS_ROOK));
-  bool removesBlackK = ((move.from == BLACK_KING_SQUARE) || (move.from == BLACK_KINGS_ROOK) || (move.to == BLACK_KINGS_ROOK));
-  bool removesBlackQ = ((move.from == BLACK_KING_SQUARE) || (move.from == BLACK_QUEENS_ROOK) || (move.to == BLACK_QUEENS_ROOK));
+  Square fromSquare = from(move);
+  Square toSquare = to(move);
+
+  bool removesWhiteK = ((fromSquare == WHITE_KING_SQUARE) || (fromSquare == WHITE_KINGS_ROOK) || (toSquare == WHITE_KINGS_ROOK));
+  bool removesWhiteQ = ((fromSquare == WHITE_KING_SQUARE) || (fromSquare == WHITE_QUEENS_ROOK) || (toSquare == WHITE_QUEENS_ROOK));
+  bool removesBlackK = ((fromSquare == BLACK_KING_SQUARE) || (fromSquare == BLACK_KINGS_ROOK) || (toSquare == BLACK_KINGS_ROOK));
+  bool removesBlackQ = ((fromSquare == BLACK_KING_SQUARE) || (fromSquare == BLACK_QUEENS_ROOK) || (toSquare == BLACK_QUEENS_ROOK));
 
   newState->m_castlingRights[0] = not isBlackCastle && not removesBlackK && m_castlingRights[0];
   newState->m_castlingRights[1] = not isBlackCastle && not removesBlackQ && m_castlingRights[1];
@@ -216,7 +219,7 @@ GameState* GameState::update(const Move &move)
   newState->m_castlingRights[3] = not isWhiteCastle && not removesWhiteQ && m_castlingRights[3];
 
   // Update the ep square
-  int possibleTargets[4] = {NULL_SQUARE, move.to + 8, NULL_SQUARE, move.to - 8};
+  int possibleTargets[4] = {NULL_SQUARE, toSquare + 8, NULL_SQUARE, toSquare - 8};
 
   // To find the ep target square we need to find the square behind the pawn that just moved.
   // If the side that is currently moving is black (m_side = false) then we need to add 8 to the "to" square

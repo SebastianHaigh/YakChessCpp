@@ -367,8 +367,8 @@ TEST_CASE("KnightTests: KnightOnA1AttacksTheCorrectSquares") {
 
   // Assert
   CHECK(moveCounter == 2);
-  CHECK(moveList[0].to == C2);
-  CHECK(moveList[1].to == B3);
+  CHECK(to(moveList[0]) == C2);
+  CHECK(to(moveList[1]) == B3);
 }
 
 TEST_CASE("KnightTests: KnightOnD4AttacksTheCorrectSquares")
@@ -388,14 +388,14 @@ TEST_CASE("KnightTests: KnightOnD4AttacksTheCorrectSquares")
 
   // Assert
   CHECK(moveCounter == 8);
-  CHECK(moveList[0].to == C2);
-  CHECK(moveList[1].to == E2);
-  CHECK(moveList[2].to == B3);
-  CHECK(moveList[3].to == F3);
-  CHECK(moveList[4].to == B5);
-  CHECK(moveList[5].to == F5);
-  CHECK(moveList[6].to == C6);
-  CHECK(moveList[7].to == E6);
+  CHECK(to(moveList[0]) == C2);
+  CHECK(to(moveList[1]) == E2);
+  CHECK(to(moveList[2]) == B3);
+  CHECK(to(moveList[3]) == F3);
+  CHECK(to(moveList[4]) == B5);
+  CHECK(to(moveList[5]) == F5);
+  CHECK(to(moveList[6]) == C6);
+  CHECK(to(moveList[7]) == E6);
 }
 
 TEST_CASE("KingTests: KingOnA1AttacksTheCorrectSquares")
@@ -430,7 +430,7 @@ TEST_CASE("KingTests: KingOnA1AttacksTheCorrectSquares")
   moveCounter = 0;
   for (auto const& expectedMoveToSquare : expectedMoves)
   {
-    CHECK(moveList[moveCounter].to == expectedMoveToSquare);
+    CHECK(to(moveList[moveCounter]) == expectedMoveToSquare);
     ++moveCounter;
   }
 }

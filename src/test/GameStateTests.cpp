@@ -44,67 +44,67 @@ TEST_CASE("Castling rights")
   Move move;
 
   // give the to and from squares non-zero default values, so they don't clash with whites queenside rook
-  move.from = A2;
-  move.to = A2;
+  setFrom(move, A2);
+  setTo(move, A2);
 
   SECTION("Move from black queen side rook square")
   {
-    move.from = A8;
+    setFrom(move, A8);
     blackQueenSide = false;
   }
 
   SECTION("Move to black queen side rook square")
   {
-    move.to = A8;
+    setTo(move, A8);
     blackQueenSide = false;
   }
 
   SECTION("Move from black king side rook square")
   {
-    move.from = H8;
+    setFrom(move, H8);
     blackKingSide = false;
   }
 
   SECTION("Move to black king side rook square")
   {
-    move.to = H8;
+    setTo(move, H8);
     blackKingSide = false;
   }
 
   SECTION("Move from black king square")
   {
-    move.from = E8;
+    setFrom(move, E8);
     blackKingSide = false;
     blackQueenSide = false;
   }
 
   SECTION("Move from white queen side rook square")
   {
-    move.from = A1;
+    setFrom(move, A1);
     whiteQueenSide = false;
   }
 
   SECTION("Move to white queen side rook square")
   {
-    move.to = A1;
+    setTo(move, A1);
     whiteQueenSide = false;
   }
 
   SECTION("Move from white king side rook square")
   {
-    move.from = H1;
+    setFrom(move, H1);
     whiteKingSide = false;
   }
 
   SECTION("Move to white king side rook square")
   {
-    move.to = H1;
+    setTo(move, H1);
     whiteKingSide = false;
   }
 
   SECTION("Move from white king square")
   {
-    move.from = E1;
+    setFrom(move, E1);
     whiteKingSide = false;
     whiteQueenSide = false;
   }
@@ -126,7 +126,7 @@ TEST_CASE("Game stack tests")
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
 
-  move.from = E1; // This move will remove the white castling rights
+  setFrom(move, E1); // This move will remove the white castling rights
   gs.update(move);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
   CHECK(gs->sideNotToMove() == PieceColour::WHITE);
@@ -135,7 +135,7 @@ TEST_CASE("Game stack tests")
   CHECK_FALSE(gs->canQueenSideCastle(PieceColour::WHITE));
   CHECK_FALSE(gs->canKingSideCastle(PieceColour::WHITE));
 
-  move.from = E8; // This move will remove the black castling rights
+  setFrom(move, E8); // This move will remove the black castling rights
   gs.update(move);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -146,7 +146,7 @@ TEST_CASE("Game stack tests")
 
   const Move* move_p = gs.pop();
   REQUIRE(move_p);
-  CHECK(move_p->from == E8);
+  CHECK(from(*move_p) == E8);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
   CHECK(gs->sideNotToMove() == PieceColour::WHITE);
   CHECK(gs->canQueenSideCastle(PieceColour::BLACK));
@@ -156,7 +156,7 @@ TEST_CASE("Game stack tests")
 
   move_p =gs.pop();
   REQUIRE(move_p);
-  CHECK(move_p->from == E1);
+  CHECK(from(*move_p) == E1);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
   CHECK(gs->canQueenSideCastle(PieceColour::BLACK));
@@ -173,7 +173,7 @@ TEST_CASE("Check that the ep square works")
   GameStateManager gs{};
   Move move;
 
-  move.to = A4;
+  setTo(move, A4);
   move.doublePush = true;
 
   gs.update(move);
@@ -185,7 +185,7 @@ TEST_CASE("Check that the ep square works")
   CHECK(gs->canKingSideCastle(PieceColour::WHITE));
   CHECK(gs->epTargetSquare() == A3);
 
-  move.to = A5;
+  setTo(move, A5);
   gs.update(move);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -195,7 +195,7 @@ TEST_CASE("Check that the ep square works")
   CHECK(gs->canKingSideCastle(PieceColour::WHITE));
   CHECK(gs->epTargetSquare() == A6);
 
-  move.to = F7;
+  setTo(move, F7);
   move.doublePush = false;
   gs.update(move);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
@@ -208,7 +208,7 @@ TEST_CASE("Check that the ep square works")
 
   const Move* move_p = gs.pop();
   REQUIRE(move_p);
-  CHECK(move_p->to == F7);
+  CHECK(to(*move_p) == F7);
   CHECK_FALSE(move_p->doublePush);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -221,7 +221,7 @@ TEST_CASE("Check that the ep square works")
 
   move_p = gs.pop();
   REQUIRE(move_p);
-  CHECK(move_p->to == A5);
+  CHECK(to(*move_p) == A5);
   CHECK(move_p->doublePush);
   CHECK(gs->sideToMove() == PieceColour::BLACK);
   CHECK(gs->sideNotToMove() == PieceColour::WHITE);
@@ -233,7 +233,7 @@ TEST_CASE("Check that the ep square works")
 
   move_p = gs.pop();
   REQUIRE(move_p);
-  CHECK(move_p->to == A4);
+  CHECK(to(*move_p) == A4);
   CHECK(move_p->doublePush);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);

@@ -84,6 +84,12 @@ Square squareIndex(std::string_view square);
 std::string toAlgebraic(Square square);
 std::string toAlgebraic(File file_index, Rank rank_index);
 
+
+// | F  | R  | O  | M  | -- | -> | T  | O  |
+// | -- | -- | -- | -> | F  | L  | A  | GS |
+// | MO | VE | D  | -> | CA | PT | UR | ED |
+// |    |    |    |    |    |    |    |    |
+
 // TODO this needs to be compacted into a 32 bit int
 // from square 6 bits
 // to square 6 bits
@@ -91,8 +97,7 @@ std::string toAlgebraic(File file_index, Rank rank_index);
 // captured piece 4 bits?
 struct Move
 {
-  Square from{NULL_SQUARE};
-  Square to{NULL_SQUARE};
+  uint32_t fromAndTo{ 0 };
   bool capture = false;
   PieceType capturePiece = PieceType::NULL_PIECE;
   bool enPassant = false;
@@ -102,11 +107,37 @@ struct Move
   PieceType castle = PieceType::NULL_PIECE;
   PieceType promotion = PieceType::NULL_PIECE;
 
-  std::string toAlgebraic() const
-  {
-    return ::yak::toAlgebraic(from) + ::yak::toAlgebraic(to);
-  }
+  std::string toAlgebraic() const;
 };
+
+inline constexpr Square from(const Move& move)
+{
+  // The from square is encoded in the least significant 6 bits
+  return static_cast<Square>(move.fromAndTo & 0b0011'1111);
+}
+
+inline constexpr void setFrom(Move& move, Square square)
+{
+  uint32_t x = move.fromAndTo & ~0b0011'1111; // Get the number without the from square
+  move.fromAndTo = (x | (square & 0b0011'1111));
+}
+
+inline constexpr Square to(const Move& move)
+{
+  // The to square is encoded in the 6 bits after the from square
+  return static_cast<Square>((move.fromAndTo >> 6) & 0b0011'1111);
+}
+
+inline constexpr void setTo(Move& move, Square square)
+{
+  uint32_t x = move.fromAndTo & ~0b1111'1100'0000; // Get the number without the to square
+  move.fromAndTo = (x | ((square << 6) & 0b1111'1100'0000));
+}
+
+inline std::string Move::toAlgebraic() const
+{
+  return ::yak::toAlgebraic(from(*this)) + ::yak::toAlgebraic(to(*this));
+}
 
 } // namespace yak
 
