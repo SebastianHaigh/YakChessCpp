@@ -22,7 +22,7 @@ constexpr void generatePawnSinglePushes(Move *moveList,
 
   while (sources && not Promotions)
   {
-    *moveList++ = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *moveList++ = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets), PieceType::PAWN);
     moveCounter++;
   }
 

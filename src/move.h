@@ -9,13 +9,15 @@ namespace yak::move {
  * \brief Constructs a quiet Move.
  * \param[in] from - The square from which to move.
  * \param[in] to - The square to move to.
+ * \param[in] moved - The PieceType being moved.
  * \return The constructed quiet move.
  */
-inline Move makeQuiet(Square from, Square to)
+inline auto makeQuiet(Square from, Square to, PieceType moved) -> Move
 {
   Move move;
   setFrom(move, from);
   setTo(move, to);
+  setMoved(move, moved);
   return move;
 }
 
@@ -28,11 +30,12 @@ inline Move makeQuiet(Square from, Square to)
  * \note Use this when constructing double push moves to ensure
  * that the en passant target is properly set after making the move.
  */
-inline Move makeDoublePush(Square from, Square to)
+inline auto makeDoublePush(Square from, Square to) -> Move
 {
   Move move;
   setFrom(move, from);
   setTo(move, to);
+  setMoved(move, PieceType::PAWN);
   move.doublePush = true;
   return move;
 }
@@ -41,13 +44,17 @@ inline Move makeDoublePush(Square from, Square to)
  * \brief Constructs a move with capture.
  * \param[in] from - The square from which to move.
  * \param[in] to - The square to move to.
+ * \param[in] moved - The PieceType being moved.
+ * \param[in] captured - The PieceType being captured.
  * \return The constructed capture move.
  */
-inline Move makeCapture(Square from, Square to)
+inline auto makeCapture(Square from, Square to, PieceType moved, PieceType captured) -> Move
 {
   Move move;
   setFrom(move, from);
   setTo(move, to);
+  setMoved(move, moved);
+  setCaptured(move, captured);
   move.capture = true;
   return move;
 };
@@ -58,11 +65,13 @@ inline Move makeCapture(Square from, Square to)
  * \param[in] to - The square to move to.
  * \return The constructed en passant capture.
  */
-inline Move makeEpCapture(Square from, Square to)
+inline auto makeEpCapture(Square from, Square to) -> Move
 {
   Move move;
   setFrom(move, from);
   setTo(move, to);
+  setMoved(move, PieceType::PAWN);
+  setCaptured(move, PieceType::PAWN);
   move.capture = true;
   move.enPassant = true;
   return move;
@@ -75,11 +84,12 @@ inline Move makeEpCapture(Square from, Square to)
  * \param[in] type - The type of piece to promote to.
  * \return The constructed quiet promotion.
  */
-inline Move makeQuietPromotion(Square from, Square to, PieceType type)
+inline auto makeQuietPromotion(Square from, Square to, PieceType type) -> Move
 {
   Move move;
   setFrom(move, from);
   setTo(move, to);
+  setMoved(move, PieceType::PAWN);
   move.promotion = type;
   return move;
 };
@@ -89,26 +99,29 @@ inline Move makeQuietPromotion(Square from, Square to, PieceType type)
  * \param[in] from - The square from which to move.
  * \param[in] to - The square to move to.
  * \param[in] type - The type of piece to promote to.
+ * \param[in] captured - The PieceType of the captured piece.
  * \return The constructed capture promotion.
  */
-inline Move makeCapturePromotion(Square from, Square to, PieceType type)
+inline auto makeCapturePromotion(Square from, Square to, PieceType type, PieceType captured) -> Move
 {
   Move move;
   setFrom(move, from);
   setTo(move, to);
+  setMoved(move, PieceType::PAWN);
+  setCaptured(move, captured);
   move.capture = true;
   move.promotion = type;
   return move;
 };
 
-inline Move makeKingsideCastle()
+inline auto makeKingsideCastle() -> Move
 {
   Move move;
   move.castle = PieceType::KING;
   return move;
 };
 
-inline Move makeQueensideCastle()
+inline auto makeQueensideCastle() -> Move
 {
   Move move;
   move.castle = PieceType::QUEEN;

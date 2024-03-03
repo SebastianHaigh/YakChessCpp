@@ -34,7 +34,7 @@ TEST_CASE("MoveTest: Make EP Capture")
 TEST_CASE("MoveTest: Create pawn push move")
 {
   Board board{ STANDARD_STARTING_FEN };
-  board.makeMove(move::makeQuiet(A2, A3));
+  board.makeMove(move::makeQuiet(A2, A3, PieceType::PAWN));
 
   CHECK(board.toFen() == "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1");
 }
@@ -204,10 +204,7 @@ TEST_CASE("BoardTest: Castling rights change when rook is moved or is captured")
 {
   Board board{ "rnbqkbnr/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNR b KQkq - 0 1" };
 
-  Move move = move::makeCapture(H8, H1);
-  move.capturePiece = PieceType::ROOK;
-
-  board.makeMove(move);
+  board.makeMove(move::makeCapture(H8, H1, PieceType::ROOK, PieceType::ROOK));
 
   CHECK(board.toFen() == "rnbqkbn1/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNr w Qq - 0 2");
 }
@@ -216,7 +213,7 @@ TEST_CASE("BoardTest: Undoing move restores state")
 {
   Board board{ STANDARD_STARTING_FEN };
 
-  board.makeMove(move::makeQuiet(E2, E4));
+  board.makeMove(move::makeQuiet(E2, E4, PieceType::PAWN));
 
   board.undoMove();
 
