@@ -421,9 +421,13 @@ void Board::generatePawnDoublePushes(Move* moveList,
                                      Bitboard pawnPositions,
                                      Bitboard emptySquares)
 {
-  Bitboard targets = pawns::pawnDoublePushTarget<Colour>() & emptySquares;
-  Bitboard sources = pawns::pawnSinglePushSource<Colour>(targets) & emptySquares;
-  sources = pawns::pawnSinglePushSource<Colour>(sources) & pawnPositions;
+  Bitboard targets = pawns::pawnSinglePushTarget<Colour>(pawnPositions) & emptySquares;
+  targets = pawns::pawnSinglePushTarget<Colour>(targets) & emptySquares & pawns::pawnDoublePushTarget<Colour>();
+
+  // TODO (haigh) the sources could just use the known starting rank for this colour.
+  Bitboard sources = pawns::pawnSinglePushSource<Colour>(targets);
+  sources = pawns::pawnSinglePushSource<Colour>(sources);
+
   while (sources)
   {
     *moveList++ = move::makeDoublePush(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
