@@ -21,28 +21,17 @@ static constexpr bool Failed = false;
 static constexpr int numSquares = 64;
 static constexpr int numPermutations = 4096;
 
-template<PieceType Type> struct numMaskPermutations { static_assert(Failed<Type>, "Cannot get mask permutations for this type"); };
-template<> struct numMaskPermutations<PieceType::ROOK> { static constexpr int value = 4096; };
-template<> struct numMaskPermutations<PieceType::BISHOP> { static constexpr int value = 4096; };
-
-struct MagicMap
-{
-  std::array<Bitboard, numSquares * numPermutations> m_map;
-  std::array<Bitboard, 64> m_mask;
-  std::array<Bitboard, 64> m_magic;
-};
-
 inline auto random_uint64() -> Bitboard
 {
-    Bitboard u1, u2, u3, u4;
-    u1 = (Bitboard)(rand()) & 0xFFFF; u2 = (Bitboard)(rand()) & 0xFFFF;
-    u3 = (Bitboard)(rand()) & 0xFFFF; u4 = (Bitboard)(rand()) & 0xFFFF;
-    return u1 | (u2 << 16) | (u3 << 32) | (u4 << 48);
+  Bitboard u1, u2, u3, u4;
+  u1 = (Bitboard)(rand()) & 0xFFFF; u2 = (Bitboard)(rand()) & 0xFFFF;
+  u3 = (Bitboard)(rand()) & 0xFFFF; u4 = (Bitboard)(rand()) & 0xFFFF;
+  return u1 | (u2 << 16) | (u3 << 32) | (u4 << 48);
 }
 
 inline auto randomBitboard() -> Bitboard
 {
-    return random_uint64() & random_uint64() & random_uint64();
+  return random_uint64() & random_uint64() & random_uint64();
 }
 
 /*
@@ -59,6 +48,7 @@ constexpr auto occupancyMask(Square square) -> Bitboard
 
   if constexpr (Type == PieceType::ROOK)
   {
+    // TODO (haigh) compile time?
     for (int currentRank = rank + 1; currentRank <= 6; currentRank++) { mask |= (1ULL << (file + currentRank * 8)); }
     for (int currentRank = rank - 1; currentRank >= 1; currentRank--) { mask |= (1ULL << (file + currentRank * 8)); }
     for (int currentFile = file + 1; currentFile <= 6; currentFile++) { mask |= (1ULL << (currentFile + rank * 8)); }
@@ -101,9 +91,6 @@ constexpr auto singleSquareAttack(int sq, Bitboard blockers) -> Bitboard
 {
   Bitboard attacks{0ULL};
 
-  const int rank = sq / 8;
-  const int file = sq % 8;
-
   if constexpr (Type == PieceType::ROOK)
   {
     attacks |= attackmap::blockedRay<Direction::NORTH>(static_cast<Square>(sq), blockers);
@@ -123,12 +110,11 @@ constexpr auto singleSquareAttack(int sq, Bitboard blockers) -> Bitboard
     static_assert(Type == PieceType::ROOK, "The attacks function only works for ROOKS and BISHOPS");
   }
 
-
   return attacks;
 }
 
 template<PieceType Type>
-constexpr auto allAttacks(Square square, const std::array<Bitboard, 4096>& blockers)
+constexpr auto allAttacks(Square square, std::array<Bitboard, 4096> const& blockers) -> std::array<Bitboard, 4096>
 {
   std::array<Bitboard, 4096> attackArray{};
 
@@ -204,11 +190,12 @@ constexpr auto findMagic(Square square) -> std::optional<MagicReturn>
 
   const int numBits = bitboard::countSetBits(mask);
   const int numPermutations = (1 << numBits);
-  std::array<Bitboard, 4096> attacks;// = allAttacks<Type>(square, allPossibleBlockers);
+  std::array<Bitboard, 4096> attacks;
 
   for (int i = 0; i < numPermutations; ++i)
   {
     allPossibleBlockers[i] = maskPermutation(mask, i);
+
     if (i > 0)
     {
       attacks[i - 1] = singleSquareAttack<Type>(static_cast<int>(square), allPossibleBlockers[i - 1]);

@@ -47,7 +47,7 @@ struct rayMap : rayMap<D, static_cast<Square>(S + 1), B..., ray<D, S>::value>
 };
 
 template<Direction D, Bitboard... B>
-struct rayMap<D, static_cast<Square>(63), B...>
+struct rayMap<D, static_cast<Square>(64), B...>
 {
   static constexpr std::array<Bitboard, 64> value = {B...};
 };
@@ -59,7 +59,7 @@ template<> struct isPositiveRay<Direction::SOUTH_EAST> : std::false_type {};
 template<> struct isPositiveRay<Direction::SOUTH_WEST> : std::false_type {};
 
 template<Direction D>
-constexpr Bitboard blockedRay(Square square, Bitboard occupied)
+constexpr auto blockedRay(Square square, Bitboard occupied) -> Bitboard
 {
   constexpr std::array<Bitboard, 64> thisDirectionRayMap = rayMap<D>::value;
 
