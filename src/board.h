@@ -360,9 +360,9 @@ auto Board::generatePieceMoves(Move *moveList,
     Square from = bitboard::popLS1B(piecePositions);
 
     Bitboard atk_bb = (Type == PieceType::KNIGHT) ? piece::KnightMap::attacks(from) :
-      (Type == PieceType::BISHOP) ? attackmap::BishopMap::attacks(from, ~emptySquares()) :
-      (Type == PieceType::ROOK) ? attackmap::RookMap::attacks(from, ~emptySquares()) :
-      (Type == PieceType::QUEEN) ? attackmap::QueenMap::attacks(from, ~emptySquares()) :
+      (Type == PieceType::BISHOP) ? m_bishopMap.attacks(from, ~emptySquares()) :
+      (Type == PieceType::ROOK) ? m_rookMap.attacks(from, ~emptySquares()) :
+      (Type == PieceType::QUEEN) ? (m_bishopMap.attacks(from, ~emptySquares()) | m_rookMap.attacks(from, ~emptySquares())) :
       (Type == PieceType::KING) ? piece::KingMap::attacks(from) : Bitboard{0};
 
     Bitboard quiet = atk_bb & emptySquares();
