@@ -86,10 +86,10 @@ TEST_CASE("NorthRayAttackMapTest: ReturnsEmptyBitboardForAnySquareOnTheEighthRan
     Bitboard occupiedSquares_bb = 0;
     Bitboard attackRay_bb[8];
 
-    constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::NORTH>::value;
+    constexpr std::array<Bitboard, 64> RayMap = yak::attackmap::RayMap<Direction::NORTH>::value;
     // Act
     for (int i = 0; i < 8; i++) {
-        attackRay_bb[i] = rayMap[serialisedPieces[i]];
+        attackRay_bb[i] = RayMap[serialisedPieces[i]];
     }
 
     // Assert
@@ -179,10 +179,10 @@ TEST_CASE("SouthRayAttackMapTest: ReturnsEmptyBitboardForAnySquareOnTheFirstRank
     Square serialisedPieces[8] = { A1, B1, C1, D1, E1, F1, H1 };
     Bitboard occupiedSquares_bb = 0;
     Bitboard attackRay_bb[8];
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::SOUTH>::value;
+  constexpr std::array<Bitboard, 64> RayMap = yak::attackmap::RayMap<Direction::SOUTH>::value;
     // Act
     for (int i = 0; i < 8; i++) {
-        attackRay_bb[i] = rayMap[serialisedPieces[i]];
+        attackRay_bb[i] = RayMap[serialisedPieces[i]];
     }
 
     // Assert
@@ -272,11 +272,11 @@ TEST_CASE("EastRayAttackMapTest: ReturnsEmptyBitboardForAnySquareOnTheHFile") {
     Square serialisedPieces[8] = { H1, H2, H3, H4, H5, H6, H7, H8 };
     Bitboard occupiedSquares_bb = 0;
     std::vector<Bitboard>attackRay_bb(8, 0);
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::EAST>::value;
+  constexpr std::array<Bitboard, 64> RayMap = yak::attackmap::RayMap<Direction::EAST>::value;
 
     // Act
     for (int i = 0; i < 8; i++) {
-        attackRay_bb[i] = rayMap[serialisedPieces[i]];
+        attackRay_bb[i] = RayMap[serialisedPieces[i]];
     }
 
     // Assert
@@ -361,10 +361,10 @@ TEST_CASE("WestRayAttackMapTest: ReturnsEmptyBitboardForAnySquareOnTheAFile") {
     Square serialisedPieces[8] = { A1, A2, A3, A4, A5, A6, A7, A8 };
     Bitboard occupiedSquares_bb = 0;
     Bitboard attackRay_bb[8];
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::WEST>::value;
+  constexpr std::array<Bitboard, 64> RayMap = yak::attackmap::RayMap<Direction::WEST>::value;
     // Act
     for (int i = 0; i < 8; i++) {
-        attackRay_bb[i] = rayMap[serialisedPieces[i]];
+        attackRay_bb[i] = RayMap[serialisedPieces[i]];
     }
 
     // Assert
@@ -455,11 +455,11 @@ TEST_CASE("NorthEastRayAttackMapTest: ReturnsEmptyBitboardForAnySquareOnTheHFile
   Square serialisedPieces[8] = { H1, H2, H3, H4, H5, H6, H7, H8 };
   Bitboard occupiedSquares_bb = 0;
   Bitboard attackRay_bb[8];
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::NORTH_EAST>::value;
+  constexpr std::array<Bitboard, 64> RayMap = yak::attackmap::RayMap<Direction::NORTH_EAST>::value;
 
   // Act
   for (int i = 0; i < 8; i++) {
-    attackRay_bb[i] = rayMap[serialisedPieces[i]];
+    attackRay_bb[i] = RayMap[serialisedPieces[i]];
   }
 
   // Assert
@@ -550,10 +550,10 @@ TEST_CASE("SouthEastRayAttackMapTest: ReturnsEmptyBitboardForAnySquareOnTheHFile
     Bitboard occupiedSquares_bb = 0;
     Bitboard attackRay_bb[8];
 
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::SOUTH_EAST>::value;
+  constexpr std::array<Bitboard, 64> RayMap = yak::attackmap::RayMap<Direction::SOUTH_EAST>::value;
   // Act
   for (int i = 0; i < 8; i++) {
-    attackRay_bb[i] = rayMap[serialisedPieces[i]];
+    attackRay_bb[i] = RayMap[serialisedPieces[i]];
   }
 
     // Assert
@@ -636,10 +636,10 @@ TEST_CASE("NorthWestRayAttackMapTest: Returns empty bitboard for any square on t
   Bitboard occupiedSquares_bb = 0;
   Bitboard attackRay_bb[8];
 
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::NORTH_WEST>::value;
+  constexpr std::array<Bitboard, 64> RayMap = yak::attackmap::RayMap<Direction::NORTH_WEST>::value;
 
   for (int i = 0; i < 8; i++) {
-    CHECK(rayMap[serialisedPieces[i]] == 0);
+    CHECK(RayMap[serialisedPieces[i]] == 0);
   }
 }
 
@@ -718,11 +718,11 @@ TEST_CASE("SouthWestRayAttackMapTest: ReturnsEmptyBitboardForAnySquareOnTheAFile
   Bitboard occupiedSquares_bb{0};
   Bitboard attackRay_bb[8];
 
-  constexpr std::array<Bitboard, 64> rayMap = yak::attackmap::rayMap<Direction::SOUTH_WEST>::value;
+  constexpr std::array<Bitboard, 64> RayMap = yak::attackmap::RayMap<Direction::SOUTH_WEST>::value;
 
   for (int i = 0; i < 8; i++)
   {
-    attackRay_bb[i] = rayMap[serialisedPieces[i]];
+    attackRay_bb[i] = RayMap[serialisedPieces[i]];
   }
 
   CHECK(attackRay_bb[0] == 0);
