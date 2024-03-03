@@ -20,24 +20,28 @@ TEST_CASE("Perft Test")
   {
     result = perft(board, 1);
     CHECK(result.m_total == 20);
+    CHECK(result.m_captures == 0);
   };
 
   BENCHMARK("Two Moves")
   {
     result = perft(board, 2);
     CHECK(result.m_total == 400);
+    CHECK(result.m_captures == 0);
   };
 
   BENCHMARK("Three Moves")
   {
     result = perft(board, 3);
     CHECK(result.m_total == 8902);
+    CHECK(result.m_captures == 34);
   };
 
   BENCHMARK("Four Moves")
   {
     result = perft(board, 4);
-    /* CHECK(result.m_total == 197281); */
+    CHECK(result.m_total == 197281);
+    CHECK(result.m_captures == 1576);
   };
 
   BENCHMARK("Five Moves")
