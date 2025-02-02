@@ -226,7 +226,7 @@ private:
                          Bitboard pawnPositions,
                          Bitboard emptySquares);
 
-  std::vector<Move> generateCastlingMoves(std::vector<Move> moves);
+  void generateCastlingMoves(std::vector<Move>& moves);
   void parseFen(std::string_view fen);
   std::string rankToFen(Rank rank);
   std::string rankToBoardFen(Rank rank);

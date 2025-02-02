@@ -160,12 +160,12 @@ std::vector<Move> Board::generateMoves()
     undoMove();
   }
 
-  legal_moves = generateCastlingMoves(legal_moves);
+  generateCastlingMoves(legal_moves);
 
   return legal_moves;
 }
 
-std::vector<Move> Board::generateCastlingMoves(std::vector<Move> moves)
+void Board::generateCastlingMoves(std::vector<Move>& moves)
 {
   const Bitboard squaresAttackedByEnemy = attacked_by(m_state->sideNotToMove());
   const Bitboard king = getPosition(m_state->sideToMove(), PieceType::KING);
@@ -189,7 +189,6 @@ std::vector<Move> Board::generateCastlingMoves(std::vector<Move> moves)
     }
 
   }
-  return moves;
 }
 
 Board::MoveResult Board::makeMove(const Move &move)
