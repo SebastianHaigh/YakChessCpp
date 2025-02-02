@@ -1,6 +1,6 @@
 #include "GameState.h"
 
-#include "types.h"
+#include <types.h>
 
 namespace yak {
 
@@ -180,7 +180,7 @@ std::string GameState::toFen()
   fen += " ";
 
   fen += (m_epSquare == NULL_SQUARE) ? "-" : toAlgebraic(m_epSquare);
-  fen += " 0 ";  // TODO (haigh) half move clock
+  fen += " 0 ";  // TODO (haigh) implement the half move clock
   fen += std::to_string(m_moveClock);
 
   return fen;
@@ -208,10 +208,10 @@ GameState* GameState::update(const Move &move)
   Square fromSquare = from(move);
   Square toSquare = to(move);
 
-  bool removesWhiteK = ((fromSquare == WHITE_KING_SQUARE) || (fromSquare == WHITE_KINGS_ROOK) || (toSquare == WHITE_KINGS_ROOK));
-  bool removesWhiteQ = ((fromSquare == WHITE_KING_SQUARE) || (fromSquare == WHITE_QUEENS_ROOK) || (toSquare == WHITE_QUEENS_ROOK));
-  bool removesBlackK = ((fromSquare == BLACK_KING_SQUARE) || (fromSquare == BLACK_KINGS_ROOK) || (toSquare == BLACK_KINGS_ROOK));
-  bool removesBlackQ = ((fromSquare == BLACK_KING_SQUARE) || (fromSquare == BLACK_QUEENS_ROOK) || (toSquare == BLACK_QUEENS_ROOK));
+  bool removesWhiteK = (fromSquare == WHITE_KING_SQUARE || fromSquare == WHITE_KINGS_ROOK || toSquare == WHITE_KINGS_ROOK);
+  bool removesWhiteQ = (fromSquare == WHITE_KING_SQUARE || fromSquare == WHITE_QUEENS_ROOK || toSquare == WHITE_QUEENS_ROOK);
+  bool removesBlackK = (fromSquare == BLACK_KING_SQUARE || fromSquare == BLACK_KINGS_ROOK || toSquare == BLACK_KINGS_ROOK);
+  bool removesBlackQ = (fromSquare == BLACK_KING_SQUARE || fromSquare == BLACK_QUEENS_ROOK || toSquare == BLACK_QUEENS_ROOK);
 
   newState->m_castlingRights[0] = not isBlackCastle && not removesBlackK && m_castlingRights[0];
   newState->m_castlingRights[1] = not isBlackCastle && not removesBlackQ && m_castlingRights[1];

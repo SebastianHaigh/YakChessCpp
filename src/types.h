@@ -133,6 +133,13 @@ inline constexpr void setTo(Move& move, Square square)
   move.fromAndTo = (x | ((square << 6) & 0b1111'1100'0000));
 }
 
+inline constexpr void setDoublePush(Move& move, Square from, Square to)
+{
+  setTo(move, to);
+  setFrom(move, from);
+  move.doublePush = true;
+}
+
 inline auto Move::toAlgebraic() const -> std::string
 {
   return ::yak::toAlgebraic(from(*this)) + ::yak::toAlgebraic(to(*this));
