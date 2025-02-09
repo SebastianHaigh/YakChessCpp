@@ -1,7 +1,6 @@
 enable_testing()
 
 add_subdirectory(test)
-add_subdirectory(benchmarking)
 add_subdirectory(perft)
 
 add_library(yak board.cpp pieces.cpp bitboard.cpp GameState.cpp types.cpp)
