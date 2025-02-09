@@ -8,4 +8,8 @@ target_link_libraries(PerftTests
                         Catch2::Catch2WithMain)
 
 add_test(NAME PerftTests
-         COMMAND PerftTests)
+         COMMAND PerftTests ~[benchmark])
+
+add_executable(PerftExt PerftExt.cpp Perft.cpp)
+
+target_link_libraries(PerftExt PUBLIC yak)

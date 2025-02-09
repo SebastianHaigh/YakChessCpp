@@ -14,9 +14,8 @@ struct PerftResult {
   size_t m_checkmates{0};
 };
 
-PerftResult perft(int depth);
-
 class Board;
+PerftResult perft(Board& board, int depth);
 PerftResult perftHelper(Board& board, int depth);
 
 } // namespace yak

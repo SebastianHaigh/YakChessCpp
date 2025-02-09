@@ -1,8 +1,8 @@
 #ifndef YAK_BITBOARD_H_
 #define YAK_BITBOARD_H_
 
-#include <stdint.h>
-#include <iostream>
+#include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 #include "types.h"
@@ -101,7 +101,7 @@ constexpr Bitboard shift(Bitboard board)
  * \param[in] board - A non-zero bitboard.
  * \return A Square corresponding to the index of the MS1B.
  */
-inline Square MS1B(Bitboard board)
+inline constexpr Square MS1B(Bitboard board)
 {
 #if defined __GNUC__
   int idx = __builtin_clzll(board); // Returns number of leading zeros
@@ -120,7 +120,7 @@ inline Square MS1B(Bitboard board)
  * \param[in] board - A non-zero bitboard.
  * \return A Square corresponding to the index of the LS1B.
  */
-inline Square LS1B(Bitboard board)
+inline constexpr Square LS1B(Bitboard board)
 {
 #if defined __GNUC__
   int idx = __builtin_ffsll(board) - 1;
@@ -139,14 +139,24 @@ inline Square LS1B(Bitboard board)
  * \param[in] board - A reference to a non-zero bitboard.
  * \return A Square corresponding to the index of the bit that was cleared.
  */
-Square popLS1B(Bitboard &board);
+inline constexpr auto popLS1B(Bitboard& board) -> Square
+{
+  Square idx = LS1B(board);
+  board &= board - 1;
+  return idx;
+}
 
 /**
  * \brief Clears the most significant 1 bit (MS1B).
  * \param[in] board - A reference to a non-zero bitboard.
  * \return A Square corresponding to the index of the bit that was cleared.
  */
-Square popMS1B(Bitboard &board);
+inline constexpr auto popMS1B(Bitboard& board) -> Square
+{
+  Square idx = MS1B(board);
+  board &= ~(Bitboard{1} << idx);
+  return idx;
+}
 
 constexpr auto countSetBits(Bitboard board) -> int
 {
@@ -160,8 +170,16 @@ constexpr auto countSetBits(Bitboard board) -> int
   return setBits;
 }
 
-void setSquare(Bitboard& board, const Square& square);
-void setSquare(Bitboard &board, const Rank& rank, const File& file);
+inline void setSquare(Bitboard& board, Square const& square)
+{
+  Bitboard pieceToSet{1};
+  board |= pieceToSet << square;
+}
+
+inline void setSquare(Bitboard& board, const Rank& rank, const File& file)
+{
+  setSquare(board, squareIndex(file, rank));
+}
 
 std::vector<Square> scanForward(Bitboard board);
 std::vector<Square> scanBackward(Bitboard board);

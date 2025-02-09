@@ -1,11 +1,10 @@
 #ifndef YAK_ATTACK_MAPS_H_
 #define YAK_ATTACK_MAPS_H_
 
-#include <bitboard.h>
-#include <types.h>
+#include "bitboard.h"
+#include "types.h"
 
-#include <algorithm>
-#include <stdint.h>
+#include <type_traits>
 #include <array>
 
 namespace yak::attackmap {
@@ -20,9 +19,9 @@ namespace yak::attackmap {
  * \tparam S - Square of the piece casting the ray.
  */
 template<Direction D, Square S, Bitboard B = bitboard::shift<D>(Bitboard{1} << S)>
-struct ray
+struct Ray
 {
-  static constexpr Bitboard value = B | ray<D, S, bitboard::shift<D>(B)>::value;
+  static constexpr Bitboard value = B | Ray<D, S, bitboard::shift<D>(B)>::value;
 };
 
 /**
@@ -31,7 +30,7 @@ struct ray
  * \tparam S - Square of the piece casting the ray.
  */
 template<Direction D, Square S>
-struct ray<D, S, 0>
+struct Ray<D, S, 0>
 {
   static constexpr Bitboard value{0};
 };
@@ -43,26 +42,26 @@ struct ray<D, S, 0>
  * Usage: ray_map<Direction::NORTH>::value[42];
  */
 template<Direction D, Square S = A1, Bitboard... B>
-struct rayMap : rayMap<D, static_cast<Square>(S + 1), B..., ray<D, S>::value>
+struct RayMap : RayMap<D, static_cast<Square>(S + 1), B..., Ray<D, S>::value>
 {
 };
 
 template<Direction D, Bitboard... B>
-struct rayMap<D, static_cast<Square>(63), B...>
+struct RayMap<D, static_cast<Square>(64), B...>
 {
   static constexpr std::array<Bitboard, 64> value = {B...};
 };
 
-template<Direction D> struct isPositiveRay : std::true_type {};
-template<> struct isPositiveRay<Direction::SOUTH> : std::false_type {};
-template<> struct isPositiveRay<Direction::WEST> : std::false_type {};
-template<> struct isPositiveRay<Direction::SOUTH_EAST> : std::false_type {};
-template<> struct isPositiveRay<Direction::SOUTH_WEST> : std::false_type {};
+template<Direction D> struct IsPositiveRay : std::true_type {};
+template<> struct IsPositiveRay<Direction::SOUTH> : std::false_type {};
+template<> struct IsPositiveRay<Direction::WEST> : std::false_type {};
+template<> struct IsPositiveRay<Direction::SOUTH_EAST> : std::false_type {};
+template<> struct IsPositiveRay<Direction::SOUTH_WEST> : std::false_type {};
 
 template<Direction D>
-constexpr Bitboard blockedRay(Square square, Bitboard occupied)
+constexpr auto blockedRay(Square square, Bitboard occupied) -> Bitboard
 {
-  constexpr std::array<Bitboard, 64> thisDirectionRayMap = rayMap<D>::value;
+  constexpr std::array<Bitboard, 64> thisDirectionRayMap = RayMap<D>::value;
 
   const Bitboard piecesInRay = thisDirectionRayMap[square] & occupied;
 
@@ -71,42 +70,15 @@ constexpr Bitboard blockedRay(Square square, Bitboard occupied)
     return thisDirectionRayMap[square];
   }
 
-  const Square blockerSquare = (isPositiveRay<D>::value)
-                               ? bitboard::LS1B(piecesInRay)
-                               : bitboard::MS1B(piecesInRay);
-
-  return thisDirectionRayMap[square] ^ thisDirectionRayMap[blockerSquare];
+  if constexpr (IsPositiveRay<D>::value)
+  {
+    return thisDirectionRayMap[square] ^ thisDirectionRayMap[bitboard::LS1B(piecesInRay)];
+  }
+  else
+  {
+    return thisDirectionRayMap[square] ^ thisDirectionRayMap[bitboard::MS1B(piecesInRay)];
+  }
 }
-
-/**
- * \brief Attack map for rooks.
- */
-class RookMap
-{
-public:
-  /**
-   * \brief Calculates all squares attacked by a single rook.
-   * \param[in] square - the index of the square that the rook is on.
-   * \param[in] occupiedSquares - a Bitboard of every occupied square.
-   * \return A Bitboard of all squares attacked by the rook.
-   *
-   * \summary The returned bitboard will included as attacked squares
-   * all blocking pieces, whether they are friendly or not.
-   */
-  static Bitboard attacks(Square square, Bitboard occupiedSquares);
-};
-
-class BishopMap
-{
-public:
-  static Bitboard attacks(Square square, Bitboard occupiedSquares);
-};
-
-class QueenMap
-{
-public:
-  static Bitboard attacks(Square square, Bitboard occupiedSquares);
-};
 
 } // namespace yak::attackmap
 

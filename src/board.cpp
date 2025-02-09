@@ -1,11 +1,12 @@
-#include <board.h>
+#include "board.h"
 
-#include <stdexcept>
-#include <cassert>
-#include "move.h"
-#include "pieces.h"
-#include "attackmaps.h"
-#include "generation.h"
+#include <cstring>
+#include <ctype.h>
+
+#include <bitboard.h>
+#include <move.h>
+#include <pieces.h>
+#include <generation.h>
 
 namespace yak {
 
@@ -14,11 +15,20 @@ Board::Board(std::string_view fen)
   parseFen(fen);
 }
 
+void Board::reset(std::string_view fen)
+{
+  std::memset(m_pieceTypeBitboard, bitboard::EMPTY, sizeof(m_pieceTypeBitboard));
+  std::memset(m_colourBitboard, bitboard::EMPTY, sizeof(m_colourBitboard));
+  m_psudeoLegalMovePointer = 0;
+
+  parseFen(fen);
+}
+
 void Board::parseFen(std::string_view fen)
 {
   auto endOfPiecePlacement = fen.find_first_of(" ");
 
-  Square currentSquare{static_cast<Square>(56)};
+  Square currentSquare{ static_cast<Square>(56) };
 
   for (int i = 0; i < endOfPiecePlacement; i++)
   {
@@ -101,71 +111,71 @@ Bitboard Board::emptySquares()
 
 std::vector<Move> Board::generateMoves()
 {
-  Move psuedoLegalMoveList[330];
+  m_psudeoLegalMovePointer = 0;
   Move enPassantMove;
-  int moveCounter{0};
 
   const PieceColour thisSide = m_state->sideToMove();
   const PieceColour otherSide = m_state->sideNotToMove();
 
   if (thisSide == PieceColour::WHITE)
   {
-    generatePawnMoves<PieceColour::WHITE>(&psuedoLegalMoveList[moveCounter],
-                                          moveCounter,
+    generatePawnMoves<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                          m_psudeoLegalMovePointer,
                                           getPosition(thisSide, PieceType::PAWN),
                                           emptySquares());
 
-    move::generateEpCaptures<PieceColour::WHITE>(&enPassantMove,
-                                           moveCounter,
-                                           getPosition(thisSide, PieceType::PAWN),
-                                           m_state->epTarget());
+    move::generateEpCaptures<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                 m_psudeoLegalMovePointer,
+                                                 getPosition(thisSide, PieceType::PAWN),
+                                                 m_state->epTarget());
   }
   else
   {
-    generatePawnMoves<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
-                                          moveCounter,
+    generatePawnMoves<PieceColour::BLACK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                          m_psudeoLegalMovePointer,
                                           getPosition(thisSide, PieceType::PAWN),
                                           emptySquares());
 
-    move::generateEpCaptures<PieceColour::BLACK>(&psuedoLegalMoveList[moveCounter],
-                                           moveCounter,
-                                           getPosition(thisSide, PieceType::PAWN),
-                                           m_state->epTarget());
+    move::generateEpCaptures<PieceColour::BLACK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                 m_psudeoLegalMovePointer,
+                                                 getPosition(thisSide, PieceType::PAWN),
+                                                 m_state->epTarget());
   }
 
-  moveCounter += generatePieceMoves<PieceType::KNIGHT>(&psuedoLegalMoveList[moveCounter],
-                                                       thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::KNIGHT>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                    thisSide);
 
-  moveCounter += generatePieceMoves<PieceType::KING>(&psuedoLegalMoveList[moveCounter],
-                                                     thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::KING>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                  thisSide);
 
-  moveCounter += generatePieceMoves<PieceType::BISHOP>(&psuedoLegalMoveList[moveCounter],
-                                                       thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::BISHOP>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                    thisSide);
 
-  moveCounter += generatePieceMoves<PieceType::ROOK>(&psuedoLegalMoveList[moveCounter],
-                                                     thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::ROOK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                  thisSide);
 
-  moveCounter += generatePieceMoves<PieceType::QUEEN>(&psuedoLegalMoveList[moveCounter],
-                                                      thisSide);
+  m_psudeoLegalMovePointer += generatePieceMoves<PieceType::QUEEN>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                   thisSide);
 
   std::vector<Move> legal_moves;
-  for (int i = 0; i < moveCounter; i++)
+  legal_moves.reserve(m_psudeoLegalMovePointer);
+  for (int i = 0; i < m_psudeoLegalMovePointer; i++)
   {
-    makeMove(psuedoLegalMoveList[i]);
+    makeMove(m_psuedoLegalMoveListBuffer[i]);
     // TODO (haigh) not safe, check for null here
     if (!isCheck(m_state->getPrevState()->sideToMove()))
     {
-      legal_moves.push_back(psuedoLegalMoveList[i]);
+      legal_moves.push_back(m_psuedoLegalMoveListBuffer[i]);
     }
     undoMove();
   }
 
-  legal_moves = generateCastlingMoves(legal_moves);
+  generateCastlingMoves(legal_moves);
 
   return legal_moves;
 }
 
-std::vector<Move> Board::generateCastlingMoves(std::vector<Move> moves)
+void Board::generateCastlingMoves(std::vector<Move>& moves)
 {
   const Bitboard squaresAttackedByEnemy = attacked_by(m_state->sideNotToMove());
   const Bitboard king = getPosition(m_state->sideToMove(), PieceType::KING);
@@ -189,7 +199,6 @@ std::vector<Move> Board::generateCastlingMoves(std::vector<Move> moves)
     }
 
   }
-  return moves;
 }
 
 Board::MoveResult Board::makeMove(const Move &move)
@@ -349,62 +358,17 @@ Bitboard Board::pawnAttacks(PieceColour colour)
                                         : pawns::pawnAttacks<PieceColour::WHITE>(pawnsBitboard);
 }
 
-Bitboard Board::pieceAttacks(PieceType pieceType, PieceColour pieceColour)
-{
-  switch (pieceType)
-  {
-    case PieceType::KNIGHT:
-    {
-      return piece::pieceAttacks<PieceType::KNIGHT>(getPosition(pieceColour, pieceType),
-                                                        occupiedSquares());
-    }
-
-    case PieceType::BISHOP:
-    {
-      return piece::pieceAttacks<PieceType::BISHOP>(getPosition(pieceColour, pieceType),
-                                                        occupiedSquares());
-    }
-
-    case PieceType::ROOK:
-    {
-      return piece::pieceAttacks<PieceType::ROOK>(getPosition(pieceColour, pieceType),
-                                                      occupiedSquares());
-    }
-
-    case PieceType::QUEEN:
-    {
-      return piece::pieceAttacks<PieceType::QUEEN>(getPosition(pieceColour, pieceType),
-                                                       occupiedSquares());
-    }
-
-    case PieceType::KING:
-    {
-      return piece::pieceAttacks<PieceType::KING>(getPosition(pieceColour, pieceType),
-                                                      occupiedSquares());
-    }
-
-    case PieceType::PAWN:
-    case PieceType::NULL_PIECE:
-    default:
-    {
-      break;
-    }
-  }
-  // If the wrong piece has been provided then we return 0, i.e., this piece attacks no squares.
-  return Bitboard{0};
-}
-
 Bitboard Board::allAttacks(PieceColour colour)
 {
-  Bitboard attacked_squares{0};
-  Bitboard friendly_pieces = get_position(colour);
-  attacked_squares |= (pawnAttacks(colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::KNIGHT, colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::BISHOP, colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::ROOK, colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::QUEEN, colour) & ~friendly_pieces);
-  attacked_squares |= (pieceAttacks(PieceType::KING, colour) & ~friendly_pieces);
-  return attacked_squares;
+  Bitboard attacked_bb{0};
+  Bitboard friendly_bb = get_position(colour);
+  attacked_bb |= (pawnAttacks(colour) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::KNIGHT>(getPosition(colour, PieceType::KNIGHT), occupiedSquares()) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::BISHOP>(getPosition(colour, PieceType::BISHOP), occupiedSquares()) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::ROOK>(getPosition(colour, PieceType::ROOK), occupiedSquares()) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::QUEEN>(getPosition(colour, PieceType::QUEEN), occupiedSquares()) & ~friendly_bb);
+  attacked_bb |= (piece::pieceAttacks<PieceType::KING>(getPosition(colour, PieceType::KING), occupiedSquares()) & ~friendly_bb);
+  return attacked_bb;
 }
 
 } // namespace yak

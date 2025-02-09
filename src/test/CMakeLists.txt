@@ -59,3 +59,13 @@ target_link_libraries(MagicBitboardTests
 
 add_test(NAME MagicBitboardTests
          COMMAND MagicBitboardTests)
+
+add_executable(TypesTests TypesTests.cpp)
+target_link_libraries(TypesTests
+                      PUBLIC
+                        yak
+                      PRIVATE
+                       Catch2::Catch2WithMain)
+
+add_test(NAME TypesTests
+         COMMAND TypesTests)

@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <string>
-#include <type_traits>
+#include <string_view>
 
 namespace yak {
 
@@ -84,6 +84,12 @@ Square squareIndex(std::string_view square);
 std::string toAlgebraic(Square square);
 std::string toAlgebraic(File file_index, Rank rank_index);
 
+
+// | F  | R  | O  | M  | -- | -> | T  | O  |
+// | -- | -- | -- | -> | F  | L  | A  | GS |
+// | MO | VE | D  | -> | CA | PT | UR | ED |
+// |    |    |    |    |    |    |    |    |
+
 // TODO this needs to be compacted into a 32 bit int
 // from square 6 bits
 // to square 6 bits
@@ -91,10 +97,8 @@ std::string toAlgebraic(File file_index, Rank rank_index);
 // captured piece 4 bits?
 struct Move
 {
-  Square from{NULL_SQUARE};
-  Square to{NULL_SQUARE};
+  uint32_t fromAndTo{ 0 };
   bool capture = false;
-  PieceType capturePiece = PieceType::NULL_PIECE;
   bool enPassant = false;
   bool doublePush = false;
   bool pawnMove = false;
@@ -102,11 +106,71 @@ struct Move
   PieceType castle = PieceType::NULL_PIECE;
   PieceType promotion = PieceType::NULL_PIECE;
 
-  std::string toAlgebraic() const
-  {
-    return ::yak::toAlgebraic(from) + ::yak::toAlgebraic(to);
-  }
+  std::string toAlgebraic() const;
 };
+
+inline constexpr auto from(Move const& move) -> Square
+{
+  // The from square is encoded in the least significant 6 bits
+  return static_cast<Square>(move.fromAndTo & 0b0011'1111);
+}
+
+inline constexpr void setFrom(Move& move, Square square)
+{
+  uint32_t x = move.fromAndTo & ~0b0011'1111; // Get the number without the from square
+  move.fromAndTo = (x | (square & 0b0011'1111));
+}
+
+inline constexpr auto to(Move const& move) -> Square
+{
+  // The to square is encoded in the 6 bits after the from square
+  return static_cast<Square>((move.fromAndTo >> 6) & 0b0011'1111);
+}
+
+inline constexpr void setTo(Move& move, Square square)
+{
+  uint32_t x = move.fromAndTo & ~0b1111'1100'0000; // Get the number without the to square
+  move.fromAndTo = (x | ((square << 6) & 0b1111'1100'0000));
+}
+
+inline constexpr void setDoublePush(Move& move, Square from, Square to)
+{
+  setTo(move, to);
+  setFrom(move, from);
+  move.doublePush = true;
+}
+
+inline auto Move::toAlgebraic() const -> std::string
+{
+  return ::yak::toAlgebraic(from(*this)) + ::yak::toAlgebraic(to(*this));
+}
+
+inline constexpr auto pieceTypeToInt(PieceType type) -> uint8_t
+{
+  return (static_cast<uint8_t>(type) & 0x0F);
+}
+
+inline constexpr void setMoved(Move& move, PieceType type)
+{
+  uint32_t x = move.fromAndTo & ~0xF0000;
+  move.fromAndTo = (x | (pieceTypeToInt(type) << 16) & 0x000F0000);
+}
+
+inline constexpr auto moved(Move const& move) -> PieceType
+{
+  return static_cast<PieceType>((move.fromAndTo >> 16) & 0x0F);
+}
+
+inline constexpr void setCaptured(Move& move, PieceType type)
+{
+  uint32_t x = move.fromAndTo & ~0xF00000;
+  move.fromAndTo = (x | (pieceTypeToInt(type) << 20) & 0x00F00000);
+}
+
+inline constexpr auto captured(Move const& move) -> PieceType
+{
+  return static_cast<PieceType>((move.fromAndTo >> 20) & 0x0F);
+}
 
 } // namespace yak
 
