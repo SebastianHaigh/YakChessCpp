@@ -9,8 +9,6 @@
 #include <array>
 #include <string>
 
-#define MAGIC
-
 namespace yak::piece {
 
 template<PieceType Type>
@@ -48,11 +46,7 @@ public:
   }
 
 private:
-
-#ifdef MAGIC
   MagicBitboardImpl<Type> m_impl;
-#else
-#endif
 };
 
 /**
