@@ -10,50 +10,6 @@
 
 namespace yak::move {
 
-template<PieceColour Colour, bool Promotions>
-constexpr void generatePawnSinglePushes(Move *moveList,
-                                        int &moveCounter,
-                                        Bitboard pawnPositions,
-                                        Bitboard emptySquares)
-{
-  pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
-  Bitboard sources = pawns::pawnSinglePushSource<Colour>(emptySquares) & pawnPositions;
-  Bitboard targets = pawns::pawnSinglePushTarget<Colour>(sources);
-
-  while (sources && not Promotions)
-  {
-    *moveList++ = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets), PieceType::PAWN);
-    moveCounter++;
-  }
-
-  while (sources && Promotions)
-  {
-    Square from = bitboard::popLS1B(sources);
-    Square to = bitboard::popLS1B(targets);
-    *moveList++ = makeQuietPromotion(from, to, PieceType::KNIGHT);
-    *moveList++ = makeQuietPromotion(from, to, PieceType::BISHOP);
-    *moveList++ = makeQuietPromotion(from, to, PieceType::ROOK);
-    *moveList++ = makeQuietPromotion(from, to, PieceType::QUEEN);
-    moveCounter += 4;
-  }
-}
-
-template<PieceColour Colour, bool Promotions>
-constexpr void generatePawnDoublePushes(Move *moveList,
-                                        int &moveCounter,
-                                        Bitboard pawnPositions,
-                                        Bitboard emptySquares)
-{
-  Bitboard targets = pawns::pawnDoublePushTarget<Colour>() & emptySquares;
-  Bitboard sources = pawns::pawnSinglePushSource<Colour>(targets) & emptySquares;
-  sources = pawns::pawnSinglePushSource<Colour>(sources) & pawnPositions;
-  while (sources)
-  {
-    *moveList++ = makeDoublePush(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
-    moveCounter++;
-  }
-}
-
 template<PieceColour Colour>
 void generateEpCaptures(Move *moveList,
                         int &moveCounter,

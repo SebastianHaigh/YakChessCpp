@@ -238,10 +238,6 @@ private:
 
   GameStateManager m_state;
 
-  attackmap::RookMap m_rookAtks;      /* \brief Attack map for Rooks */
-  attackmap::BishopMap m_bishopAtks;    /* \brief Attack map for Bishops */
-  attackmap::QueenMap m_queenAtks;    /* \brief Attack map for Queens */
-
   piece::SlidingPieceMap<PieceType::ROOK> m_rookMap;
   piece::SlidingPieceMap<PieceType::BISHOP> m_bishopMap;
 
@@ -262,8 +258,6 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
     return processCastle<PieceType::QUEEN, C>(move);
   }
 
-  /* if (move.to == move.from) return MoveResult::INVALID_TO_OR_FROM; */
-
   // Same for en passant
   if (move.enPassant)
   {
@@ -277,8 +271,6 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
 
   // TODO (haigh) Change get piece type on to maintain a map of all the piece positions
   const PieceType pieceToMove = moved(move);
-
-  if (pieceToMove == PieceType::NULL_PIECE) return MoveResult::NO_PIECE_TO_MOVE;
 
   int colourToMove = static_cast<int>(C);
   int opposingColour = static_cast<int>(OppositeColour<C>::value);
