@@ -80,36 +80,6 @@ constexpr auto blockedRay(Square square, Bitboard occupied) -> Bitboard
   }
 }
 
-/**
- * \brief Attack map for rooks.
- */
-class RookMap
-{
-public:
-  /**
-   * \brief Calculates all squares attacked by a single rook.
-   * \param[in] square - the index of the square that the rook is on.
-   * \param[in] occupiedSquares - a Bitboard of every occupied square.
-   * \return A Bitboard of all squares attacked by the rook.
-   *
-   * \summary The returned bitboard will included as attacked squares
-   * all blocking pieces, whether they are friendly or not.
-   */
-  static Bitboard attacks(Square square, Bitboard occupiedSquares);
-};
-
-class BishopMap
-{
-public:
-  static Bitboard attacks(Square square, Bitboard occupiedSquares);
-};
-
-class QueenMap
-{
-public:
-  static Bitboard attacks(Square square, Bitboard occupiedSquares);
-};
-
 } // namespace yak::attackmap
 
 #endif // YAK_ATTACK_MAPS_H_
