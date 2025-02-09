@@ -100,6 +100,8 @@ public:
   Board(Board const&) = delete;
   Board& operator=(Board const&) = delete;
 
+  void reset(std::string_view fen);
+
   PieceType getPieceTypeOn(Square square);
   PieceColour getPieceColourOn(Square square);
 
@@ -231,7 +233,7 @@ private:
   std::string rankToFen(Rank rank);
   std::string rankToBoardFen(Rank rank);
 
-  Bitboard m_pieceTypeBitboard[6] = { 0, 0, 0, 0, 0, 0 };
+  Bitboard m_pieceTypeBitboard[6] { 0, 0, 0, 0, 0, 0 };
   Bitboard m_colourBitboard[2] { 0, 0 };
 
   GameStateManager m_state;

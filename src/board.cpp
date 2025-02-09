@@ -1,5 +1,6 @@
 #include "board.h"
 
+#include <cstring>
 #include <ctype.h>
 
 #include <bitboard.h>
@@ -14,11 +15,20 @@ Board::Board(std::string_view fen)
   parseFen(fen);
 }
 
+void Board::reset(std::string_view fen)
+{
+  std::memset(m_pieceTypeBitboard, bitboard::EMPTY, sizeof(m_pieceTypeBitboard));
+  std::memset(m_colourBitboard, bitboard::EMPTY, sizeof(m_colourBitboard));
+  m_psudeoLegalMovePointer = 0;
+
+  parseFen(fen);
+}
+
 void Board::parseFen(std::string_view fen)
 {
   auto endOfPiecePlacement = fen.find_first_of(" ");
 
-  Square currentSquare{static_cast<Square>(56)};
+  Square currentSquare{ static_cast<Square>(56) };
 
   for (int i = 0; i < endOfPiecePlacement; i++)
   {
