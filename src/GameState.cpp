@@ -97,33 +97,23 @@ bool GameStateManager::loadFen(std::string_view fen)
     m_currentState->m_epSquare = squareIndex(fen.substr(startOfEpTarget + 1, 2));
   }
 
+  m_currentState->m_castlingRights[0] = false;
+  m_currentState->m_castlingRights[1] = false;
+  m_currentState->m_castlingRights[2] = false;
+  m_currentState->m_castlingRights[3] = false;
+
   int lengthCastlingRights = startOfEpTarget - startOfCastlingRights;
-  auto castling = fen.substr(startOfCastlingRights + 1, lengthCastlingRights);
+  auto castling = fen.substr(startOfCastlingRights + 1, lengthCastlingRights - 1);
 
   if (castling.empty() || (castling.size() == 1 && castling[0] == '-'))
   {
     return true;
   }
 
-  m_currentState->m_castlingRights[0] = false;
-  m_currentState->m_castlingRights[1] = false;
-  m_currentState->m_castlingRights[2] = false;
-  m_currentState->m_castlingRights[3] = false;
-
   for (const auto &character : castling)
   {
     switch (character)
     {
-      case 'K':
-      {
-        m_currentState->m_castlingRights[2] = true;
-        break;
-      }
-      case 'Q':
-      {
-        m_currentState->m_castlingRights[3] = true;
-        break;
-      }
       case 'k':
       {
         m_currentState->m_castlingRights[0] = true;
@@ -132,6 +122,16 @@ bool GameStateManager::loadFen(std::string_view fen)
       case 'q':
       {
         m_currentState->m_castlingRights[1] = true;
+        break;
+      }
+      case 'K':
+      {
+        m_currentState->m_castlingRights[2] = true;
+        break;
+      }
+      case 'Q':
+      {
+        m_currentState->m_castlingRights[3] = true;
         break;
       }
       default:
@@ -208,10 +208,17 @@ GameState* GameState::update(const Move &move)
   Square fromSquare = from(move);
   Square toSquare = to(move);
 
-  bool removesWhiteK = (fromSquare == WHITE_KING_SQUARE || fromSquare == WHITE_KINGS_ROOK || toSquare == WHITE_KINGS_ROOK);
-  bool removesWhiteQ = (fromSquare == WHITE_KING_SQUARE || fromSquare == WHITE_QUEENS_ROOK || toSquare == WHITE_QUEENS_ROOK);
-  bool removesBlackK = (fromSquare == BLACK_KING_SQUARE || fromSquare == BLACK_KINGS_ROOK || toSquare == BLACK_KINGS_ROOK);
-  bool removesBlackQ = (fromSquare == BLACK_KING_SQUARE || fromSquare == BLACK_QUEENS_ROOK || toSquare == BLACK_QUEENS_ROOK);
+  bool removesWhiteK{ false }, removesWhiteQ{ false }, removesBlackK{ false }, removesBlackQ{ false };
+
+  // If this is a castle move, the from and to squares are set to A1, which is a white rook starting square,
+  // only consider the from and to squares if this move is not a castling move
+  if (not isCastle)
+  {
+    removesWhiteK = (fromSquare == WHITE_KING_SQUARE || fromSquare == WHITE_KINGS_ROOK || toSquare == WHITE_KINGS_ROOK);
+    removesWhiteQ = (fromSquare == WHITE_KING_SQUARE || fromSquare == WHITE_QUEENS_ROOK || toSquare == WHITE_QUEENS_ROOK);
+    removesBlackK = (fromSquare == BLACK_KING_SQUARE || fromSquare == BLACK_KINGS_ROOK || toSquare == BLACK_KINGS_ROOK);
+    removesBlackQ = (fromSquare == BLACK_KING_SQUARE || fromSquare == BLACK_QUEENS_ROOK || toSquare == BLACK_QUEENS_ROOK);
+  }
 
   newState->m_castlingRights[0] = not isBlackCastle && not removesBlackK && m_castlingRights[0];
   newState->m_castlingRights[1] = not isBlackCastle && not removesBlackQ && m_castlingRights[1];
