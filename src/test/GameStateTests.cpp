@@ -144,6 +144,7 @@ TEST_CASE("Game stack tests")
   CHECK_FALSE(gs->canQueenSideCastle(PieceColour::WHITE));
   CHECK_FALSE(gs->canKingSideCastle(PieceColour::WHITE));
 
+  // Game state is restored by popping moves
   const Move* move_p = gs.pop();
   REQUIRE(move_p);
   CHECK(from(*move_p) == E8);
@@ -154,7 +155,7 @@ TEST_CASE("Game stack tests")
   CHECK_FALSE(gs->canQueenSideCastle(PieceColour::WHITE));
   CHECK_FALSE(gs->canKingSideCastle(PieceColour::WHITE));
 
-  move_p =gs.pop();
+  move_p = gs.pop();
   REQUIRE(move_p);
   CHECK(from(*move_p) == E1);
   CHECK(gs->sideToMove() == PieceColour::WHITE);
