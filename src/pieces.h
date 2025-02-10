@@ -16,21 +16,15 @@ class MagicBitboardImpl
 public:
   MagicBitboardImpl()
   {
-    m_magics = magic::findAllMagics<Type>();
   }
 
   auto attacks(Square square, Bitboard occupied) -> Bitboard
   {
     if (square > H8) [[unlikely]] return 0;
 
-    auto const& magic = m_magics[static_cast<int>(square)];
-
-    return magic.m_map[magic::transform(occupied & magic.m_mask,
-                                        magic.m_magic,
-                                        magic.m_numBits)];
+    return magic::MagicBitboards<Type>(square, occupied);
   }
 private:
-  std::array<magic::MagicReturn, 64> m_magics;
 };
 
 template<PieceType Type>
