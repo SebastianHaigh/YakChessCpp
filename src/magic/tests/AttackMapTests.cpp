@@ -4,8 +4,6 @@
 #include <types.h>
 #include <bitboard.h>
 
-#include <vector>
-
 namespace yak::attackmap {
 
 TEST_CASE("Ray generation")

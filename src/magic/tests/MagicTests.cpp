@@ -1,7 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <MagicBitboards.hpp>
-
 #include <bitboard.h>
 
 namespace yak::magic {

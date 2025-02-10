@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../types.h"
+#include <types.h>
 #include "MagicCommon.h"
 #include <GeneratedMagics.h>
 #include <array>

@@ -97,11 +97,6 @@ struct jump_map : jump_map<T,
                            static_cast<Square>(S + 1),
                            B...,
                            jumpingPieceMap<T, S>()>
-                           /* (T == PieceType::KNIGHT) */
-                           /*   ? attackmap::knight_map<S>::value */
-                           /*   : (T == PieceType::KING) */
-                           /*     ? attackmap::king_map<S>::value */
-                           /*     : Bitboard{0}> */
 {
 };
 
