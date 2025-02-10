@@ -3,7 +3,6 @@
 #include <types.h>
 #include <bitboard.h>
 #include "AttackMaps.hpp"
-#include <array>
 
 namespace yak::magic {
 

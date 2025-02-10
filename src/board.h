@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "GameState.h"
+#include <magic/MagicBitboards.hpp>
 #include "move.h"
 #include "pieces.h"
 #include "bitboard.h"
