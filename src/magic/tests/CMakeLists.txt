@@ -6,8 +6,8 @@ target_link_libraries(MagicTests
                       PRIVATE
                        Catch2::Catch2WithMain)
 
-target_include_directories(MagicTests PUBLIC /YakChessCpp/build/src/magic
-                                             /YakChessCpp/src)
+target_include_directories(MagicTests PUBLIC $<TARGET_PROPERTY:GeneratedMagic,INTERFACE_INCLUDE_DIRECTORIES>)
+
 
 add_test(NAME MagicTests
          COMMAND MagicTests)
