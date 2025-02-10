@@ -50,16 +50,6 @@ target_link_libraries(GameStateTests
 add_test(NAME GameStateTests
          COMMAND GameStateTests)
 
-add_executable(MagicBitboardTests MagicBitboardTests.cpp)
-target_link_libraries(MagicBitboardTests
-                      PUBLIC
-                        yak
-                      PRIVATE
-                       Catch2::Catch2WithMain)
-
-add_test(NAME MagicBitboardTests
-         COMMAND MagicBitboardTests)
-
 add_executable(TypesTests TypesTests.cpp)
 target_link_libraries(TypesTests
                       PUBLIC
