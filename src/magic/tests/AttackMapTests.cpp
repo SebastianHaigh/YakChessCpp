@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <attackmaps.h>
+#include <AttackMaps.hpp>
 #include <types.h>
 #include <bitboard.h>
 

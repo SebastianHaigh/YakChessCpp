@@ -1,15 +1,5 @@
 enable_testing()
 
-add_executable(AttackMapTests attackmaps_test.cpp)
-target_link_libraries(AttackMapTests
-                      PUBLIC
-                        yak
-                      PRIVATE
-                        Catch2::Catch2WithMain)
-
-add_test(NAME AttackMapTests
-         COMMAND AttackMapTests)
-
 add_executable(BitboardTests bitboard_test.cpp)
 target_link_libraries(BitboardTests
                       PUBLIC
