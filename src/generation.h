@@ -4,7 +4,6 @@
 #include "bitboard.h"
 #include "move.h"
 #include "pieces.h"
-#include "attackmaps.h"
 #include "pawns.h"
 #include "types.h"
 

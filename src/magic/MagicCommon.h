@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../types.h" // TODO (haigh) improve this include
-#include "../bitboard.h" // TODO (haigh) improve this include
+#include <types.h>
+#include <bitboard.h>
 #include "AttackMaps.hpp"
 #include <array>
 

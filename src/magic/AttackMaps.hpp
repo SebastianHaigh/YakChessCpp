@@ -1,5 +1,4 @@
-#ifndef YAK_ATTACK_MAPS_H_
-#define YAK_ATTACK_MAPS_H_
+#pragma once
 
 #include "bitboard.h"
 #include "types.h"
@@ -81,5 +80,3 @@ constexpr auto blockedRay(Square square, Bitboard occupied) -> Bitboard
 }
 
 } // namespace yak::attackmap
-
-#endif // YAK_ATTACK_MAPS_H_

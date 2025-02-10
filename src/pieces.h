@@ -2,8 +2,7 @@
 #define YAK_PIECES_H_
 
 #include "bitboard.h"
-#include "attackmaps.h"
-#include "MagicBitboards.h"
+#include <magic/MagicBitboards.hpp>
 #include "types.h"
 
 #include <array>
