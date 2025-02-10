@@ -15,32 +15,47 @@ Board::Board(std::string_view fen)
   parseFen(fen);
 }
 
-void Board::reset(std::string_view fen)
+bool Board::reset(std::string_view fen)
 {
   std::memset(m_pieceTypeBitboard, bitboard::EMPTY, sizeof(m_pieceTypeBitboard));
   std::memset(m_colourBitboard, bitboard::EMPTY, sizeof(m_colourBitboard));
   m_psudeoLegalMovePointer = 0;
 
-  parseFen(fen);
+  return parseFen(fen);
 }
 
-void Board::parseFen(std::string_view fen)
+bool Board::parseFen(std::string_view fen)
 {
+  if (fen.empty()) return false;
+
   auto endOfPiecePlacement = fen.find_first_of(" ");
 
-  Square currentSquare{ static_cast<Square>(56) };
+  if (endOfPiecePlacement == std::string::npos) return false;
+
+  constexpr std::array<Square, 8> hFileSquares = { H8, H7, H6, H5, H4, H3, H2, H1 };
+  Square currentSquare{ A8 }; // Starting from the upper left corner of the board
+
+  int squaresOnRank{ 0 };
+
+  auto hFile_p = hFileSquares.begin();
 
   for (int i = 0; i < endOfPiecePlacement; i++)
   {
     if (fen[i] == '/')
     {
+      // Make sure that every square on the last rank was accounted for
+      if (squaresOnRank != 8) return false;
+
       // Advance to next rank
       currentSquare = static_cast<Square>(currentSquare - 16);
+      squaresOnRank = 0;
     }
     else if (isdigit(fen[i]))
     {
       // Advance squares (digits are empty squares)
-      currentSquare = static_cast<Square>(currentSquare + (fen[i] - '0'));
+      auto digit = fen[i] - '0';
+      currentSquare = static_cast<Square>(currentSquare + digit);
+      squaresOnRank += digit;
     }
     else
     {
@@ -50,10 +65,14 @@ void Board::parseFen(std::string_view fen)
       bitboard::setSquare(m_pieceTypeBitboard[static_cast<int>(pieceType)], currentSquare);
       bitboard::setSquare(m_colourBitboard[static_cast<int>(pieceColour)], currentSquare);
       currentSquare = static_cast<Square>(currentSquare + 1);
+      ++squaresOnRank;
     }
   }
 
-  m_state.loadFen(fen.substr(endOfPiecePlacement + 1));
+  // Make sure that every square on the last rank was accounted for
+  if (squaresOnRank != 8) return false;
+
+  return m_state.loadFen(fen.substr(endOfPiecePlacement + 1));
 }
 
 Bitboard Board::get_position(PieceType type)

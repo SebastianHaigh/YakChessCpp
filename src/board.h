@@ -100,7 +100,7 @@ public:
   Board(Board const&) = delete;
   Board& operator=(Board const&) = delete;
 
-  void reset(std::string_view fen);
+  bool reset(std::string_view fen);
 
   PieceType getPieceTypeOn(Square square);
   PieceColour getPieceColourOn(Square square);
@@ -229,7 +229,7 @@ private:
                          Bitboard emptySquares);
 
   void generateCastlingMoves(std::vector<Move>& moves);
-  void parseFen(std::string_view fen);
+  bool parseFen(std::string_view fen);
   std::string rankToFen(Rank rank);
   std::string rankToBoardFen(Rank rank);
 
