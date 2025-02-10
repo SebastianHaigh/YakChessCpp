@@ -55,6 +55,64 @@ Provided FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
  Total moves: 119060324
 ```
 
+## Design Overview
+
+YakChessCpp uses bitboards to represent the chessboard and efficiently generate legal moves. A total of 8 bitboards are used:
+
+- 6 bitboards for each piece type (pawn, knight, bishop, rook, queen, king).
+- 2 bitboards for each color (one for white pieces, one for black pieces).
+
+Each bitboard is a 64-bit integer, where each bit corresponds to a square on the chessboard (starting from A1 at the least significant bit).
+
+For example, at the start of the game, the pawn bitboard looks like this:
+
+```
+0 0 0 0 0 0 0 0
+1 1 1 1 1 1 1 1
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+1 1 1 1 1 1 1 1
+0 0 0 0 0 0 0 0
+```
+
+while the bitboard for black pieces is:
+
+```
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+```
+
+Pawn move generation is handled separately using bitwise shifts. For other pieces
+YakChessCpp uses precomputed lookup tables to efficiently generate moves:
+
+- Magic bitboards for sliding pieces (bishop, rook, queen).
+- Jump maps for non-sliding pieces (knight, king).
+
+Magic bitboards are a perfect hashing technique used to quickly determine moves for
+sliding pieces. Instead of dynamically computing move rays, magic bitboards allow for fast lookup
+from a precomputed table.
+
+### Build-Time Magic Number Computation
+
+Unlike jump maps, magic bitboards require precomputed "magic numbers" to efficiently index the
+lookup table. These magic numbers are difficult to find via simple mathematical formulas, so they
+are computed using brute force.
+
+Static lookup table generation process:
+
+- Magic numbers are computed at build time using a separate executable, MagicGenerator.
+- This generator finds valid magic numbers through randomized brute force.
+- The generated magic numbers are stored in a generated header file (GeneratedMagics.h), which contains two arrays of 64 magic numbers (one for rooks, one for bishops).
+- The static lookup table is then computed at compile time using C++ template metaprogramming, reducing runtime computations.
+
 ## Future Development
 
 ### Move Generation Optimisation
