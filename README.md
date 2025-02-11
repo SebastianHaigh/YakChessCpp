@@ -17,7 +17,7 @@ make -jN
 Where `N` is the number of parallel build jobs.
 
 Tests can be run either with `make test` or `ctest`. Most of the tests are very
-fast, but PerftTests can take a long time to complete (~300 seconds on my
+fast, but PerftTests can take a long time to complete (~30 seconds on my
 machine).
 
 ## Running PerftExt
