@@ -39,7 +39,7 @@ struct Magics<PieceType::BISHOP>
 };
 
 template<PieceType Type, Square S>
-constexpr auto buildMagicMap() -> std::array<Bitboard, MAX_PERMUTATIONS>
+consteval auto buildMagicMap() -> std::array<Bitboard, MAX_PERMUTATIONS>
 {
   std::array<Bitboard, MAX_PERMUTATIONS> map{};
 
