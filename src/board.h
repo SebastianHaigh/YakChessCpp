@@ -249,17 +249,17 @@ template<PieceColour C>
 Board::MoveResult Board::processMove(const Move &move, bool undo)
 {
   // If the move to be processed is a castle then we can handle this here and then exit.
-  if (move.castle == PieceType::KING)
+  if (isKingSideCastle(move))
   {
     return processCastle<PieceType::KING, C>(move);
   }
-  else if (move.castle == PieceType::QUEEN)
+  else if (isQueenSideCastle(move))
   {
     return processCastle<PieceType::QUEEN, C>(move);
   }
 
   // Same for en passant
-  if (move.enPassant)
+  if (isEnPassant(move))
   {
     return processEp<C>(move);
   }
@@ -280,21 +280,21 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
   m_colourBitboard[colourToMove] ^= fromToBitboard;
 
   // If the move is a capture, remove the captured piece.
-  if (move.capture)
+  if (isCapture(move))
   {
     PieceType pieceToCapture = captured(move);
-    Bitboard captureSquare = (move.enPassant ? m_state->epTarget() : toBitboard);
+    Bitboard captureSquare = (isEnPassant(move) ? m_state->epTarget() : toBitboard);
 
     m_pieceTypeBitboard[static_cast<int>(pieceToCapture)] ^= captureSquare;
     m_colourBitboard[opposingColour] ^= captureSquare;
   }
 
   // If the move is a promotion, swap the moved piece for a piece of the promoted type.
-  if (move.promotion != PieceType::NULL_PIECE)
+  if (isPromotion(move))
   {
     m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= toBitboard;
     m_colourBitboard[colourToMove] ^= toBitboard;
-    m_pieceTypeBitboard[static_cast<int>(move.promotion)] ^= toBitboard;
+    m_pieceTypeBitboard[static_cast<int>(promotion(move))] ^= toBitboard;
     m_colourBitboard[colourToMove] ^= toBitboard;
   }
 

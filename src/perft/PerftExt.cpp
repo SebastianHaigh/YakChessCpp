@@ -55,13 +55,13 @@ int main(int argv, char** argc)
     {
       board.makeMove(move);
       auto result = perft(board, depth);
-      std::cout << " " << move.toAlgebraic() << " " << result.m_total << "\n";
+      std::cout << " " << yak::toAlgebraic(move) << " " << result.m_total << "\n";
       total += result.m_total;
       board.undoMove();
       continue;
     }
 
-    std::cout << move.toAlgebraic() << " " << 1 << "\n";
+    std::cout << yak::toAlgebraic(move) << " " << 1 << "\n";
     ++total;
   }
 

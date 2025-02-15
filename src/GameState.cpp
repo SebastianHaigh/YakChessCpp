@@ -201,9 +201,9 @@ GameState* GameState::update(const Move &move)
   newState->m_side = not m_side;
 
   // Update the castling rights in the new state
-  bool isCastle = (move.castle != PieceType::NULL_PIECE);
-  bool isWhiteCastle = isCastle && m_side;
-  bool isBlackCastle = isCastle && not m_side;
+  bool castle = isCastle(move);
+  bool isWhiteCastle = castle && m_side;
+  bool isBlackCastle = castle && not m_side;
 
   Square fromSquare = from(move);
   Square toSquare = to(move);
@@ -212,7 +212,7 @@ GameState* GameState::update(const Move &move)
 
   // If this is a castle move, the from and to squares are set to A1, which is a white rook starting square,
   // only consider the from and to squares if this move is not a castling move
-  if (not isCastle)
+  if (not castle)
   {
     removesWhiteK = (fromSquare == WHITE_KING_SQUARE || fromSquare == WHITE_KINGS_ROOK || toSquare == WHITE_KINGS_ROOK);
     removesWhiteQ = (fromSquare == WHITE_KING_SQUARE || fromSquare == WHITE_QUEENS_ROOK || toSquare == WHITE_QUEENS_ROOK);
@@ -235,11 +235,11 @@ GameState* GameState::update(const Move &move)
   //
   // m_side * 2 will either be 0 or 2
   // double push will either be 0 or 1
-  newState->m_epSquare = static_cast<Square>(possibleTargets[static_cast<int>(m_side) * 2 + move.doublePush]);
+  newState->m_epSquare = static_cast<Square>(possibleTargets[static_cast<int>(m_side) * 2 + isDoublePush(move)]);
 
   // Update the move clocks
   newState->m_moveClock = (not m_side) ? m_moveClock + 1 : m_moveClock;
-  newState->m_halfMoveClock = (move.capture || move.pawnMove) ? 0 : m_halfMoveClock + 1;
+  newState->m_halfMoveClock = (isCapture(move) || isPawnMove(move)) ? 0 : m_halfMoveClock + 1;
 
   return newState;
 }

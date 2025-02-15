@@ -36,7 +36,7 @@ inline auto makeDoublePush(Square from, Square to) -> Move
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
-  move.doublePush = true;
+  setMoveFlag<MoveFlag::DOUBLE_PUSH>(move);
   return move;
 }
 
@@ -55,7 +55,7 @@ inline auto makeCapture(Square from, Square to, PieceType moved, PieceType captu
   setTo(move, to);
   setMoved(move, moved);
   setCaptured(move, captured);
-  move.capture = true;
+  setMoveFlag<MoveFlag::CAPTURE>(move);
   return move;
 };
 
@@ -72,8 +72,7 @@ inline auto makeEpCapture(Square from, Square to) -> Move
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
   setCaptured(move, PieceType::PAWN);
-  move.capture = true;
-  move.enPassant = true;
+  setMoveFlags<MoveFlag::CAPTURE, MoveFlag::EP>(move);
   return move;
 };
 
@@ -90,7 +89,8 @@ inline auto makeQuietPromotion(Square from, Square to, PieceType type) -> Move
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
-  move.promotion = type;
+  setMoveFlag<MoveFlag::PROMOTION>(move);
+  setPromotion(move, type);
   return move;
 };
 
@@ -109,22 +109,22 @@ inline auto makeCapturePromotion(Square from, Square to, PieceType type, PieceTy
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
   setCaptured(move, captured);
-  move.capture = true;
-  move.promotion = type;
+  setMoveFlags<MoveFlag::CAPTURE, MoveFlag::PROMOTION>(move);
+  setPromotion(move, type);
   return move;
 };
 
 inline auto makeKingsideCastle() -> Move
 {
   Move move;
-  move.castle = PieceType::KING;
+  setKingSideCastle(move);
   return move;
 };
 
 inline auto makeQueensideCastle() -> Move
 {
   Move move;
-  move.castle = PieceType::QUEEN;
+  setQueenSideCastle(move);
   return move;
 };
 
