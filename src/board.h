@@ -249,11 +249,11 @@ template<PieceColour C>
 Board::MoveResult Board::processMove(const Move &move, bool undo)
 {
   // If the move to be processed is a castle then we can handle this here and then exit.
-  if (move.castle == PieceType::KING)
+  if (isKingSideCastle(move))
   {
     return processCastle<PieceType::KING, C>(move);
   }
-  else if (move.castle == PieceType::QUEEN)
+  else if (isQueenSideCastle(move))
   {
     return processCastle<PieceType::QUEEN, C>(move);
   }

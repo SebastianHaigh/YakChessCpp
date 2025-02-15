@@ -116,14 +116,14 @@ inline auto makeCapturePromotion(Square from, Square to, PieceType type, PieceTy
 inline auto makeKingsideCastle() -> Move
 {
   Move move;
-  move.castle = PieceType::KING;
+  setKingSideCastle(move);
   return move;
 };
 
 inline auto makeQueensideCastle() -> Move
 {
   Move move;
-  move.castle = PieceType::QUEEN;
+  setQueenSideCastle(move);
   return move;
 };
 

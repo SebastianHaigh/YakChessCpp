@@ -22,7 +22,7 @@ std::vector<Move>::const_iterator findFirstCastlingMove(std::vector<Move>::const
   return std::find_if(begin_p, end_p,
                       [] (const Move& move)
                       {
-                        return (move.castle != PieceType::NULL_PIECE);
+                        return (isCastle(move));
                       });
 }
 
@@ -233,7 +233,6 @@ TEST_CASE("BoardTest: Make and undo all moves to depth 3")
 
   for (const auto& move : moves)
   {
-    std::cout << "making a first move WHITE" << std::endl;
     yak::Board::MoveResult makeResult = board.makeMove(move);
     CHECK(makeResult == yak::Board::MoveResult::SUCCESS);
 

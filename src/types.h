@@ -102,7 +102,6 @@ using MoveMask = NewMove;
 struct Move
 {
   NewMove fromAndTo{ 0 };
-  PieceType castle = PieceType::NULL_PIECE;
   PieceType promotion = PieceType::NULL_PIECE;
 
   std::string toAlgebraic() const;
@@ -121,12 +120,14 @@ static constexpr MoveMask CAPTURED_PIECE_MASK  { 0b0111'0000'0000'0000'0000'0000
 
 static constexpr MoveMask NOT_FROM_MASK{ ~FROM_MASK };
 static constexpr MoveMask NOT_TO_MASK{ ~TO_MASK };
+static constexpr MoveMask NOT_CASTLE_MASK{ ~CASTLE_MASK };
 static constexpr MoveMask NOT_PROMOTION_MASK{ ~PROMOTION_MASK };
 static constexpr MoveMask NOT_MOVED_PIECE_MASK{ ~MOVED_PIECE_MASK };
 static constexpr MoveMask NOT_CAPTURED_PIECE_MASK{ ~CAPTURED_PIECE_MASK };
 
 static constexpr int FROM_OFFSET{ 0 };
 static constexpr int TO_OFFSET{ 6 };
+static constexpr int CASTLE_OFFSET{ 16 };
 static constexpr int PROMOTION_OFFSET{ 18 };
 static constexpr int MOVED_PIECE_OFFSET{ 21 };
 static constexpr int CAPTURED_PIECE_OFFSET{ 24 };
@@ -143,10 +144,17 @@ enum class MoveValue
 {
   FROM,
   TO,
+  CASTLE,
   PROMOTION,
   MOVED,
   CAPTURED,
 };
+
+static constexpr uint8_t KINGSIDE_CASTLE_VALUE{ 0b01 };
+static constexpr uint8_t QUEENSIDE_CASTLE_VALUE{ 0b10 };
+
+template<typename T>
+static constexpr bool failed{ false };
 
 template<MoveFlag flag>
 consteval auto getMoveMask() -> MoveMask
@@ -154,9 +162,8 @@ consteval auto getMoveMask() -> MoveMask
   if constexpr (flag == MoveFlag::PAWN_MOVE) return PAWN_MOVE_MASK;
   else if constexpr (flag == MoveFlag::DOUBLE_PUSH) return DOUBLE_PUSH_MASK;
   else if constexpr (flag == MoveFlag::EP) return EP_MASK;
-  else if constexpr (flag == MoveFlag::CAPTURE) return CASTLE_MASK;
-
-  return {};
+  else if constexpr (flag == MoveFlag::CAPTURE) return CAPTURE_MASK;
+  else static_assert(failed<MoveFlag>, "Unknown move flag");
 }
 
 template<MoveValue value>
@@ -164,11 +171,11 @@ consteval auto getValueMask() -> MoveMask
 {
   if constexpr (value == MoveValue::FROM) return FROM_MASK;
   else if constexpr (value == MoveValue::TO) return TO_MASK;
+  else if constexpr (value == MoveValue::CASTLE) return CASTLE_MASK;
   else if constexpr (value == MoveValue::PROMOTION) return PROMOTION_MASK;
   else if constexpr (value == MoveValue::MOVED) return MOVED_PIECE_MASK;
   else if constexpr (value == MoveValue::CAPTURED) return CAPTURED_PIECE_MASK;
-
-  return {};
+  else static_assert(failed<MoveValue>, "Unknown move value");
 }
 
 template<MoveValue value>
@@ -176,11 +183,11 @@ consteval auto getNotValueMask() -> MoveMask
 {
   if constexpr (value == MoveValue::FROM) return NOT_FROM_MASK;
   else if constexpr (value == MoveValue::TO) return NOT_TO_MASK;
+  else if constexpr (value == MoveValue::CASTLE) return NOT_CASTLE_MASK;
   else if constexpr (value == MoveValue::PROMOTION) return NOT_PROMOTION_MASK;
   else if constexpr (value == MoveValue::MOVED) return NOT_MOVED_PIECE_MASK;
   else if constexpr (value == MoveValue::CAPTURED) return NOT_CAPTURED_PIECE_MASK;
-
-  return {};
+  else static_assert(failed<MoveValue>, "Unknown move value");
 }
 
 template<MoveValue value>
@@ -188,11 +195,11 @@ consteval auto getValueOffset() -> int
 {
   if constexpr (value == MoveValue::FROM) return FROM_OFFSET;
   else if constexpr (value == MoveValue::TO) return TO_OFFSET;
+  else if constexpr (value == MoveValue::CASTLE) return CASTLE_OFFSET;
   else if constexpr (value == MoveValue::PROMOTION) return PROMOTION_OFFSET;
   else if constexpr (value == MoveValue::MOVED) return MOVED_PIECE_OFFSET;
   else if constexpr (value == MoveValue::CAPTURED) return CAPTURED_PIECE_OFFSET;
-
-  return {};
+  else static_assert(failed<MoveValue>, "Unknown move value");
 }
 
 template<MoveFlag flag>
@@ -294,6 +301,31 @@ inline constexpr auto captured(Move const& move) -> PieceType
 inline constexpr void setCaptured(Move& move, PieceType type)
 {
   setValue<MoveValue::CAPTURED>(move, pieceTypeToInt(type));
+}
+
+inline constexpr void setKingSideCastle(Move& move)
+{
+  setValue<MoveValue::CASTLE>(move, KINGSIDE_CASTLE_VALUE);
+}
+
+inline constexpr auto isKingSideCastle(const Move& move) -> bool
+{
+  return (getValue<MoveValue::CASTLE, uint32_t>(move) == KINGSIDE_CASTLE_VALUE);
+}
+
+inline constexpr void setQueenSideCastle(Move& move)
+{
+  setValue<MoveValue::CASTLE>(move, QUEENSIDE_CASTLE_VALUE);
+}
+
+inline constexpr auto isQueenSideCastle(const Move& move) -> bool
+{
+  return (getValue<MoveValue::CASTLE, uint32_t>(move) == QUEENSIDE_CASTLE_VALUE);
+}
+
+inline auto isCastle(const Move& move) -> bool
+{
+  return (getValue<MoveValue::CASTLE, uint32_t>(move) != 0);
 }
 
 inline auto Move::toAlgebraic() const -> std::string
