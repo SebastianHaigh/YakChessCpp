@@ -16,7 +16,7 @@ static constexpr bool Failed = false;
  * where each ray doesn't include the outer edge of the board
  */
 template<PieceType Type>
-constexpr auto occupancyMask(Square square) -> Bitboard
+consteval auto occupancyMask(Square square) -> Bitboard
 {
   Bitboard mask{0};
 
