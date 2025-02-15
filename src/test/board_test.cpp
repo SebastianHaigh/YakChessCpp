@@ -32,7 +32,7 @@ std::vector<Move>::const_iterator findFirstEpMove(std::vector<Move>::const_itera
   return std::find_if(begin_p, end_p,
                       [] (const Move& move)
                       {
-                        return move.enPassant;
+                        return isEnPassant(move);
                       });
 }
 

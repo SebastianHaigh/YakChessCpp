@@ -382,7 +382,7 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
 
   move_p = state.pop();
   REQUIRE(move_p);
-  CHECK(move_p->capture);
+  CHECK(isCapture(*move_p));
   CHECK(state->sideToMove() == PieceColour::WHITE);
   CHECK(state->sideNotToMove() == PieceColour::BLACK);
   CHECK(state->moveClock() == 3);

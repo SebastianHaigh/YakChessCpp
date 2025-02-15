@@ -102,8 +102,6 @@ using MoveMask = NewMove;
 struct Move
 {
   NewMove fromAndTo{ 0 };
-  bool capture = false;
-  bool enPassant = false;
   PieceType castle = PieceType::NULL_PIECE;
   PieceType promotion = PieceType::NULL_PIECE;
 
@@ -207,6 +205,32 @@ template<MoveFlag flag>
 inline constexpr void setMoveFlag(Move& move)
 {
   move.fromAndTo |= getMoveMask<flag>();
+}
+
+template<MoveFlag... flags>
+inline constexpr void setMoveFlags(Move& move)
+{
+  (..., setMoveFlag<flags>(move));
+}
+
+inline constexpr auto isPawnMove(const Move& move) -> bool
+{
+  return getMoveFlag<MoveFlag::PAWN_MOVE>(move);
+}
+
+inline constexpr auto isDoublePush(const Move& move) -> bool
+{
+  return getMoveFlag<MoveFlag::DOUBLE_PUSH>(move);
+}
+
+inline constexpr auto isCapture(const Move& move) -> bool
+{
+  return getMoveFlag<MoveFlag::CAPTURE>(move);
+}
+
+inline constexpr auto isEnPassant(const Move& move) -> bool
+{
+  return getMoveFlag<MoveFlag::EP>(move);
 }
 
 template<MoveValue toSet, typename Value>

@@ -259,7 +259,7 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
   }
 
   // Same for en passant
-  if (move.enPassant)
+  if (isEnPassant(move))
   {
     return processEp<C>(move);
   }
@@ -280,10 +280,10 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
   m_colourBitboard[colourToMove] ^= fromToBitboard;
 
   // If the move is a capture, remove the captured piece.
-  if (move.capture)
+  if (isCapture(move))
   {
     PieceType pieceToCapture = captured(move);
-    Bitboard captureSquare = (move.enPassant ? m_state->epTarget() : toBitboard);
+    Bitboard captureSquare = (isEnPassant(move) ? m_state->epTarget() : toBitboard);
 
     m_pieceTypeBitboard[static_cast<int>(pieceToCapture)] ^= captureSquare;
     m_colourBitboard[opposingColour] ^= captureSquare;

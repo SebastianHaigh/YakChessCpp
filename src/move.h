@@ -55,7 +55,7 @@ inline auto makeCapture(Square from, Square to, PieceType moved, PieceType captu
   setTo(move, to);
   setMoved(move, moved);
   setCaptured(move, captured);
-  move.capture = true;
+  setMoveFlag<MoveFlag::CAPTURE>(move);
   return move;
 };
 
@@ -72,8 +72,7 @@ inline auto makeEpCapture(Square from, Square to) -> Move
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
   setCaptured(move, PieceType::PAWN);
-  move.capture = true;
-  move.enPassant = true;
+  setMoveFlags<MoveFlag::CAPTURE, MoveFlag::EP>(move);
   return move;
 };
 
@@ -109,7 +108,7 @@ inline auto makeCapturePromotion(Square from, Square to, PieceType type, PieceTy
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
   setCaptured(move, captured);
-  move.capture = true;
+  setMoveFlag<MoveFlag::CAPTURE>(move);
   move.promotion = type;
   return move;
 };

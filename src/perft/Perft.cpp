@@ -70,7 +70,7 @@ PerftResult perftHelper(Board& board, int depth, std::unique_ptr<ThreadPool> thr
     // TODO (haigh) use ranges?
     for (const auto& move : moves)
     {
-      if (move.capture) ++result.m_captures;
+      if (isCapture(move)) ++result.m_captures;
     }
     return result;
   }
