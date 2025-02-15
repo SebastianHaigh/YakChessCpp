@@ -290,11 +290,11 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
   }
 
   // If the move is a promotion, swap the moved piece for a piece of the promoted type.
-  if (move.promotion != PieceType::NULL_PIECE)
+  if (isPromotion(move))
   {
     m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= toBitboard;
     m_colourBitboard[colourToMove] ^= toBitboard;
-    m_pieceTypeBitboard[static_cast<int>(move.promotion)] ^= toBitboard;
+    m_pieceTypeBitboard[static_cast<int>(promotion(move))] ^= toBitboard;
     m_colourBitboard[colourToMove] ^= toBitboard;
   }
 

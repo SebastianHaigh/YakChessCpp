@@ -89,7 +89,8 @@ inline auto makeQuietPromotion(Square from, Square to, PieceType type) -> Move
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
-  move.promotion = type;
+  setMoveFlag<MoveFlag::PROMOTION>(move);
+  setPromotion(move, type);
   return move;
 };
 
@@ -108,8 +109,8 @@ inline auto makeCapturePromotion(Square from, Square to, PieceType type, PieceTy
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
   setCaptured(move, captured);
-  setMoveFlag<MoveFlag::CAPTURE>(move);
-  move.promotion = type;
+  setMoveFlags<MoveFlag::CAPTURE, MoveFlag::PROMOTION>(move);
+  setPromotion(move, type);
   return move;
 };
 

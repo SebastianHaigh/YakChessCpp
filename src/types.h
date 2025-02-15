@@ -11,7 +11,8 @@ using Bitboard = uint64_t;
 using File = uint64_t;
 using Rank = uint64_t;
 
-enum Square {
+enum Square
+{
   A1 = 0, B1, C1, D1, E1, F1, G1, H1,
   A2, B2, C2, D2, E2, F2, G2, H2,
   A3, B3, C3, D3, E3, F3, G3, H3,
@@ -23,12 +24,14 @@ enum Square {
   NULL_SQUARE
 };
 
-enum class RayType {
+enum class RayType
+{
   POSITIVE,
   NEGATIVE
 };
 
-enum class Direction {
+enum class Direction
+{
   NORTH,
   EAST,
   SOUTH,
@@ -39,7 +42,8 @@ enum class Direction {
   SOUTH_WEST
 };
 
-enum class PieceType {
+enum class PieceType
+{
   PAWN = 0,
   KNIGHT,
   BISHOP,
@@ -102,7 +106,6 @@ using MoveMask = NewMove;
 struct Move
 {
   NewMove fromAndTo{ 0 };
-  PieceType promotion = PieceType::NULL_PIECE;
 
   std::string toAlgebraic() const;
 };
@@ -113,10 +116,11 @@ static constexpr MoveMask PAWN_MOVE_MASK       { 0b0000'0000'0000'0001'0000'0000
 static constexpr MoveMask DOUBLE_PUSH_MASK     { 0b0000'0000'0000'0010'0000'0000'0000 };
 static constexpr MoveMask EP_MASK              { 0b0000'0000'0000'0100'0000'0000'0000 };
 static constexpr MoveMask CAPTURE_MASK         { 0b0000'0000'0000'1000'0000'0000'0000 };
-static constexpr MoveMask CASTLE_MASK          { 0b0000'0000'0011'0000'0000'0000'0000 };
-static constexpr MoveMask PROMOTION_MASK       { 0b0000'0001'1100'0000'0000'0000'0000 };
-static constexpr MoveMask MOVED_PIECE_MASK     { 0b0000'1110'0000'0000'0000'0000'0000 };
-static constexpr MoveMask CAPTURED_PIECE_MASK  { 0b0111'0000'0000'0000'0000'0000'0000 };
+static constexpr MoveMask PROMOTION_FLAG_MASK  { 0b0000'0000'0001'0000'0000'0000'0000 };
+static constexpr MoveMask CASTLE_MASK          { 0b0000'0000'0110'0000'0000'0000'0000 };
+static constexpr MoveMask PROMOTION_MASK       { 0b0000'0011'1000'0000'0000'0000'0000 };
+static constexpr MoveMask MOVED_PIECE_MASK     { 0b0001'1100'0000'0000'0000'0000'0000 };
+static constexpr MoveMask CAPTURED_PIECE_MASK  { 0b1110'0000'0000'0000'0000'0000'0000 };
 
 static constexpr MoveMask NOT_FROM_MASK{ ~FROM_MASK };
 static constexpr MoveMask NOT_TO_MASK{ ~TO_MASK };
@@ -127,10 +131,10 @@ static constexpr MoveMask NOT_CAPTURED_PIECE_MASK{ ~CAPTURED_PIECE_MASK };
 
 static constexpr int FROM_OFFSET{ 0 };
 static constexpr int TO_OFFSET{ 6 };
-static constexpr int CASTLE_OFFSET{ 16 };
-static constexpr int PROMOTION_OFFSET{ 18 };
-static constexpr int MOVED_PIECE_OFFSET{ 21 };
-static constexpr int CAPTURED_PIECE_OFFSET{ 24 };
+static constexpr int CASTLE_OFFSET{ 17 };
+static constexpr int PROMOTION_OFFSET{ 19 };
+static constexpr int MOVED_PIECE_OFFSET{ 22 };
+static constexpr int CAPTURED_PIECE_OFFSET{ 25 };
 
 enum class MoveFlag
 {
@@ -138,6 +142,7 @@ enum class MoveFlag
   DOUBLE_PUSH,
   EP,
   CAPTURE,
+  PROMOTION,
 };
 
 enum class MoveValue
@@ -163,6 +168,7 @@ consteval auto getMoveMask() -> MoveMask
   else if constexpr (flag == MoveFlag::DOUBLE_PUSH) return DOUBLE_PUSH_MASK;
   else if constexpr (flag == MoveFlag::EP) return EP_MASK;
   else if constexpr (flag == MoveFlag::CAPTURE) return CAPTURE_MASK;
+  else if constexpr (flag == MoveFlag::PROMOTION) return PROMOTION_FLAG_MASK;
   else static_assert(failed<MoveFlag>, "Unknown move flag");
 }
 
@@ -240,6 +246,11 @@ inline constexpr auto isEnPassant(const Move& move) -> bool
   return getMoveFlag<MoveFlag::EP>(move);
 }
 
+inline constexpr auto isPromotion(const Move& move) -> bool
+{
+  return getMoveFlag<MoveFlag::PROMOTION>(move);
+}
+
 template<MoveValue toSet, typename Value>
 inline constexpr auto setValue(Move& move, Value value)
 {
@@ -301,6 +312,16 @@ inline constexpr auto captured(Move const& move) -> PieceType
 inline constexpr void setCaptured(Move& move, PieceType type)
 {
   setValue<MoveValue::CAPTURED>(move, pieceTypeToInt(type));
+}
+
+inline constexpr auto promotion(Move const& move) -> PieceType
+{
+  return getValue<MoveValue::PROMOTION, PieceType>(move);
+}
+
+inline constexpr void setPromotion(Move& move, PieceType type)
+{
+  setValue<MoveValue::PROMOTION>(move, pieceTypeToInt(type));
 }
 
 inline constexpr void setKingSideCastle(Move& move)
