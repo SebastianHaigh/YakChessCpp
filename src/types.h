@@ -100,15 +100,8 @@ std::string toAlgebraic(File file_index, Rank rank_index);
 // flags 4 bits
 // captured piece 4 bits?
 
-using NewMove = uint32_t;
-using MoveMask = NewMove;
-
-struct Move
-{
-  NewMove fromAndTo{ 0 };
-
-  std::string toAlgebraic() const;
-};
+using Move = uint32_t;
+using MoveMask = Move;
 
 static constexpr MoveMask FROM_MASK            { 0b0000'0000'0000'0000'0000'0011'1111 };
 static constexpr MoveMask TO_MASK              { 0b0000'0000'0000'0000'1111'1100'0000 };
@@ -209,15 +202,15 @@ consteval auto getValueOffset() -> int
 }
 
 template<MoveFlag flag>
-inline constexpr auto getMoveFlag(const Move& move) -> bool
+inline constexpr auto getMoveFlag(Move move) -> bool
 {
-  return (move.fromAndTo & getMoveMask<flag>());
+  return (move & getMoveMask<flag>());
 }
 
 template<MoveFlag flag>
 inline constexpr void setMoveFlag(Move& move)
 {
-  move.fromAndTo |= getMoveMask<flag>();
+  move |= getMoveMask<flag>();
 }
 
 template<MoveFlag... flags>
@@ -226,27 +219,27 @@ inline constexpr void setMoveFlags(Move& move)
   (..., setMoveFlag<flags>(move));
 }
 
-inline constexpr auto isPawnMove(const Move& move) -> bool
+inline constexpr auto isPawnMove(Move move) -> bool
 {
   return getMoveFlag<MoveFlag::PAWN_MOVE>(move);
 }
 
-inline constexpr auto isDoublePush(const Move& move) -> bool
+inline constexpr auto isDoublePush(Move move) -> bool
 {
   return getMoveFlag<MoveFlag::DOUBLE_PUSH>(move);
 }
 
-inline constexpr auto isCapture(const Move& move) -> bool
+inline constexpr auto isCapture(Move move) -> bool
 {
   return getMoveFlag<MoveFlag::CAPTURE>(move);
 }
 
-inline constexpr auto isEnPassant(const Move& move) -> bool
+inline constexpr auto isEnPassant(Move move) -> bool
 {
   return getMoveFlag<MoveFlag::EP>(move);
 }
 
-inline constexpr auto isPromotion(const Move& move) -> bool
+inline constexpr auto isPromotion(Move move) -> bool
 {
   return getMoveFlag<MoveFlag::PROMOTION>(move);
 }
@@ -254,17 +247,17 @@ inline constexpr auto isPromotion(const Move& move) -> bool
 template<MoveValue toSet, typename Value>
 inline constexpr auto setValue(Move& move, Value value)
 {
-  auto notValue = move.fromAndTo & getNotValueMask<toSet>();
-  move.fromAndTo = (notValue | ((value << getValueOffset<toSet>()) & getValueMask<toSet>()));
+  auto notValue = move & getNotValueMask<toSet>();
+  move = (notValue | ((value << getValueOffset<toSet>()) & getValueMask<toSet>()));
 }
 
 template<MoveValue toGet, typename T>
-inline constexpr auto getValue(const Move& move) -> T
+inline constexpr auto getValue(Move move) -> T
 {
-  return static_cast<T>(((move.fromAndTo & getValueMask<toGet>()) >> getValueOffset<toGet>()));
+  return static_cast<T>(((move & getValueMask<toGet>()) >> getValueOffset<toGet>()));
 }
 
-inline constexpr auto from(Move const& move) -> Square
+inline constexpr auto from(Move move) -> Square
 {
   return getValue<MoveValue::FROM, Square>(move);
 }
@@ -274,7 +267,7 @@ inline constexpr void setFrom(Move& move, Square square)
   setValue<MoveValue::FROM>(move, square);
 }
 
-inline constexpr auto to(Move const& move) -> Square
+inline constexpr auto to(Move move) -> Square
 {
   return getValue<MoveValue::TO, Square>(move);
 }
@@ -289,7 +282,7 @@ inline constexpr auto pieceTypeToInt(PieceType type) -> uint8_t
   return (static_cast<uint8_t>(type) & 0x0F);
 }
 
-inline constexpr auto moved(Move const& move) -> PieceType
+inline constexpr auto moved(Move move) -> PieceType
 {
   return getValue<MoveValue::MOVED, PieceType>(move);
 }
@@ -304,7 +297,7 @@ inline constexpr void setMoved(Move& move, PieceType type)
   setValue<MoveValue::MOVED>(move, pieceTypeToInt(type));
 }
 
-inline constexpr auto captured(Move const& move) -> PieceType
+inline constexpr auto captured(Move move) -> PieceType
 {
   return getValue<MoveValue::CAPTURED, PieceType>(move);
 }
@@ -314,7 +307,7 @@ inline constexpr void setCaptured(Move& move, PieceType type)
   setValue<MoveValue::CAPTURED>(move, pieceTypeToInt(type));
 }
 
-inline constexpr auto promotion(Move const& move) -> PieceType
+inline constexpr auto promotion(Move move) -> PieceType
 {
   return getValue<MoveValue::PROMOTION, PieceType>(move);
 }
@@ -329,7 +322,7 @@ inline constexpr void setKingSideCastle(Move& move)
   setValue<MoveValue::CASTLE>(move, KINGSIDE_CASTLE_VALUE);
 }
 
-inline constexpr auto isKingSideCastle(const Move& move) -> bool
+inline constexpr auto isKingSideCastle(Move move) -> bool
 {
   return (getValue<MoveValue::CASTLE, uint32_t>(move) == KINGSIDE_CASTLE_VALUE);
 }
@@ -339,19 +332,19 @@ inline constexpr void setQueenSideCastle(Move& move)
   setValue<MoveValue::CASTLE>(move, QUEENSIDE_CASTLE_VALUE);
 }
 
-inline constexpr auto isQueenSideCastle(const Move& move) -> bool
+inline constexpr auto isQueenSideCastle(Move move) -> bool
 {
   return (getValue<MoveValue::CASTLE, uint32_t>(move) == QUEENSIDE_CASTLE_VALUE);
 }
 
-inline auto isCastle(const Move& move) -> bool
+inline auto isCastle(Move move) -> bool
 {
   return (getValue<MoveValue::CASTLE, uint32_t>(move) != 0);
 }
 
-inline auto Move::toAlgebraic() const -> std::string
+inline auto toAlgebraic(Move move) -> std::string
 {
-  return ::yak::toAlgebraic(from(*this)) + ::yak::toAlgebraic(to(*this));
+  return toAlgebraic(from(move)) + toAlgebraic(to(move));
 }
 
 } // namespace yak
