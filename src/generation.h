@@ -2,7 +2,7 @@
 #define GENERATION_PIECES_H_
 
 #include "bitboard.h"
-#include "move.h"
+#include "move.hpp"
 #include "pieces.h"
 #include "pawns.h"
 #include "types.h"

@@ -7,7 +7,7 @@
 
 #include "GameState.h"
 #include <magic/MagicBitboards.hpp>
-#include "move.h"
+#include "move.hpp"
 #include "pieces.h"
 #include "bitboard.h"
 #include "pawns.h"
@@ -362,7 +362,7 @@ auto Board::generatePieceMoves(Move *moveList,
     Bitboard quiet = atk_bb & emptySquares();
     while (quiet)
     {
-      *moveList = move::makeQuiet(from, bitboard::popLS1B(quiet), Type);
+      *moveList = makeQuiet(from, bitboard::popLS1B(quiet), Type);
       ++moveList;
       ++moveCounter;
     }
@@ -371,7 +371,7 @@ auto Board::generatePieceMoves(Move *moveList,
     while (capture)
     {
       Square captureSquare = bitboard::popLS1B(capture);
-      *moveList = move::makeCapture(from, captureSquare, Type, getPieceTypeOn(captureSquare));
+      *moveList = makeCapture(from, captureSquare, Type, getPieceTypeOn(captureSquare));
       ++moveList;
       ++moveCounter;
     }
@@ -392,7 +392,7 @@ void Board::generatePawnSinglePushes(Move *moveList,
 
   while (sources && not Promotions)
   {
-    *moveList = move::makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets), PieceType::PAWN);
+    *moveList = makeQuiet(bitboard::popLS1B(sources), bitboard::popLS1B(targets), PieceType::PAWN);
     ++moveList;
     ++moveCounter;
   }
@@ -401,10 +401,10 @@ void Board::generatePawnSinglePushes(Move *moveList,
   {
     const Square from = bitboard::popLS1B(sources);
     const Square to = bitboard::popLS1B(targets);
-    *moveList++ = move::makeQuietPromotion(from, to, PieceType::KNIGHT);
-    *moveList++ = move::makeQuietPromotion(from, to, PieceType::BISHOP);
-    *moveList++ = move::makeQuietPromotion(from, to, PieceType::ROOK);
-    *moveList++ = move::makeQuietPromotion(from, to, PieceType::QUEEN);
+    *moveList++ = makeQuietPromotion(from, to, PieceType::KNIGHT);
+    *moveList++ = makeQuietPromotion(from, to, PieceType::BISHOP);
+    *moveList++ = makeQuietPromotion(from, to, PieceType::ROOK);
+    *moveList++ = makeQuietPromotion(from, to, PieceType::QUEEN);
     moveCounter += 4;
   }
 }
@@ -424,7 +424,7 @@ void Board::generatePawnDoublePushes(Move* moveList,
 
   while (sources)
   {
-    *moveList++ = move::makeDoublePush(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
+    *moveList++ = makeDoublePush(bitboard::popLS1B(sources), bitboard::popLS1B(targets));
     moveCounter++;
   }
 }
@@ -442,7 +442,7 @@ void Board::generatePawnWestCaptures(Move *moveList,
   while (sources && not Promotions)
   {
     Square targetSquare = bitboard::popLS1B(targets);
-    *moveList = move::makeCapture(bitboard::popLS1B(sources), targetSquare, PieceType::PAWN, getPieceTypeOn(targetSquare));
+    *moveList = makeCapture(bitboard::popLS1B(sources), targetSquare, PieceType::PAWN, getPieceTypeOn(targetSquare));
     setMoved(*moveList, PieceType::PAWN);
     ++moveList;
     ++moveCounter;
@@ -454,10 +454,10 @@ void Board::generatePawnWestCaptures(Move *moveList,
     Square to{ bitboard::popLS1B(targets) };
     PieceType capturedPiece{ getPieceTypeOn(to) };
 
-    *moveList++ = move::makeCapturePromotion(from, to, PieceType::KNIGHT, capturedPiece);
-    *moveList++ = move::makeCapturePromotion(from, to, PieceType::BISHOP, capturedPiece);
-    *moveList++ = move::makeCapturePromotion(from, to, PieceType::ROOK, capturedPiece);
-    *moveList++ = move::makeCapturePromotion(from, to, PieceType::QUEEN, capturedPiece);
+    *moveList++ = makeCapturePromotion(from, to, PieceType::KNIGHT, capturedPiece);
+    *moveList++ = makeCapturePromotion(from, to, PieceType::BISHOP, capturedPiece);
+    *moveList++ = makeCapturePromotion(from, to, PieceType::ROOK, capturedPiece);
+    *moveList++ = makeCapturePromotion(from, to, PieceType::QUEEN, capturedPiece);
 
     moveCounter += 4;
   }
@@ -476,7 +476,7 @@ void Board::generatePawnEastCaptures(Move* moveList,
   while (sources && !Promotions)
   {
     Square targetSquare = bitboard::popLS1B(targets);
-    *moveList = move::makeCapture(bitboard::popLS1B(sources), targetSquare, PieceType::PAWN, getPieceTypeOn(targetSquare));
+    *moveList = makeCapture(bitboard::popLS1B(sources), targetSquare, PieceType::PAWN, getPieceTypeOn(targetSquare));
     ++moveList;
     ++moveCounter;
   }
@@ -487,10 +487,10 @@ void Board::generatePawnEastCaptures(Move* moveList,
     Square to{ bitboard::popLS1B(targets) };
     PieceType capturedPiece{ getPieceTypeOn(to) };
 
-    *moveList++ = move::makeCapturePromotion(from, to, PieceType::KNIGHT, capturedPiece);
-    *moveList++ = move::makeCapturePromotion(from, to, PieceType::BISHOP, capturedPiece);
-    *moveList++ = move::makeCapturePromotion(from, to, PieceType::ROOK, capturedPiece);
-    *moveList++ = move::makeCapturePromotion(from, to, PieceType::QUEEN, capturedPiece);
+    *moveList++ = makeCapturePromotion(from, to, PieceType::KNIGHT, capturedPiece);
+    *moveList++ = makeCapturePromotion(from, to, PieceType::BISHOP, capturedPiece);
+    *moveList++ = makeCapturePromotion(from, to, PieceType::ROOK, capturedPiece);
+    *moveList++ = makeCapturePromotion(from, to, PieceType::QUEEN, capturedPiece);
     moveCounter += 4;
   }
 }

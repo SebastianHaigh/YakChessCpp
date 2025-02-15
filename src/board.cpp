@@ -4,7 +4,6 @@
 #include <ctype.h>
 
 #include <bitboard.h>
-#include <move.h>
 #include <pieces.h>
 #include <generation.h>
 
@@ -204,7 +203,7 @@ void Board::generateCastlingMoves(std::vector<Move>& moves)
     const Bitboard kingPath = bitboard::shift<Direction::EAST>(king) | bitboard::shift<Direction::EAST>(bitboard::shift<Direction::EAST>(king));
     if ((kingPath & occupiedSquares()) == 0 && (kingPath & squaresAttackedByEnemy) == 0)
     {
-      moves.push_back(move::makeKingsideCastle());
+      moves.push_back(makeKingsideCastle());
     }
   }
 
@@ -214,7 +213,7 @@ void Board::generateCastlingMoves(std::vector<Move>& moves)
     const Bitboard rookPath = kingPath | bitboard::shift<Direction::WEST>(kingPath);
     if ((rookPath & occupiedSquares()) == 0 && (kingPath & squaresAttackedByEnemy) == 0)
     {
-      moves.push_back(move::makeQueensideCastle());
+      moves.push_back(makeQueensideCastle());
     }
 
   }

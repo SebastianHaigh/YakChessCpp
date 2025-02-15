@@ -1,6 +1,7 @@
 #include "GameState.h"
 
 #include <types.h>
+#include <move.hpp>
 
 namespace yak {
 
