@@ -39,10 +39,3 @@ ENV CXX=/usr/bin/g++-12
 RUN ln -s /usr/bin/g++-12 /usr/local/bin/c++
 RUN ln -s /usr/local/bin/cmake /usr/bin/cmake
 
-RUN mkdir -p /home/haigh/dev/YakChessCpp
-
-# Verify installation
-# RUN gcc --version && g++ --version && clang --version && cmake --version && ls /usr/local/include/boost
-
-WORKDIR /YakChessCpp
-
