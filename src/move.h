@@ -36,7 +36,7 @@ inline auto makeDoublePush(Square from, Square to) -> Move
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
-  move.doublePush = true;
+  setMoveFlag<MoveFlag::DOUBLE_PUSH>(move);
   return move;
 }
 

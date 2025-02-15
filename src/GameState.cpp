@@ -235,11 +235,11 @@ GameState* GameState::update(const Move &move)
   //
   // m_side * 2 will either be 0 or 2
   // double push will either be 0 or 1
-  newState->m_epSquare = static_cast<Square>(possibleTargets[static_cast<int>(m_side) * 2 + move.doublePush]);
+  newState->m_epSquare = static_cast<Square>(possibleTargets[static_cast<int>(m_side) * 2 + getMoveFlag<MoveFlag::DOUBLE_PUSH>(move)]);
 
   // Update the move clocks
   newState->m_moveClock = (not m_side) ? m_moveClock + 1 : m_moveClock;
-  newState->m_halfMoveClock = (move.capture || move.pawnMove) ? 0 : m_halfMoveClock + 1;
+  newState->m_halfMoveClock = (move.capture || getMoveFlag<MoveFlag::PAWN_MOVE>(move)) ? 0 : m_halfMoveClock + 1;
 
   return newState;
 }

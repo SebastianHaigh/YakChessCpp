@@ -2,6 +2,7 @@
 
 #include <GameState.h>
 #include <types.h>
+#include <move.h>
 
 namespace yak {
 
@@ -172,44 +173,49 @@ TEST_CASE("Game stack tests")
 TEST_CASE("Check that the EP square works")
 {
   GameStateManager state{};
-  Move move;
 
-  setDoublePush(move, A2, A4);
+  {
+    auto move = move::makeDoublePush(A2, A4);
+    state.update(move);
 
-  state.update(move);
-  CHECK(state->sideToMove() == PieceColour::BLACK);
-  CHECK(state->sideNotToMove() == PieceColour::WHITE);
-  CHECK(state->canQueenSideCastle(PieceColour::BLACK));
-  CHECK(state->canKingSideCastle(PieceColour::BLACK));
-  CHECK(state->canQueenSideCastle(PieceColour::WHITE));
-  CHECK(state->canKingSideCastle(PieceColour::WHITE));
-  CHECK(state->epTargetSquare() == A3);
+    CHECK(state->sideToMove() == PieceColour::BLACK);
+    CHECK(state->sideNotToMove() == PieceColour::WHITE);
+    CHECK(state->canQueenSideCastle(PieceColour::BLACK));
+    CHECK(state->canKingSideCastle(PieceColour::BLACK));
+    CHECK(state->canQueenSideCastle(PieceColour::WHITE));
+    CHECK(state->canKingSideCastle(PieceColour::WHITE));
+    CHECK(state->epTargetSquare() == A3);
+  }
 
-  setDoublePush(move, A7, A5);
-  state.update(move);
-  CHECK(state->sideToMove() == PieceColour::WHITE);
-  CHECK(state->sideNotToMove() == PieceColour::BLACK);
-  CHECK(state->canQueenSideCastle(PieceColour::BLACK));
-  CHECK(state->canKingSideCastle(PieceColour::BLACK));
-  CHECK(state->canQueenSideCastle(PieceColour::WHITE));
-  CHECK(state->canKingSideCastle(PieceColour::WHITE));
-  CHECK(state->epTargetSquare() == A6);
+  {
+    auto move = move::makeDoublePush(A7, A5);
+    state.update(move);
+    CHECK(state->sideToMove() == PieceColour::WHITE);
+    CHECK(state->sideNotToMove() == PieceColour::BLACK);
+    CHECK(state->canQueenSideCastle(PieceColour::BLACK));
+    CHECK(state->canKingSideCastle(PieceColour::BLACK));
+    CHECK(state->canQueenSideCastle(PieceColour::WHITE));
+    CHECK(state->canKingSideCastle(PieceColour::WHITE));
+    CHECK(state->epTargetSquare() == A6);
+  }
 
-  setTo(move, F7);
-  move.doublePush = false;
-  state.update(move);
-  CHECK(state->sideToMove() == PieceColour::BLACK);
-  CHECK(state->sideNotToMove() == PieceColour::WHITE);
-  CHECK(state->canQueenSideCastle(PieceColour::BLACK));
-  CHECK(state->canKingSideCastle(PieceColour::BLACK));
-  CHECK(state->canQueenSideCastle(PieceColour::WHITE));
-  CHECK(state->canKingSideCastle(PieceColour::WHITE));
-  CHECK(state->epTargetSquare() == NULL_SQUARE);
+  {
+    auto move = move::makeQuiet(B2, B3, PieceType::PAWN);
+    state.update(move);
+    CHECK(state->sideToMove() == PieceColour::BLACK);
+    CHECK(state->sideNotToMove() == PieceColour::WHITE);
+    CHECK(state->canQueenSideCastle(PieceColour::BLACK));
+    CHECK(state->canKingSideCastle(PieceColour::BLACK));
+    CHECK(state->canQueenSideCastle(PieceColour::WHITE));
+    CHECK(state->canKingSideCastle(PieceColour::WHITE));
+    CHECK(state->epTargetSquare() == NULL_SQUARE);
+  }
 
   const Move* move_p = state.pop();
   REQUIRE(move_p);
-  CHECK(to(*move_p) == F7);
-  CHECK_FALSE(move_p->doublePush);
+  CHECK(to(*move_p) == B3);
+  CHECK(from(*move_p) == B2);
+  CHECK_FALSE(getMoveFlag<MoveFlag::DOUBLE_PUSH>(*move_p));
   CHECK(state->sideToMove() == PieceColour::WHITE);
   CHECK(state->sideNotToMove() == PieceColour::BLACK);
   CHECK(state->sideNotToMove() == PieceColour::BLACK);
@@ -222,7 +228,8 @@ TEST_CASE("Check that the EP square works")
   move_p = state.pop();
   REQUIRE(move_p);
   CHECK(to(*move_p) == A5);
-  CHECK(move_p->doublePush);
+  CHECK(from(*move_p) == A7);
+  CHECK(getMoveFlag<MoveFlag::DOUBLE_PUSH>(*move_p));
   CHECK(state->sideToMove() == PieceColour::BLACK);
   CHECK(state->sideNotToMove() == PieceColour::WHITE);
   CHECK(state->canQueenSideCastle(PieceColour::BLACK));
@@ -234,7 +241,8 @@ TEST_CASE("Check that the EP square works")
   move_p = state.pop();
   REQUIRE(move_p);
   CHECK(to(*move_p) == A4);
-  CHECK(move_p->doublePush);
+  CHECK(from(*move_p) == A2);
+  CHECK(getMoveFlag<MoveFlag::DOUBLE_PUSH>(*move_p));
   CHECK(state->sideToMove() == PieceColour::WHITE);
   CHECK(state->sideNotToMove() == PieceColour::BLACK);
   CHECK(state->canQueenSideCastle(PieceColour::BLACK));
@@ -302,53 +310,68 @@ TEST_CASE("Check that the move clock works")
 
 TEST_CASE("Half move clock is reset by pawn moves and captures")
 {
+  // The moves in this test don't make sense, but they don't need to as only the game state is
+  // being tested, not the full position.
   GameStateManager state{};
-  Move move;
 
   CHECK(state->sideToMove() == PieceColour::WHITE);
   CHECK(state->sideNotToMove() == PieceColour::BLACK);
   CHECK(state->moveClock() == 1);
   CHECK(state->halfMoveClock() == 0);
 
-  move.pawnMove = true;
-  state.update(move);
-  CHECK(state->sideToMove() == PieceColour::BLACK);
-  CHECK(state->sideNotToMove() == PieceColour::WHITE);
-  CHECK(state->moveClock() == 1);
-  CHECK(state->halfMoveClock() == 0);
+  {
+    auto move = move::makeQuiet(D2, D4, PieceType::PAWN);
+    state.update(move);
+    CHECK(state->sideToMove() == PieceColour::BLACK);
+    CHECK(state->sideNotToMove() == PieceColour::WHITE);
+    CHECK(state->moveClock() == 1);
+    CHECK(state->halfMoveClock() == 0);
+  }
 
-  move.pawnMove = false;
-  state.update(move);
-  CHECK(state->sideToMove() == PieceColour::WHITE);
-  CHECK(state->sideNotToMove() == PieceColour::BLACK);
-  CHECK(state->moveClock() == 2);
-  CHECK(state->halfMoveClock() == 1);
+  {
+    auto move = move::makeQuiet(B8, C6, PieceType::KNIGHT);
+    state.update(move);
+    CHECK(state->sideToMove() == PieceColour::WHITE);
+    CHECK(state->sideNotToMove() == PieceColour::BLACK);
+    CHECK(state->moveClock() == 2);
+    CHECK(state->halfMoveClock() == 1);
+  }
 
-  state.update(move);
-  CHECK(state->sideToMove() == PieceColour::BLACK);
-  CHECK(state->sideNotToMove() == PieceColour::WHITE);
-  CHECK(state->moveClock() == 2);
-  CHECK(state->halfMoveClock() == 2);
+  {
+    auto move = move::makeQuiet(B1, C3, PieceType::KNIGHT);
+    state.update(move);
+    CHECK(state->sideToMove() == PieceColour::BLACK);
+    CHECK(state->sideNotToMove() == PieceColour::WHITE);
+    CHECK(state->moveClock() == 2);
+    CHECK(state->halfMoveClock() == 2);
+  }
 
-  state.update(move);
-  CHECK(state->sideToMove() == PieceColour::WHITE);
-  CHECK(state->sideNotToMove() == PieceColour::BLACK);
-  CHECK(state->moveClock() == 3);
-  CHECK(state->halfMoveClock() == 3);
+  {
+    auto move = move::makeQuiet(G8, F3, PieceType::KNIGHT);
+    state.update(move);
+    CHECK(state->sideToMove() == PieceColour::WHITE);
+    CHECK(state->sideNotToMove() == PieceColour::BLACK);
+    CHECK(state->moveClock() == 3);
+    CHECK(state->halfMoveClock() == 3);
+  }
 
-  move.capture = true;
-  state.update(move);
-  CHECK(state->sideToMove() == PieceColour::BLACK);
-  CHECK(state->sideNotToMove() == PieceColour::WHITE);
-  CHECK(state->moveClock() == 3);
-  CHECK(state->halfMoveClock() == 0);
+  {
+    auto move = move::makeCapture(G8, F3, PieceType::KNIGHT, PieceType::PAWN);
+    state.update(move);
+    CHECK(state->sideToMove() == PieceColour::BLACK);
+    CHECK(state->sideNotToMove() == PieceColour::WHITE);
+    CHECK(state->moveClock() == 3);
+    CHECK(state->halfMoveClock() == 0);
+  }
 
-  move.capture = false;
-  state.update(move);
-  CHECK(state->sideToMove() == PieceColour::WHITE);
-  CHECK(state->sideNotToMove() == PieceColour::BLACK);
-  CHECK(state->moveClock() == 4);
-  CHECK(state->halfMoveClock() == 1);
+  {
+    auto move = move::makeQuiet(G8, F3, PieceType::KNIGHT);
+    state.update(move);
+    CHECK(state->sideToMove() == PieceColour::WHITE);
+    CHECK(state->sideNotToMove() == PieceColour::BLACK);
+    CHECK(state->moveClock() == 4);
+    CHECK(state->halfMoveClock() == 1);
+  }
 
   const Move* move_p = state.pop();
   CHECK(move_p);
@@ -388,7 +411,7 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
 
   move_p = state.pop();
   REQUIRE(move_p);
-  CHECK(move_p->pawnMove);
+  CHECK(getMoveFlag<MoveFlag::PAWN_MOVE>(*move_p));
   CHECK(state->sideToMove() == PieceColour::WHITE);
   CHECK(state->sideNotToMove() == PieceColour::BLACK);
   CHECK(state->moveClock() == 1);
