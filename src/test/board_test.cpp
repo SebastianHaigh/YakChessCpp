@@ -2,15 +2,13 @@
 
 #include <board.h>
 #include <bitboard.h>
-#include <functional>
-#include <move.h>
+#include <move.hpp>
 #include <types.h>
 
-#include <string>
-#include <iostream>
 #include <stddef.h>
 #include <string_view>
 #include <vector>
+#include <algorithm>
 
 namespace yak {
 
@@ -42,24 +40,24 @@ TEST_CASE("MoveTest 1")
   CHECK(board.toFen() == STANDARD_STARTING_FEN);
 
   // Undo restores state
-  board.makeMove(move::makeQuiet(E2, E4, PieceType::PAWN));
+  board.makeMove(makeQuiet(E2, E4, PieceType::PAWN));
   board.undoMove();
   CHECK(board.toFen() == STANDARD_STARTING_FEN);
 
   // Double pawn push
-  board.makeMove(move::makeDoublePush(A2, A4));
+  board.makeMove(makeDoublePush(A2, A4));
   CHECK(board.toFen() == "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq a3 0 1");
 
   // Single pawn push
   board.reset(STANDARD_STARTING_FEN);
   CHECK(board.toFen() == STANDARD_STARTING_FEN);
-  board.makeMove(move::makeQuiet(A2, A3, PieceType::PAWN));
+  board.makeMove(makeQuiet(A2, A3, PieceType::PAWN));
   CHECK(board.toFen() == "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1");
 
   // EP capture
   board.reset("8/8/8/8/Pp6/1P6/8/8 b KQkq a3 0 1");
   CHECK(board.toFen() == "8/8/8/8/Pp6/1P6/8/8 b KQkq a3 0 1");
-  board.makeMove(move::makeEpCapture(B4, A3));
+  board.makeMove(makeEpCapture(B4, A3));
   CHECK(board.toFen() == "8/8/8/8/8/pP6/8/8 w KQkq - 0 2");
 }
 
@@ -215,7 +213,7 @@ TEST_CASE("Castling rights")
 
   board.reset("rnbqkbnr/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNR b KQkq - 0 1");
   CHECK(board.toFen() == "rnbqkbnr/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNR b KQkq - 0 1");
-  board.makeMove(move::makeCapture(H8, H1, PieceType::ROOK, PieceType::ROOK));
+  board.makeMove(makeCapture(H8, H1, PieceType::ROOK, PieceType::ROOK));
   CHECK(board.toFen() == "rnbqkbn1/ppppppp1/8/8/8/8/PPPPPPP1/RNBQKBNr w Qq - 0 2");
 }
 

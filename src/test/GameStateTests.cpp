@@ -2,7 +2,7 @@
 
 #include <GameState.h>
 #include <types.h>
-#include <move.h>
+#include <move.hpp>
 
 namespace yak {
 
@@ -175,7 +175,7 @@ TEST_CASE("Check that the EP square works")
   GameStateManager state{};
 
   {
-    auto move = move::makeDoublePush(A2, A4);
+    auto move = makeDoublePush(A2, A4);
     state.update(move);
 
     CHECK(state->sideToMove() == PieceColour::BLACK);
@@ -188,7 +188,7 @@ TEST_CASE("Check that the EP square works")
   }
 
   {
-    auto move = move::makeDoublePush(A7, A5);
+    auto move = makeDoublePush(A7, A5);
     state.update(move);
     CHECK(state->sideToMove() == PieceColour::WHITE);
     CHECK(state->sideNotToMove() == PieceColour::BLACK);
@@ -200,7 +200,7 @@ TEST_CASE("Check that the EP square works")
   }
 
   {
-    auto move = move::makeQuiet(B2, B3, PieceType::PAWN);
+    auto move = makeQuiet(B2, B3, PieceType::PAWN);
     state.update(move);
     CHECK(state->sideToMove() == PieceColour::BLACK);
     CHECK(state->sideNotToMove() == PieceColour::WHITE);
@@ -320,7 +320,7 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
   CHECK(state->halfMoveClock() == 0);
 
   {
-    auto move = move::makeQuiet(D2, D4, PieceType::PAWN);
+    auto move = makeQuiet(D2, D4, PieceType::PAWN);
     state.update(move);
     CHECK(state->sideToMove() == PieceColour::BLACK);
     CHECK(state->sideNotToMove() == PieceColour::WHITE);
@@ -329,7 +329,7 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
   }
 
   {
-    auto move = move::makeQuiet(B8, C6, PieceType::KNIGHT);
+    auto move = makeQuiet(B8, C6, PieceType::KNIGHT);
     state.update(move);
     CHECK(state->sideToMove() == PieceColour::WHITE);
     CHECK(state->sideNotToMove() == PieceColour::BLACK);
@@ -338,7 +338,7 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
   }
 
   {
-    auto move = move::makeQuiet(B1, C3, PieceType::KNIGHT);
+    auto move = makeQuiet(B1, C3, PieceType::KNIGHT);
     state.update(move);
     CHECK(state->sideToMove() == PieceColour::BLACK);
     CHECK(state->sideNotToMove() == PieceColour::WHITE);
@@ -347,7 +347,7 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
   }
 
   {
-    auto move = move::makeQuiet(G8, F3, PieceType::KNIGHT);
+    auto move = makeQuiet(G8, F3, PieceType::KNIGHT);
     state.update(move);
     CHECK(state->sideToMove() == PieceColour::WHITE);
     CHECK(state->sideNotToMove() == PieceColour::BLACK);
@@ -356,7 +356,7 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
   }
 
   {
-    auto move = move::makeCapture(G8, F3, PieceType::KNIGHT, PieceType::PAWN);
+    auto move = makeCapture(G8, F3, PieceType::KNIGHT, PieceType::PAWN);
     state.update(move);
     CHECK(state->sideToMove() == PieceColour::BLACK);
     CHECK(state->sideNotToMove() == PieceColour::WHITE);
@@ -365,7 +365,7 @@ TEST_CASE("Half move clock is reset by pawn moves and captures")
   }
 
   {
-    auto move = move::makeQuiet(G8, F3, PieceType::KNIGHT);
+    auto move = makeQuiet(G8, F3, PieceType::KNIGHT);
     state.update(move);
     CHECK(state->sideToMove() == PieceColour::WHITE);
     CHECK(state->sideNotToMove() == PieceColour::BLACK);
