@@ -3,6 +3,7 @@ enable_testing()
 add_subdirectory(test)
 add_subdirectory(perft)
 add_subdirectory(magic)
+add_subdirectory(engine)
 
 add_library(YakTypes types.cpp)
 target_include_directories(YakTypes PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
