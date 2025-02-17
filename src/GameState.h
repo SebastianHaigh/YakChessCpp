@@ -131,15 +131,6 @@ public:
     return bitboard::createBitboard(m_epSquare);
   }
 
-  inline void setCaptured(PieceType type)
-  {
-    m_captured = type;
-  }
-
-  inline PieceType captured()
-  {
-    return m_captured;
-  }
 private:
   void parseFen(const std::string& fen);
   void toggleSideToMove();
@@ -154,8 +145,7 @@ private:
   GameState* m_prevState = nullptr;  // 8 bytes
 
   // The move that was applied in order to get to the next state
-  Move m_move;  // 24 bytes
-  PieceType m_captured = PieceType::NULL_PIECE;
+  Move m_move;
   PieceColour m_colours[2] = {PieceColour::BLACK, PieceColour::WHITE};
 };
 
