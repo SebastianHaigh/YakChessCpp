@@ -1,9 +1,7 @@
-#ifndef GENERATION_PIECES_H_
-#define GENERATION_PIECES_H_
+#pragma once
 
 #include "bitboard.h"
 #include "move.hpp"
-#include "pieces.h"
 #include "pawns.h"
 #include "types.h"
 
@@ -33,5 +31,3 @@ void generateEpCaptures(Move *moveList,
 };
 
 } // namespace yak::move
-
-#endif // GENERATION_PIECES_H_
