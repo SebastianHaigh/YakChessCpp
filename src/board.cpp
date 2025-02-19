@@ -5,7 +5,6 @@
 
 #include <bitboard.h>
 #include <pieces.h>
-#include <generation.h>
 
 namespace yak {
 
@@ -137,27 +136,23 @@ std::vector<Move> Board::generateMoves()
 
   if (thisSide == PieceColour::WHITE)
   {
-    generatePawnMoves<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
-                                          m_psudeoLegalMovePointer,
-                                          getPosition(thisSide, PieceType::PAWN),
-                                          emptySquares());
+    m_psudeoLegalMovePointer += generatePawnMoves<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                     getPosition(thisSide, PieceType::PAWN),
+                                                                     emptySquares());
 
-    move::generateEpCaptures<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
-                                                 m_psudeoLegalMovePointer,
-                                                 getPosition(thisSide, PieceType::PAWN),
-                                                 m_state->epTarget());
+    m_psudeoLegalMovePointer += generateEpCaptures<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                       getPosition(thisSide, PieceType::PAWN),
+                                                                       m_state->epTarget());
   }
   else
   {
-    generatePawnMoves<PieceColour::BLACK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
-                                          m_psudeoLegalMovePointer,
-                                          getPosition(thisSide, PieceType::PAWN),
-                                          emptySquares());
+    m_psudeoLegalMovePointer += generatePawnMoves<PieceColour::BLACK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                     getPosition(thisSide, PieceType::PAWN),
+                                                                     emptySquares());
 
-    move::generateEpCaptures<PieceColour::BLACK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
-                                                 m_psudeoLegalMovePointer,
-                                                 getPosition(thisSide, PieceType::PAWN),
-                                                 m_state->epTarget());
+    m_psudeoLegalMovePointer += generateEpCaptures<PieceColour::BLACK>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
+                                                                       getPosition(thisSide, PieceType::PAWN),
+                                                                       m_state->epTarget());
   }
 
   m_psudeoLegalMovePointer += generatePieceMoves<PieceType::KNIGHT>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
