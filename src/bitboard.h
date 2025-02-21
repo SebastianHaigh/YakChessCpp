@@ -225,6 +225,24 @@ constexpr auto createBitboard(Squares ...squares) -> Bitboard
 void print_board(Bitboard board);
 std::string to_string(Bitboard board);
 
+template<PieceType T, PieceColour C> static constexpr Bitboard KingCastleTarget{ 0 };
+template<> constexpr Bitboard KingCastleTarget<PieceType::KING, PieceColour::WHITE>{ bitboard::static_bitboard<G1>::value };
+template<> constexpr Bitboard KingCastleTarget<PieceType::KING, PieceColour::BLACK>{ bitboard::static_bitboard<G8>::value };
+template<> constexpr Bitboard KingCastleTarget<PieceType::QUEEN, PieceColour::WHITE>{ bitboard::static_bitboard<C1>::value };
+template<> constexpr Bitboard KingCastleTarget<PieceType::QUEEN, PieceColour::BLACK>{ bitboard::static_bitboard<C8>::value };
+
+template<PieceType T, PieceColour C> static constexpr Bitboard RookCastleSource{ 0 };
+template<> constexpr Bitboard RookCastleSource<PieceType::KING, PieceColour::WHITE>{ bitboard::static_bitboard<H1>::value };
+template<> constexpr Bitboard RookCastleSource<PieceType::KING, PieceColour::BLACK>{ bitboard::static_bitboard<H8>::value };
+template<> constexpr Bitboard RookCastleSource<PieceType::QUEEN, PieceColour::WHITE>{ bitboard::static_bitboard<A1>::value };
+template<> constexpr Bitboard RookCastleSource<PieceType::QUEEN, PieceColour::BLACK>{ bitboard::static_bitboard<A8>::value };
+
+template<PieceType T, PieceColour C> static constexpr Bitboard RookCastleTarget{ 0 };
+template<> constexpr Bitboard RookCastleTarget<PieceType::KING, PieceColour::WHITE>{ bitboard::static_bitboard<F1>::value };
+template<> constexpr Bitboard RookCastleTarget<PieceType::KING, PieceColour::BLACK>{ bitboard::static_bitboard<F8>::value };
+template<> constexpr Bitboard RookCastleTarget<PieceType::QUEEN, PieceColour::WHITE>{ bitboard::static_bitboard<D1>::value };
+template<> constexpr Bitboard RookCastleTarget<PieceType::QUEEN, PieceColour::BLACK>{ bitboard::static_bitboard<D8>::value };
+
 } // namespace yak::bitboard
 
 #endif // YAK_BITBOARD_H_
