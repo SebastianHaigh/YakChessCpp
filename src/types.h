@@ -48,6 +48,12 @@ enum class PieceType
   NULL_PIECE
 };
 
+enum class PieceColour {
+  BLACK = 0,
+  WHITE,
+  NULL_COLOUR
+};
+
 template<typename T>
 concept Type = std::is_same_v<T, PieceType>;
 
@@ -63,12 +69,6 @@ concept Slideable = SimplySlideable<T> || CompoundSlideable<T>;
 template<PieceType T>
 concept Jumpable = (T == PieceType::KNIGHT) || (T == PieceType::KING);
 
-enum class PieceColour {
-  BLACK = 0,
-  WHITE,
-  NULL_COLOUR
-};
-
 File fileIndex(const Square& squareIndex);
 File fileIndex(char algebraicFile);
 File fileIndex(std::string_view algebraic_square);
@@ -82,6 +82,10 @@ Square squareIndex(std::string_view square);
 
 std::string toAlgebraic(Square square);
 std::string toAlgebraic(File file_index, Rank rank_index);
+
+template<PieceColour C> static constexpr PieceColour OppositeColour{ PieceColour::NULL_COLOUR };
+template<> constexpr PieceColour OppositeColour<PieceColour::WHITE>{ PieceColour::BLACK };
+template<> constexpr PieceColour OppositeColour<PieceColour::BLACK>{ PieceColour::WHITE };
 
 
 } // namespace yak

@@ -15,82 +15,6 @@
 
 namespace yak {
 
-template<PieceType T, PieceColour C>
-struct KingCastleTarget {
-  static constexpr Bitboard value{0};
-};
-
-template<> struct KingCastleTarget<PieceType::KING, PieceColour::WHITE> {
-  static constexpr Bitboard value = bitboard::static_bitboard<G1>::value;
-};
-
-template<> struct KingCastleTarget<PieceType::KING, PieceColour::BLACK> {
-  static constexpr Bitboard value = bitboard::static_bitboard<G8>::value;
-};
-
-template<> struct KingCastleTarget<PieceType::QUEEN, PieceColour::WHITE> {
-  static constexpr Bitboard value = bitboard::static_bitboard<C1>::value;
-};
-
-template<> struct KingCastleTarget<PieceType::QUEEN, PieceColour::BLACK> {
-  static constexpr Bitboard value = bitboard::static_bitboard<C8>::value;
-};
-
-template<PieceType T, PieceColour C>
-struct RookCastleSource {
-  static constexpr Bitboard value{0};
-};
-
-template<> struct RookCastleSource<PieceType::KING, PieceColour::WHITE> {
-  static constexpr Bitboard value = bitboard::static_bitboard<H1>::value;
-};
-
-template<> struct RookCastleSource<PieceType::KING, PieceColour::BLACK> {
-  static constexpr Bitboard value = bitboard::static_bitboard<H8>::value;
-};
-
-template<> struct RookCastleSource<PieceType::QUEEN, PieceColour::WHITE> {
-  static constexpr Bitboard value = bitboard::static_bitboard<A1>::value;
-};
-
-template<> struct RookCastleSource<PieceType::QUEEN, PieceColour::BLACK> {
-  static constexpr Bitboard value = bitboard::static_bitboard<A8>::value;
-};
-
-template<PieceType T, PieceColour C>
-struct RookCastleTarget {
-  static constexpr Bitboard value{0};
-};
-
-template<> struct RookCastleTarget<PieceType::KING, PieceColour::WHITE> {
-  static constexpr Bitboard value = bitboard::static_bitboard<F1>::value;
-};
-
-template<> struct RookCastleTarget<PieceType::KING, PieceColour::BLACK> {
-  static constexpr Bitboard value = bitboard::static_bitboard<F8>::value;
-};
-
-template<> struct RookCastleTarget<PieceType::QUEEN, PieceColour::WHITE> {
-  static constexpr Bitboard value = bitboard::static_bitboard<D1>::value;
-};
-
-template<> struct RookCastleTarget<PieceType::QUEEN, PieceColour::BLACK> {
-  static constexpr Bitboard value = bitboard::static_bitboard<D8>::value;
-};
-
-template<PieceColour C>
-struct OppositeColour {
-  static constexpr PieceColour value = PieceColour::NULL_COLOUR;
-};
-
-template<> struct OppositeColour<PieceColour::WHITE> {
-  static constexpr PieceColour value = PieceColour::BLACK;
-};
-
-template<> struct OppositeColour<PieceColour::BLACK> {
-  static constexpr PieceColour value = PieceColour::WHITE;
-};
-
 class Board
 {
 public:
@@ -263,7 +187,7 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
   const PieceType pieceToMove = moved(move);
 
   int colourToMove = static_cast<int>(C);
-  int opposingColour = static_cast<int>(OppositeColour<C>::value);
+  int opposingColour = static_cast<int>(OppositeColour<C>);
 
   // Make the basic move.
   m_pieceTypeBitboard[static_cast<int>(pieceToMove)] ^= fromToBitboard;
@@ -305,7 +229,7 @@ Board::MoveResult Board::processEp(const Move &move)
   // it will give the same result when the move is undo'd.
   Bitboard captureSquare = pawns::pawnSinglePushSource<C>(toBitboard);
   m_pieceTypeBitboard[static_cast<int>(PieceType::PAWN)] ^= captureSquare;
-  m_colourBitboard[static_cast<int>(OppositeColour<C>::value)] ^= captureSquare;
+  m_colourBitboard[static_cast<int>(OppositeColour<C>)] ^= captureSquare;
 
   // TODO (haigh) Can this fail?
   return MoveResult::SUCCESS;
@@ -317,12 +241,12 @@ Board::MoveResult Board::processCastle(const Move &move)
   if (m_state->can_castle<T>())
   {
     // Move the king
-    Bitboard fromToBitboard = getPosition(C, PieceType::KING) ^ KingCastleTarget<T, C>::value;
+    Bitboard fromToBitboard = getPosition(C, PieceType::KING) ^ bitboard::KingCastleTarget<T, C>;
     m_pieceTypeBitboard[static_cast<int>(PieceType::KING)] ^= fromToBitboard;
     m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;
 
     // Move the rook
-    fromToBitboard = RookCastleSource<T, C>::value ^ RookCastleTarget<T, C>::value;
+    fromToBitboard = bitboard::RookCastleSource<T, C> ^ bitboard::RookCastleTarget<T, C>;
     m_pieceTypeBitboard[static_cast<int>(PieceType::ROOK)] ^= fromToBitboard;
     m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;
   }
@@ -428,7 +352,7 @@ int Board::generatePawnDoublePushes(Move* moveList, Bitboard pawnPositions, Bitb
 template<PieceColour Colour, bool Promotions>
 int Board::generatePawnWestCaptures(Move *moveList, Bitboard pawnPositions)
 {
-  Bitboard opponentPieces = get_position(OppositeColour<Colour>::value);
+  Bitboard opponentPieces = get_position(OppositeColour<Colour>);
   pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
   Bitboard sources = pawns::pawnWestAttackSource<Colour>(opponentPieces) & pawnPositions;
   Bitboard targets = pawns::pawnWestAttackTarget<Colour>(sources);
@@ -464,7 +388,7 @@ int Board::generatePawnWestCaptures(Move *moveList, Bitboard pawnPositions)
 template<PieceColour Colour, bool Promotions>
 int Board::generatePawnEastCaptures(Move* moveList, Bitboard pawnPositions)
 {
-  Bitboard opponentPieces = get_position(OppositeColour<Colour>::value);
+  Bitboard opponentPieces = get_position(OppositeColour<Colour>);
   pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
   Bitboard sources = pawns::pawnEastAttackSource<Colour>(opponentPieces) & pawnPositions;
   Bitboard targets = pawns::pawnEastAttackTarget<Colour>(sources);
