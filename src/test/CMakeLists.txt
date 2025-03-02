@@ -49,3 +49,14 @@ target_link_libraries(TypesTests
 
 add_test(NAME TypesTests
          COMMAND TypesTests)
+
+add_executable(XRayTests XRayTests.cpp)
+target_link_libraries(XRayTests
+                      PUBLIC
+                        yak
+                        MagicBitboards
+                      PRIVATE
+                       Catch2::Catch2WithMain)
+
+add_test(NAME XRayTests
+         COMMAND XRayTests)
