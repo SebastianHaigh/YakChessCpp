@@ -21,6 +21,11 @@ public:
     return m_currentState;
   };
 
+  const GameState* operator->() const
+  {
+    return m_currentState;
+  };
+
   void update(const Move& move);
   const Move* const pop();
 
@@ -38,7 +43,7 @@ public:
   explicit GameState(const std::string& fen);
   ~GameState();
 
-  std::string toFen();
+  std::string toFen() const;
 
   /*!
    * \brief Update the game state based on a given move.
@@ -52,12 +57,17 @@ public:
     return m_prevState;
   }
 
+  inline const GameState* getPrevState() const
+  {
+    return m_prevState;
+  }
+
   /*!
    * \brief Check if a side can castle on the king m_side.
    * \param[in] colour - The colour of the side to check.
    * \return true if the m_side can castle on the king side, false otherwise.
    */
-  inline bool canKingSideCastle(PieceColour colour)
+  inline bool canKingSideCastle(PieceColour colour) const
   {
     if (colour == PieceColour::NULL_COLOUR) return false;
 
@@ -68,7 +78,7 @@ public:
    * \brief Check if the current side to move can king side castle.
    * \return true if the side to move can king side castle, false otherwise.
    */
-  inline bool canKingSideCastle()
+  inline bool canKingSideCastle() const
   {
     return m_castlingRights[m_side * 2];
   }
@@ -78,7 +88,7 @@ public:
    * \param[in] colour - The colour of the side to check.
    * \return true if the side can castle on the queen side, false otherwise.
    */
-  inline bool canQueenSideCastle(PieceColour colour)
+  inline bool canQueenSideCastle(PieceColour colour) const
   {
     if (colour == PieceColour::NULL_COLOUR) return false;
 
@@ -89,13 +99,13 @@ public:
    * \brief Check if the current side to move can queen side castle.
    * \return true if the side to move can queen side castle, false otherwise.
    */
-  inline bool canQueenSideCastle()
+  inline bool canQueenSideCastle() const
   {
     return m_castlingRights[1 + (m_side * 2)];
   }
 
   template<PieceType T>
-  bool can_castle()
+  bool can_castle() const
   {
     return (T == PieceType::KING) ? canKingSideCastle() :
            (T == PieceType::QUEEN) ? canQueenSideCastle() : false;

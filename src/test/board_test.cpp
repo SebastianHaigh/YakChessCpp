@@ -459,12 +459,13 @@ TEST_CASE("Move making")
   // . . . . . . . .    . . . . . . . .
   // . . . . . . . .    . . . . . . . .
 
-  board.reset("8/8/8/8/Pp6/1P6/8/8 b - a3 0 1");
   moves = board.generateMoves();
   move_p = findFirstEpMove(moves.cbegin(), moves.cend());
   REQUIRE(move_p != moves.cend());
   CHECK(board.makeMove(*move_p) == Board::MoveResult::SUCCESS);
   CHECK(board.toFen() == "8/8/8/8/8/pP6/8/8 w - - 0 2");
+  board.undoMove();
+  CHECK(board.toFen() == "8/8/8/8/Pp6/1P6/8/8 b - a3 0 1");
 
   // White king side castle
   board.reset("8/8/8/8/8/8/8/4K2R w K - 0 1");
@@ -473,6 +474,8 @@ TEST_CASE("Move making")
   REQUIRE(move_p != moves.cend());
   CHECK(board.makeMove(*move_p) == Board::MoveResult::SUCCESS);
   CHECK(board.toFen() == "8/8/8/8/8/8/8/5RK1 b - - 0 1");
+  board.undoMove();
+  CHECK(board.toFen() == "8/8/8/8/8/8/8/4K2R w K - 0 1");
 
   board.reset("rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1");
   moves = board.generateMoves();
@@ -480,6 +483,8 @@ TEST_CASE("Move making")
   REQUIRE(move_p != moves.cend());
   CHECK(board.makeMove(*move_p) == Board::MoveResult::SUCCESS);
   CHECK(board.toFen() == "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 0 1");
+  board.undoMove();
+  CHECK(board.toFen() == "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1");
 
   // Black king side castle
   board.reset("rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 1");
@@ -488,6 +493,8 @@ TEST_CASE("Move making")
   REQUIRE(move_p != moves.cend());
   CHECK(board.makeMove(*move_p) == Board::MoveResult::SUCCESS);
   CHECK(board.toFen() == "rnbq1rk1/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 w - - 0 2");
+  board.undoMove();
+  CHECK(board.toFen() == "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 1");
 
   // White queen side castle
   board.reset("rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/R3K1NR w KQkq - 0 1");
@@ -496,6 +503,8 @@ TEST_CASE("Move making")
   REQUIRE(move_p != moves.cend());
   CHECK(board.makeMove(*move_p) == Board::MoveResult::SUCCESS);
   CHECK(board.toFen() == "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/2KR2NR b kq - 0 1");
+  board.undoMove();
+  CHECK(board.toFen() == "rnbqk2r/ppp2pbp/3p1np1/3Pp3/2B1P3/2N1B3/PPPQ1PPP/R3K1NR w KQkq - 0 1");
 
   // Black queen side castle
   board.reset("r3kbnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR b KQkq - 0 1");
@@ -504,6 +513,8 @@ TEST_CASE("Move making")
   REQUIRE(move_p != moves.cend());
   CHECK(board.makeMove(*move_p) == Board::MoveResult::SUCCESS);
   CHECK(board.toFen() == "2kr1bnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR w KQ - 0 2");
+  board.undoMove();
+  CHECK(board.toFen() == "r3kbnr/ppp2ppp/3pb3/4p1q1/4Pn2/3P4/PPP2PPP/RNBQKBNR b KQkq - 0 1");
 
   // Pawn promotions
   board.reset("8/P7/8/8/8/8/8/8 w - - 0 1");
@@ -512,17 +523,22 @@ TEST_CASE("Move making")
   board.makeMove(moves[0]);
   CHECK(board.toFen() == "N7/8/8/8/8/8/8/8 b - - 0 1");
   board.undoMove();
+  CHECK(board.toFen() == "8/P7/8/8/8/8/8/8 w - - 0 1");
 
   board.makeMove(moves[1]);
   CHECK(board.toFen() == "B7/8/8/8/8/8/8/8 b - - 0 1");
   board.undoMove();
+  CHECK(board.toFen() == "8/P7/8/8/8/8/8/8 w - - 0 1");
 
   board.makeMove(moves[2]);
   CHECK(board.toFen() == "R7/8/8/8/8/8/8/8 b - - 0 1");
   board.undoMove();
+  CHECK(board.toFen() == "8/P7/8/8/8/8/8/8 w - - 0 1");
 
   board.makeMove(moves[3]);
   CHECK(board.toFen() == "Q7/8/8/8/8/8/8/8 b - - 0 1");
+  board.undoMove();
+  CHECK(board.toFen() == "8/P7/8/8/8/8/8/8 w - - 0 1");
 }
 
 } // namespace yak
