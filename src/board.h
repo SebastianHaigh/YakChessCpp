@@ -105,7 +105,7 @@ private:
    * \param[in] move - The move to be executed.
    */
   template<PieceType T, PieceColour C>
-  MoveResult processCastle(Move const& move);
+  MoveResult processCastle();
 
   template<PieceColour C>
   MoveResult processEp(Move const& move);
@@ -165,11 +165,11 @@ Board::MoveResult Board::processMove(const Move &move, bool undo)
   // If the move to be processed is a castle then we can handle this here and then exit.
   if (isKingSideCastle(move))
   {
-    return processCastle<PieceType::KING, C>(move);
+    return processCastle<PieceType::KING, C>();
   }
   else if (isQueenSideCastle(move))
   {
-    return processCastle<PieceType::QUEEN, C>(move);
+    return processCastle<PieceType::QUEEN, C>();
   }
 
   // Same for en passant
@@ -236,20 +236,17 @@ Board::MoveResult Board::processEp(const Move &move)
 }
 
 template<PieceType T, PieceColour C>
-Board::MoveResult Board::processCastle(const Move &move)
+Board::MoveResult Board::processCastle()
 {
-  if (m_state->can_castle<T>())
-  {
-    // Move the king
-    Bitboard fromToBitboard = getPosition(C, PieceType::KING) ^ bitboard::KingCastleTarget<T, C>;
-    m_pieceTypeBitboard[static_cast<int>(PieceType::KING)] ^= fromToBitboard;
-    m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;
+  // Move the king
+  Bitboard fromToBitboard = bitboard::KingCastleSource<C> ^ bitboard::KingCastleTarget<T, C>;
+  m_pieceTypeBitboard[static_cast<int>(PieceType::KING)] ^= fromToBitboard;
+  m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;
 
-    // Move the rook
-    fromToBitboard = bitboard::RookCastleSource<T, C> ^ bitboard::RookCastleTarget<T, C>;
-    m_pieceTypeBitboard[static_cast<int>(PieceType::ROOK)] ^= fromToBitboard;
-    m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;
-  }
+  // Move the rook
+  fromToBitboard = bitboard::RookCastleSource<T, C> ^ bitboard::RookCastleTarget<T, C>;
+  m_pieceTypeBitboard[static_cast<int>(PieceType::ROOK)] ^= fromToBitboard;
+  m_colourBitboard[static_cast<int>(C)] ^= fromToBitboard;
 
   // TODO (haigh) Can this fail?
   return MoveResult::SUCCESS;

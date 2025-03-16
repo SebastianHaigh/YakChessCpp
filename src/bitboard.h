@@ -225,6 +225,10 @@ constexpr auto createBitboard(Squares ...squares) -> Bitboard
 void print_board(Bitboard board);
 std::string to_string(Bitboard board);
 
+template<PieceColour C> static constexpr Bitboard KingCastleSource{ 0 };
+template<> constexpr Bitboard KingCastleSource<PieceColour::WHITE>{ bitboard::static_bitboard<E1>::value };
+template<> constexpr Bitboard KingCastleSource<PieceColour::BLACK>{ bitboard::static_bitboard<E8>::value };
+
 template<PieceType T, PieceColour C> static constexpr Bitboard KingCastleTarget{ 0 };
 template<> constexpr Bitboard KingCastleTarget<PieceType::KING, PieceColour::WHITE>{ bitboard::static_bitboard<G1>::value };
 template<> constexpr Bitboard KingCastleTarget<PieceType::KING, PieceColour::BLACK>{ bitboard::static_bitboard<G8>::value };
