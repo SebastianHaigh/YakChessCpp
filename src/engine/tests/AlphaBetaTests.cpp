@@ -20,6 +20,9 @@ TEST_CASE("Alpha beta test 1")
     std::cout << toAlgebraic(bestMove) << " => " << score << std::endl;
     board.makeMove(bestMove);
     std::cout << board.to_string() << std::endl << std::endl;
+
+    if (board.isCheckmate()) break;
+
     board.makeMove(board.generateMoves().front());
     std::cout << board.to_string() << std::endl << std::endl;
   }

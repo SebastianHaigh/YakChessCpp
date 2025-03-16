@@ -26,6 +26,13 @@ std::pair<int, Move> alphaBeta(Board& board, int alpha, int beta, int depth, boo
     for (const auto& move : board.generateMoves())
     {
       board.makeMove(move);
+
+      if (board.isCheckmate())
+      {
+        board.undoMove();
+        return { std::numeric_limits<int>::max(), move };
+      }
+
       auto [evaluation, _] = alphaBeta(board, alpha, beta, depth - 1, false);
       board.undoMove();
 
@@ -53,6 +60,13 @@ std::pair<int, Move> alphaBeta(Board& board, int alpha, int beta, int depth, boo
   for (const auto& move : board.generateMoves())
   {
     board.makeMove(move);
+
+    if (board.isCheckmate())
+    {
+      board.undoMove();
+      return { std::numeric_limits<int>::min(), move };
+    }
+
     auto [evaluation, _] = alphaBeta(board, alpha, beta, depth - 1, true);
     board.undoMove();
 
@@ -79,12 +93,6 @@ std::pair<int, Move> alphaBeta(Board& board, int alpha, int beta, int depth, boo
 
 int evaluate(Board& board)
 {
-  if (board.isCheckmate())
-  {
-    if (board.isCheck(PieceColour::WHITE)) return std::numeric_limits<int>::min();
-    if (board.isCheck(PieceColour::BLACK)) return std::numeric_limits<int>::max();
-  }
-
   int piecesWhite{ 0 };
   piecesWhite += bitboard::countSetBits(board.getPosition(PieceColour::WHITE, PieceType::PAWN));
   piecesWhite += 3 * bitboard::countSetBits(board.getPosition(PieceColour::WHITE, PieceType::BISHOP));
