@@ -1,17 +1,23 @@
 #include "AlphaBeta.h"
 
 #include <board.h>
-
 #include <limits>
 
 namespace yak::engine {
 
-int alphaBeta(Board& board, int alpha, int beta, int depth, bool maximise)
+std::pair<int, Move> alphaBeta(Board& board, int depth, PieceColour us)
+{
+  return alphaBeta(board, std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), depth, true);
+}
+
+std::pair<int, Move> alphaBeta(Board& board, int alpha, int beta, int depth, bool maximise)
 {
   if (depth == 0)
   {
-    return evaluate(board);
+    return { evaluate(board), {} };
   }
+
+  Move bestMove;
 
   if (maximise)
   {
@@ -20,12 +26,13 @@ int alphaBeta(Board& board, int alpha, int beta, int depth, bool maximise)
     for (const auto& move : board.generateMoves())
     {
       board.makeMove(move);
-      auto evaluation = alphaBeta(board, alpha, beta, depth - 1, false);
+      auto [evaluation, _] = alphaBeta(board, alpha, beta, depth - 1, false);
       board.undoMove();
 
       if (evaluation > maxEvaluation)
       {
         maxEvaluation = evaluation;
+        bestMove = move;
 
         if (evaluation > alpha)
         {
@@ -39,19 +46,20 @@ int alphaBeta(Board& board, int alpha, int beta, int depth, bool maximise)
       }
     }
 
-    return maxEvaluation;
+    return { maxEvaluation, bestMove };
   }
 
   int minEvaluation = std::numeric_limits<int>::max();
   for (const auto& move : board.generateMoves())
   {
     board.makeMove(move);
-    auto evaluation = alphaBeta(board, alpha, beta, depth - 1, true);
+    auto [evaluation, _] = alphaBeta(board, alpha, beta, depth - 1, true);
     board.undoMove();
 
     if (evaluation < minEvaluation)
     {
       minEvaluation = evaluation;
+      bestMove = move;
 
       if (evaluation < beta)
       {
@@ -65,7 +73,7 @@ int alphaBeta(Board& board, int alpha, int beta, int depth, bool maximise)
     }
   }
 
-  return minEvaluation;
+  return { minEvaluation, bestMove };
 
 }
 
@@ -94,7 +102,18 @@ int evaluate(Board& board)
   if (board.isCheck(PieceColour::WHITE)) piecesWhite += 1;
   if (board.isCheck(PieceColour::BLACK)) piecesWhite += 1;
 
-  return (piecesWhite - piecesBlack) * 100;
+  auto materialDifference = piecesWhite - piecesBlack;
+
+  int pinnedWhitePieces = bitboard::countSetBits(board.getPinned<PieceColour::WHITE>());
+  int pinnedBlackPieces = bitboard::countSetBits(board.getPinned<PieceColour::BLACK>());
+
+  int squaresAttackedByWhite = bitboard::countSetBits(board.attacked_by(PieceColour::WHITE));
+  int squaresAttackedByBlack = bitboard::countSetBits(board.attacked_by(PieceColour::BLACK));
+
+  auto whiteScore = piecesWhite + pinnedBlackPieces + squaresAttackedByWhite;
+  auto blackScore = piecesBlack + pinnedWhitePieces + squaresAttackedByBlack;
+
+  return (whiteScore - blackScore);
 }
 
 } // namespace yak::engine
