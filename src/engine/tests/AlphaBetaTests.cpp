@@ -14,17 +14,23 @@ TEST_CASE("Alpha beta test 1")
 
   std::cout << board.to_string() << std::endl << std::endl;
 
-  while (!board.isCheckmate())
+  int numMoves{ 0 };
+
+  while (!board.isCheckmate() && numMoves < 10)
   {
-    auto [score, bestMove] = alphaBeta(board, 6, PieceColour::WHITE);
-    std::cout << toAlgebraic(bestMove) << " => " << score << std::endl;
-    board.makeMove(bestMove);
+    auto [scoreForWhite, bestMoveForWhite] = alphaBeta(board, 6, PieceColour::WHITE);
+    std::cout << "WHITE: " << toAlgebraic(bestMoveForWhite) << " => " << scoreForWhite << std::endl;
+    board.makeMove(bestMoveForWhite);
     std::cout << board.to_string() << std::endl << std::endl;
 
     if (board.isCheckmate()) break;
 
-    board.makeMove(board.generateMoves().front());
+    auto [scoreForBlack, bestMoveForBlack] = alphaBeta(board, 6, PieceColour::BLACK);
+    std::cout << "BLACK: " << toAlgebraic(bestMoveForBlack) << " => " << scoreForBlack << std::endl;
+    board.makeMove(bestMoveForBlack);
     std::cout << board.to_string() << std::endl << std::endl;
+
+    ++numMoves;
   }
 }
 

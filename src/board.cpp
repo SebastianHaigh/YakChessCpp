@@ -127,6 +127,11 @@ Bitboard Board::emptySquares() const
   return ~occupiedSquares();
 }
 
+PieceColour Board::sideToMove() const
+{
+  return m_state->sideToMove();
+}
+
 std::vector<Move> Board::generateMoves()
 {
   m_psudeoLegalMovePointer = 0;

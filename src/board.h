@@ -37,6 +37,8 @@ public:
   template<PieceColour Colour>
   Bitboard getPinned() const;
 
+  PieceColour sideToMove() const;
+
   enum class MoveResult
   {
     SUCCESS = 0,

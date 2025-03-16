@@ -7,7 +7,11 @@ namespace yak::engine {
 
 std::pair<int, Move> alphaBeta(Board& board, int depth, PieceColour us)
 {
-  return alphaBeta(board, std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), depth, true);
+  return alphaBeta(board,
+                   std::numeric_limits<int>::min(),
+                   std::numeric_limits<int>::max(),
+                   depth,
+                   (board.sideToMove() == us));
 }
 
 std::pair<int, Move> alphaBeta(Board& board, int alpha, int beta, int depth, bool maximise)
