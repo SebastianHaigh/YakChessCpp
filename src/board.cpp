@@ -138,8 +138,8 @@ std::vector<Move> Board::generateMoves()
   if (thisSide == PieceColour::WHITE)
   {
     m_psudeoLegalMovePointer += generatePawnMoves<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
-                                                                     getPosition(thisSide, PieceType::PAWN),
-                                                                     emptySquares());
+                                                                      getPosition(thisSide, PieceType::PAWN),
+                                                                      emptySquares());
 
     m_psudeoLegalMovePointer += generateEpCaptures<PieceColour::WHITE>(&m_psuedoLegalMoveListBuffer[m_psudeoLegalMovePointer],
                                                                        getPosition(thisSide, PieceType::PAWN),

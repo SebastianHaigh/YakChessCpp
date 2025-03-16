@@ -314,6 +314,8 @@ TEST_CASE("Move generation")
   // P P P P P P P P    . . . . . . . .
   // . . . . . . . .    . . . . . . . .
   moves = board.generateMoves();
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
   CHECK(moves.size() == 16);
 
   //   Test Board       W Pawn Targets
@@ -327,6 +329,8 @@ TEST_CASE("Move generation")
   // . . . . . . . .    . . . . . . . .
   board.reset("8/8/8/8/8/2p5/1P6/8 w - - 0 1");
   moves = board.generateMoves();
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
   CHECK(moves.size() == 3);
 
   //   Test Board       B Pawn Targets
@@ -340,6 +344,8 @@ TEST_CASE("Move generation")
   // . . . . . . . .    . . . . . . . .
   board.reset("8/1p6/2P5/8/8/8/8/8 b - - 0 1");
   moves = board.generateMoves();
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
   CHECK(moves.size() == 3);
 
   board.reset("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");
@@ -362,6 +368,8 @@ TEST_CASE("Move generation")
   // R N B Q K B . R
   board.reset("rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1");
   moves = board.generateMoves();
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
   CHECK(moves.size() == 27);
 
   // r n b q k b n r
@@ -374,6 +382,8 @@ TEST_CASE("Move generation")
   // R N B Q K B . R
   board.reset("rnbqkbnr/ppp3pp/3p1p2/4p3/3PP3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 1");
   moves = board.generateMoves();
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
   CHECK(moves.size() == 36);
 
   // r n b q k b n r
@@ -386,6 +396,8 @@ TEST_CASE("Move generation")
   // R N B Q K . . R
   board.reset("rnbqkbnr/pp4pp/2pp1p2/1B2p3/3PP3/5N2/PPP2PPP/RNBQK2R w KQkq - 0 1");
   moves = board.generateMoves();
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::createBitboard(C6)); // Pawn on C6 is pinned by bishop
   CHECK(moves.size() == 41);
 
   // . . . . . . . .
@@ -398,6 +410,8 @@ TEST_CASE("Move generation")
   // . . . . K . . R
   board.reset("8/8/4r3/8/8/8/8/4K2R w K - 0 1");
   moves = board.generateMoves();
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
   // Cannot castle out of check
   CHECK(findFirstCastlingMove(moves.cbegin(), moves.cend()) == moves.cend());
 
@@ -411,6 +425,8 @@ TEST_CASE("Move generation")
   // R N B Q K . . R
   board.reset("rnbqkbnr/ppp2ppp/3p4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1");
   moves = board.generateMoves();
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
   // The only legal moves are the six that remove the check: c6, Nc6, Nd7, Bd7, Qc7, Ke7
   CHECK(moves.size() == 6);
 
@@ -423,6 +439,8 @@ TEST_CASE("Move generation")
   // P P P P . P P P
   // R N B Q K . . R
   board.reset("rnbqkbnr/ppp2ppp/3p4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
   CHECK_FALSE(board.isCheckmate());
 
   // r . . q . b k r
@@ -434,6 +452,8 @@ TEST_CASE("Move generation")
   // P P P P . P P P
   // R N B   K . . R
   board.reset("r2q1bkr/ppp3pp/2n1B3/4p3/8/5Q2/PPPP1PPP/RNB1K2R b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::EMPTY);
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
   CHECK(board.isCheckmate());
 
   board.reset("rnbqkbnr/ppp2ppp/3p4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 1");
@@ -541,4 +561,104 @@ TEST_CASE("Move making")
   CHECK(board.toFen() == "8/P7/8/8/8/8/8/8 w - - 0 1");
 }
 
+TEST_CASE("Pin test")
+{
+  Board board;
+
+  // r n b q k b n r
+  // p p p . . p p p
+  // . . . p . . . .
+  // . B . . p . . Q
+  // . . . . P . . b
+  // . . q . . N . .
+  // P P P P . P P P
+  // R N B Q K . . R
+  board.reset("rnbqkbnr/ppp2ppp/3p4/1B2p2Q/4P2b/2q2N2/PPPP1PPP/RNBQK2R b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::createBitboard(D2, F2));
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::createBitboard(F7));
+
+  // r n b q k b n r
+  // p p p p p p p p
+  // . . . . . . . .
+  // . B . . r . . Q
+  // . . . . R . . b
+  // . . q . . N . .
+  // P P P P P P P P
+  // R N B Q K B . R
+  board.reset("rnbqkbnr/pppppppp/8/1B2R2Q/4r2b/2q2N2/PPPPPPPP/RNBQKB1R b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::createBitboard(D2, E2, F2));
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::createBitboard(D7, E7, F7));
+
+  // r n b q k b n r
+  // p p p p p p . p
+  // . . . . . . p .
+  // . B . . r . . Q
+  // . . . . R . . b
+  // . . q . . N . .
+  // P P P P P P P P
+  // R N B Q K B . R
+  board.reset("rnbqkbnr/pppppp1p/6p1/1B2R2Q/4r2b/2q2N2/PPPPPPPP/RNBQKB1R b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::createBitboard(D2, E2, F2));
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::createBitboard(D7, E7));
+
+  // r n b q k . n r
+  // p p p p b p . p
+  // . . . . p . p .
+  // . B . . r . . Q
+  // . . . . R . . b
+  // . . q . . N . .
+  // P P P P P P P P
+  // R N B Q K B . R
+  board.reset("rnbqk1nr/ppppbp1p/4p1p1/1B2R2Q/4r2b/2q2N2/PPPPPPPP/RNBQKB1R b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::createBitboard(D2, E2, F2));
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::createBitboard(D7));
+
+  // r n b q k . n r
+  // p p p p p p b p
+  // . . . . . . p .
+  // . B . . r . . Q
+  // . . . . R . . b
+  // . . q . . N . .
+  // P P P P P P P P
+  // R N B Q K B . R
+  board.reset("rnbqk1nr/ppppppbp/6p1/1B2R2Q/4r2b/2q2N2/PPPPPPPP/RNBQKB1R b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::createBitboard(D2, E2, F2));
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::createBitboard(D7, E7));
+
+  // r n b q . k n r
+  // p p p p p p b p
+  // . . . . . . p .
+  // . B . . r . . Q
+  // . . . . R . . b
+  // . . P . . N . .
+  // P P P . P P P P
+  // R N B Q K B . R
+  board.reset("rnbq1knr/ppppppbp/6p1/1B2R2Q/4r2b/2P2N2/PPP1PPPP/RNBQKB1R b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::createBitboard(E2, F2));
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
+
+  // r n b q . k n r
+  // p p p p p p b p
+  // . . . . . . p .
+  // . B . . r . . Q
+  // . q . . R . . b
+  // . . P . . N . .
+  // P P P . P P P P
+  // R N B Q K B . R
+  board.reset("rnbq1knr/ppppppbp/6p1/1B2R2Q/1q2r2b/2P2N2/PPP1PPPP/RNBQKB1R b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::createBitboard(C3, E2, F2));
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
+
+  // . . . q . k . q
+  // q . . . . . . .
+  // . . . . . . . .
+  // . . N N N . . .
+  // q . N K N . . q
+  // . . N N N . . .
+  // . . . . . . . .
+  // q . . q . . q .
+  board.reset("3q1k1q/q7/8/2NNN3/q1NKN2q/2NNN3/8/q2q2q1 b KQkq - 0 1");
+  CHECK(board.getPinned<PieceColour::WHITE>() == bitboard::createBitboard(C3, C4, C5, D3, D5, E3, E4, E5));
+  CHECK(board.getPinned<PieceColour::BLACK>() == bitboard::EMPTY);
+}
 } // namespace yak
