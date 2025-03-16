@@ -26,11 +26,11 @@ public:
 
   bool reset(std::string_view fen);
 
-  PieceType getPieceTypeOn(Square square);
-  PieceColour getPieceColourOn(Square square);
+  PieceType getPieceTypeOn(Square square) const;
+  PieceColour getPieceColourOn(Square square) const;
 
-  Bitboard occupiedSquares();
-  Bitboard emptySquares();
+  Bitboard occupiedSquares() const;
+  Bitboard emptySquares() const;
 
   enum class MoveResult
   {
@@ -48,33 +48,33 @@ public:
    * \brief Check if the king of the current m_side to move is in check/
    * \return true if the king is in check, false otherwise.
    */
-  bool isCheck();
-  bool isCheck(PieceColour colour);
+  bool isCheck() const;
+  bool isCheck(PieceColour colour) const;
   bool isCheckmate();
 
-  std::string toFen();
+  std::string toFen() const;
 
-  Bitboard attacked_by(PieceColour colour)
+  Bitboard attacked_by(PieceColour colour) const
   {
     return allAttacks(colour);
   }
 
-  bool canKingSideCastle(PieceColour colour);
-  bool canQueenSideCastle(PieceColour colour);
+  bool canKingSideCastle(PieceColour colour) const;
+  bool canQueenSideCastle(PieceColour colour) const;
 
   /**
    * \brief Get the bitboard for a particular piece type (both colours).
    * \param[in] type - The type of piece.
    * \return A bitboard containing the piece positions.
    */
-  Bitboard get_position(PieceType type);
+  Bitboard get_position(PieceType type) const;
 
   /**
    * \brief Get the bitboard for a particular colour.
    * \param[in] colour - The colour of the m_side.
    * \return A bitboard containing the piece positions.
    */
-  Bitboard get_position(PieceColour colour);
+  Bitboard get_position(PieceColour colour) const;
 
   /**
    * \brief Get the bitboard for a particular colour and piece type.
@@ -82,7 +82,7 @@ public:
    * \param[in] pieceType - The type of piece.
    * \return A bitboard containing the piece positions.
    */
-  Bitboard getPosition(PieceColour pieceColour, PieceType pieceType);
+  Bitboard getPosition(PieceColour pieceColour, PieceType pieceType) const;
 
   template<PieceType T>
   int generatePieceMoves(Move* moveList,
@@ -115,37 +115,37 @@ private:
    * \param[in] colour - The coloyr of the pawns.
    * \return The bitboard of all the attacked squares.
    */
-  Bitboard pawnAttacks(PieceColour colour);
+  Bitboard pawnAttacks(PieceColour colour) const;
 
   /*!
    * \brief Returns all of the squares attacked by a single m_side.
    * \param[in] colour - The colour of the m_side.
    * \return A bitboard of all the attacked squares.
    */
-  Bitboard allAttacks(PieceColour colour);
+  Bitboard allAttacks(PieceColour colour) const;
 
   template<PieceColour C, bool PROMOTIONS>
-  int generatePawnSinglePushes(Move* move_list, Bitboard pawn_positions, Bitboard empty_squares);
+  int generatePawnSinglePushes(Move* move_list, Bitboard pawn_positions, Bitboard empty_squares) const;
 
   template<PieceColour C, bool PROMOTIONS>
-  int generatePawnDoublePushes(Move* moveList, Bitboard pawnPositions, Bitboard emptySquares);
+  int generatePawnDoublePushes(Move* moveList, Bitboard pawnPositions, Bitboard emptySquares) const;
 
   template<PieceColour C, bool PROMOTIONS>
-  int generatePawnWestCaptures(Move* moveList, Bitboard pawnPositions);
+  int generatePawnWestCaptures(Move* moveList, Bitboard pawnPositions) const;
 
   template<PieceColour C, bool PROMOTIONS>
-  int generatePawnEastCaptures(Move* moveList, Bitboard pawnPositions);
+  int generatePawnEastCaptures(Move* moveList, Bitboard pawnPositions) const;
 
   template<PieceColour Colour>
-  int generateEpCaptures(Move *moveList, Bitboard pawnPositions, Bitboard epTarget);
+  int generateEpCaptures(Move *moveList, Bitboard pawnPositions, Bitboard epTarget) const;
 
   template<PieceColour C>
-  int generatePawnMoves(Move* moveList, Bitboard pawnPositions, Bitboard emptySquares);
+  int generatePawnMoves(Move* moveList, Bitboard pawnPositions, Bitboard emptySquares) const;
 
-  void generateCastlingMoves(std::vector<Move>& moves);
+  void generateCastlingMoves(std::vector<Move>& moves) const;
   bool parseFen(std::string_view fen);
-  std::string rankToFen(Rank rank);
-  std::string rankToBoardFen(Rank rank);
+  std::string rankToFen(Rank rank) const;
+  std::string rankToBoardFen(Rank rank) const;
 
   Bitboard m_pieceTypeBitboard[6] { 0, 0, 0, 0, 0, 0 };
   Bitboard m_colourBitboard[2] { 0, 0 };
@@ -291,7 +291,7 @@ auto Board::generatePieceMoves(Move *moveList, PieceColour colour) -> int
 }
 
 template<PieceColour Colour, bool Promotions>
-int Board::generatePawnSinglePushes(Move *moveList, Bitboard pawnPositions, Bitboard emptySquares)
+int Board::generatePawnSinglePushes(Move *moveList, Bitboard pawnPositions, Bitboard emptySquares) const
 {
   pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
   Bitboard sources = pawns::pawnSinglePushSource<Colour>(emptySquares) & pawnPositions;
@@ -326,7 +326,7 @@ int Board::generatePawnSinglePushes(Move *moveList, Bitboard pawnPositions, Bitb
 }
 
 template<PieceColour Colour, bool Promotions>
-int Board::generatePawnDoublePushes(Move* moveList, Bitboard pawnPositions, Bitboard emptySquares)
+int Board::generatePawnDoublePushes(Move* moveList, Bitboard pawnPositions, Bitboard emptySquares) const
 {
   Bitboard targets = pawns::pawnSinglePushTarget<Colour>(pawnPositions) & emptySquares;
   targets = pawns::pawnSinglePushTarget<Colour>(targets) & emptySquares & pawns::pawnDoublePushTarget<Colour>();
@@ -347,7 +347,7 @@ int Board::generatePawnDoublePushes(Move* moveList, Bitboard pawnPositions, Bitb
 }
 
 template<PieceColour Colour, bool Promotions>
-int Board::generatePawnWestCaptures(Move *moveList, Bitboard pawnPositions)
+int Board::generatePawnWestCaptures(Move *moveList, Bitboard pawnPositions) const
 {
   Bitboard opponentPieces = get_position(OppositeColour<Colour>);
   pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
@@ -383,7 +383,7 @@ int Board::generatePawnWestCaptures(Move *moveList, Bitboard pawnPositions)
 }
 
 template<PieceColour Colour, bool Promotions>
-int Board::generatePawnEastCaptures(Move* moveList, Bitboard pawnPositions)
+int Board::generatePawnEastCaptures(Move* moveList, Bitboard pawnPositions) const
 {
   Bitboard opponentPieces = get_position(OppositeColour<Colour>);
   pawnPositions = Promotions ? pawns::promotablePawns<Colour>(pawnPositions) : pawns::nonPromotablePawns<Colour>(pawnPositions);
@@ -417,7 +417,7 @@ int Board::generatePawnEastCaptures(Move* moveList, Bitboard pawnPositions)
 }
 
 template<PieceColour Colour>
-int Board::generateEpCaptures(Move *moveList, Bitboard pawnPositions, Bitboard epTarget)
+int Board::generateEpCaptures(Move *moveList, Bitboard pawnPositions, Bitboard epTarget) const
 {
   Bitboard sources = pawns::pawnWestAttackSource<Colour>(epTarget) & pawnPositions;
   Bitboard targets = pawns::pawnWestAttackTarget<Colour>(sources);
@@ -444,7 +444,7 @@ int Board::generateEpCaptures(Move *moveList, Bitboard pawnPositions, Bitboard e
 template<PieceColour Colour>
 int Board::generatePawnMoves(Move* moveList,
                              Bitboard pawnPositions,
-                             Bitboard emptySquares)
+                             Bitboard emptySquares) const
 {
   int moveCounter{ 0 };
 

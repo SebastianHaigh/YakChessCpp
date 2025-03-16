@@ -153,7 +153,7 @@ GameState::~GameState()
 {
 }
 
-std::string GameState::toFen()
+std::string GameState::toFen() const
 {
   std::string fen = "";
 
