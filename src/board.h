@@ -6,12 +6,14 @@
 #include <vector>
 
 #include "GameState.h"
-#include <magic/MagicBitboards.hpp>
 #include "move.hpp"
 #include "pieces.h"
 #include "bitboard.h"
 #include "pawns.h"
 #include "types.h"
+#include "xray.hpp"
+
+#include <magic/MagicBitboards.hpp>
 
 namespace yak {
 
@@ -31,6 +33,11 @@ public:
 
   Bitboard occupiedSquares() const;
   Bitboard emptySquares() const;
+
+  template<PieceColour Colour>
+  Bitboard getPinned() const;
+
+  PieceColour sideToMove() const;
 
   enum class MoveResult
   {
@@ -465,6 +472,32 @@ int Board::generatePawnMoves(Move* moveList,
 
   return moveCounter;
 };
+
+template<PieceColour ToMove>
+Bitboard Board::getPinned() const
+{
+  const auto otherSide = ToMove == PieceColour::WHITE ? PieceColour::BLACK : PieceColour::WHITE;
+
+  const auto rook_bb = getPosition(otherSide, PieceType::ROOK);
+  const auto bishop_bb = getPosition(otherSide, PieceType::BISHOP);
+  const auto queen_bb = getPosition(otherSide, PieceType::QUEEN);
+
+  const auto king_bb = getPosition(ToMove, PieceType::KING);
+
+  // Shouldn't happen, but some tests run the board without a king
+  if (king_bb == 0) return 0;
+
+  const auto ownPieces_bb = get_position(ToMove);
+  const auto occupied_bb = occupiedSquares();
+  const auto kingSquare = bitboard::LS1B(king_bb);
+
+  auto pinned_bb = pinned<PieceType::ROOK>(rook_bb, kingSquare, occupied_bb, ownPieces_bb);
+  pinned_bb |= pinned<PieceType::BISHOP>(bishop_bb, kingSquare, occupied_bb, ownPieces_bb);
+  pinned_bb |= pinned<PieceType::ROOK>(queen_bb, kingSquare, occupied_bb, ownPieces_bb);
+  pinned_bb |= pinned<PieceType::BISHOP>(queen_bb, kingSquare, occupied_bb, ownPieces_bb);
+
+  return pinned_bb;
+}
 
 } // namespace yak
 
