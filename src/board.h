@@ -40,6 +40,8 @@ public:
     INVALID_TO_OR_FROM,
   };
 
+  std::string to_string() const;
+
   std::vector<Move> generateMoves();
   MoveResult makeMove(Move const& move);
   MoveResult undoMove();

@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <ctype.h>
+#include <sstream>
 
 #include <bitboard.h>
 #include <pieces.h>
@@ -288,6 +289,55 @@ std::string Board::toFen() const
   fen += " ";
   fen += m_state->toFen();
   return fen;
+}
+
+std::string Board::to_string() const
+{
+  std::stringstream ss;
+
+  const Square squares[8][8] = {
+    {A8, B8, C8, D8, E8, F8, G8, H8 },
+    {A7, B7, C7, D7, E7, F7, G7, H7 },
+    {A6, B6, C6, D6, E6, F6, G6, H6 },
+    {A5, B5, C5, D5, E5, F5, G5, H5 },
+    {A4, B4, C4, D4, E4, F4, G4, H4 },
+    {A3, B3, C3, D3, E3, F3, G3, H3 },
+    {A2, B2, C2, D2, E2, F2, G2, H2 },
+    {A1, B1, C1, D1, E1, F1, G1, H1 }
+  };
+
+  for (const auto* file : squares)
+  {
+    for (int i = 0; i < 8; ++i)
+    {
+      auto type = getPieceTypeOn(file[i]);
+      auto colour = getPieceColourOn(file[i]);
+
+      ss << " ";
+
+      switch (type)
+      {
+        case PieceType::PAWN:
+          {
+            if (colour == PieceColour::WHITE)
+            { ss << "P"; }
+            else
+            { ss << "p"; }
+            break;
+          }
+        case PieceType::KNIGHT: if (colour == PieceColour::WHITE) { ss << "N"; } else { ss << "n"; } break;
+        case PieceType::BISHOP: if (colour == PieceColour::WHITE) { ss << "B"; } else { ss << "b"; } break;
+        case PieceType::ROOK: if (colour == PieceColour::WHITE) { ss << "R"; } else { ss << "r"; } break;
+        case PieceType::QUEEN: if (colour == PieceColour::WHITE) { ss << "Q"; } else { ss << "q"; } break;
+        case PieceType::KING: if (colour == PieceColour::WHITE) { ss << "K"; } else { ss << "k"; } break;
+        case PieceType::NULL_PIECE: ss << "."; break;
+      }
+    }
+    ss << '\n';
+  }
+  ss << '\n';
+
+  return ss.str();
 }
 
 bool Board::canKingSideCastle(PieceColour colour) const
