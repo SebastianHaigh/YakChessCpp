@@ -61,6 +61,12 @@ bool Board::parseFen(std::string_view fen)
       const PieceType pieceType = piece::fenCharToPieceType(fen[i]);
       const PieceColour pieceColour = piece::fenCharToPieceColour(fen[i]);
 
+      // Reject invalid piece symbols instead of indexing out of bounds.
+      if (pieceType == PieceType::NULL_PIECE || pieceColour == PieceColour::NULL_COLOUR)
+      {
+        return false;
+      }
+
       bitboard::setSquare(m_pieceTypeBitboard[static_cast<int>(pieceType)], currentSquare);
       bitboard::setSquare(m_colourBitboard[static_cast<int>(pieceColour)], currentSquare);
       currentSquare = static_cast<Square>(currentSquare + 1);
