@@ -138,7 +138,7 @@ public:
 
   inline Bitboard epTarget() const
   {
-    return bitboard::createBitboard(m_epSquare);
+    return (m_epSquare == NULL_SQUARE ? Bitboard{ 0 } : bitboard::createBitboard(m_epSquare));
   }
 
 private:
