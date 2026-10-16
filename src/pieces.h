@@ -103,7 +103,7 @@ struct jump_map : jump_map<T,
 template<PieceType T, Bitboard... B>
 struct jump_map<T, H8, B...>
 {
-  static constexpr std::array<Bitboard, 64> value = {B...};
+  static constexpr std::array<Bitboard, 64> value = { B..., jumpingPieceMap<T, H8>() };
 };
 
 constexpr std::array<Bitboard, 64> knightMap = jump_map<PieceType::KNIGHT>::value;

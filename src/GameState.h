@@ -138,7 +138,7 @@ public:
 
   inline Bitboard epTarget() const
   {
-    return bitboard::createBitboard(m_epSquare);
+    return (m_epSquare == NULL_SQUARE ? Bitboard{ 0 } : bitboard::createBitboard(m_epSquare));
   }
 
 private:
@@ -155,7 +155,7 @@ private:
   GameState* m_prevState = nullptr;  // 8 bytes
 
   // The move that was applied in order to get to the next state
-  Move m_move;
+  Move m_move{};
   PieceColour m_colours[2] = {PieceColour::BLACK, PieceColour::WHITE};
 };
 

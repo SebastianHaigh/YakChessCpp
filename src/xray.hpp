@@ -1,3 +1,5 @@
+#pragma once
+
 #include <AttackMaps.hpp>
 #include <MagicCommon.h>
 #include <types.h>
@@ -64,7 +66,7 @@ struct InBetweenImpl : InBetweenImpl<static_cast<Square>(S + 1), arrays..., OneS
 template<std::array<Bitboard, 64>... arrays>
 struct InBetweenImpl<H8, arrays...>
 {
-  static constexpr std::array<std::array<Bitboard, 64>, 64> value{ arrays... };
+  static constexpr std::array<std::array<Bitboard, 64>, 64> value{ arrays..., OneSquareInBetween<H8, A1>::value };
 };
 
 struct InBetween

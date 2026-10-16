@@ -7,7 +7,7 @@ namespace yak {
 
 TEST_CASE("Test setting moved and captured pieces in move")
 {
-  Move move;
+  Move move{};
 
   setMoved(move, PieceType::KING);
 

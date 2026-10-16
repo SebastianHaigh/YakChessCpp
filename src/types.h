@@ -84,8 +84,8 @@ std::string toAlgebraic(Square square);
 std::string toAlgebraic(File file_index, Rank rank_index);
 
 template<PieceColour C> static constexpr PieceColour OppositeColour{ PieceColour::NULL_COLOUR };
-template<> constexpr PieceColour OppositeColour<PieceColour::WHITE>{ PieceColour::BLACK };
-template<> constexpr PieceColour OppositeColour<PieceColour::BLACK>{ PieceColour::WHITE };
+template<> inline constexpr PieceColour OppositeColour<PieceColour::WHITE>{ PieceColour::BLACK };
+template<> inline constexpr PieceColour OppositeColour<PieceColour::BLACK>{ PieceColour::WHITE };
 
 
 } // namespace yak

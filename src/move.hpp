@@ -260,7 +260,7 @@ inline auto toAlgebraic(Move move) -> std::string
  */
 inline auto makeQuiet(Square from, Square to, PieceType moved) -> Move
 {
-  Move move;
+  Move move{};
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, moved);
@@ -278,7 +278,7 @@ inline auto makeQuiet(Square from, Square to, PieceType moved) -> Move
  */
 inline auto makeDoublePush(Square from, Square to) -> Move
 {
-  Move move;
+  Move move{};
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
@@ -296,7 +296,7 @@ inline auto makeDoublePush(Square from, Square to) -> Move
  */
 inline auto makeCapture(Square from, Square to, PieceType moved, PieceType captured) -> Move
 {
-  Move move;
+  Move move{};
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, moved);
@@ -313,7 +313,7 @@ inline auto makeCapture(Square from, Square to, PieceType moved, PieceType captu
  */
 inline auto makeEpCapture(Square from, Square to) -> Move
 {
-  Move move;
+  Move move{};
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
@@ -331,7 +331,7 @@ inline auto makeEpCapture(Square from, Square to) -> Move
  */
 inline auto makeQuietPromotion(Square from, Square to, PieceType type) -> Move
 {
-  Move move;
+  Move move{};
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
@@ -350,7 +350,7 @@ inline auto makeQuietPromotion(Square from, Square to, PieceType type) -> Move
  */
 inline auto makeCapturePromotion(Square from, Square to, PieceType type, PieceType captured) -> Move
 {
-  Move move;
+  Move move{};
   setFrom(move, from);
   setTo(move, to);
   setMoved(move, PieceType::PAWN);
@@ -362,14 +362,14 @@ inline auto makeCapturePromotion(Square from, Square to, PieceType type, PieceTy
 
 inline auto makeKingsideCastle() -> Move
 {
-  Move move;
+  Move move{};
   setKingSideCastle(move);
   return move;
 };
 
 inline auto makeQueensideCastle() -> Move
 {
-  Move move;
+  Move move{};
   setQueenSideCastle(move);
   return move;
 };
