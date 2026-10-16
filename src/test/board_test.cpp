@@ -61,6 +61,16 @@ TEST_CASE("MoveTest 1")
   CHECK(board.toFen() == "8/8/8/8/8/pP6/8/8 w KQkq - 0 2");
 }
 
+TEST_CASE("Board rejects invalid FEN piece symbols")
+{
+  Board board{};
+
+  CHECK_FALSE(board.reset("x7/8/8/8/8/8/8/8 w - - 0 1"));
+  CHECK_FALSE(board.reset("8/8/8/8/8/8/8/7X w - - 0 1"));
+
+  CHECK(board.reset(STANDARD_STARTING_FEN));
+}
+
 TEST_CASE("BoardTest: Board can return correct piece positions")
 {
   Board board{ STANDARD_STARTING_FEN };
