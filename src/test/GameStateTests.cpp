@@ -9,7 +9,7 @@ namespace yak {
 TEST_CASE("Side to move is toggled by state update")
 {
   GameStateManager gs{};
-  Move move;
+  Move move{};
 
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -42,7 +42,7 @@ TEST_CASE("Castling rights")
   CHECK(gs->canQueenSideCastle(PieceColour::BLACK));
   CHECK_FALSE(gs->canQueenSideCastle(PieceColour::NULL_COLOUR));
 
-  Move move;
+  Move move{};
 
   // give the to and from squares non-zero default values, so they don't clash with whites queenside rook
   setFrom(move, A2);
@@ -122,7 +122,7 @@ TEST_CASE("Castling rights")
 TEST_CASE("Game stack tests")
 {
   GameStateManager gs{};
-  Move move;
+  Move move{};
 
   CHECK(gs->sideToMove() == PieceColour::WHITE);
   CHECK(gs->sideNotToMove() == PieceColour::BLACK);
@@ -258,7 +258,7 @@ TEST_CASE("Check that the EP square works")
 TEST_CASE("Check that the move clock works")
 {
   GameStateManager state{};
-  Move move;
+  Move move{};
 
   CHECK(state->sideToMove() == PieceColour::WHITE);
   CHECK(state->sideNotToMove() == PieceColour::BLACK);
